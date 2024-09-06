@@ -77,48 +77,6 @@ fun TaskContainer.registerRunTask(
     block(this)
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            artifact(tasks.shadowJar)
-            versionMapping {
-                usage("java-api") {
-                    fromResolutionOf("runtimeClasspath")
-                }
-            }
-
-            pom {
-                url.set("https://github.com/MineralStudios/MineralSpigot")
-                description.set(project.description)
-                name.set(project.name)
-                version = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HH.mm.ss"))
-
-                developers {
-                    developer {
-                        id.set("jaiden")
-                        name.set("Jaiden")
-                        email.set("jaiden@mineral.gg")
-                    }
-                }
-
-                
-            }
-        }
-    }
-
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/MineralStudios/MineralSpigot")
-
-            credentials {
-                username = (project.findProperty("gpr.user") as String?) ?: System.getenv("USERNAME")
-                password = (project.findProperty("gpr.token") as String?) ?: System.getenv("TOKEN")
-            }
-        }
-    }
-}
-
 tasks {
     java {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -211,4 +169,46 @@ tasks {
         dependsOn(named("remap"))
     }
     
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            artifact(tasks.named("remap").flatMap { (it as RemapTask).outJarFile })
+            versionMapping {
+                usage("java-api") {
+                    fromResolutionOf("runtimeClasspath")
+                }
+            }
+
+            pom {
+                url.set("https://github.com/MineralStudios/MineralSpigot")
+                description.set(project.description)
+                name.set(project.name)
+                version = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HH.mm.ss"))
+
+                developers {
+                    developer {
+                        id.set("jaiden")
+                        name.set("Jaiden")
+                        email.set("jaiden@mineral.gg")
+                    }
+                }
+
+                
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/MineralStudios/MineralSpigot")
+
+            credentials {
+                username = (project.findProperty("gpr.user") as String?) ?: System.getenv("USERNAME")
+                password = (project.findProperty("gpr.token") as String?) ?: System.getenv("TOKEN")
+            }
+        }
+    }
 }

@@ -26,6 +26,7 @@ replay_pid*
 .gradle
 build-logic/build
 build-logic/.gradle
+.vscode
 
 # Exclude gradle-wrapper.jar from being ignored
 !gradle/wrapper/gradle-wrapper.jar

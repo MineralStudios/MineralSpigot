@@ -1,3 +1,6 @@
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 plugins {
     id("mineralspigot.conventions")
     `maven-publish`
@@ -67,7 +70,7 @@ publishing {
                 url.set("https://github.com/MineralStudios/MineralSpigot")
                 description.set(project.description)
                 name.set(project.name)
-                version = new Date().format("yyyyMMdd-HH:mm:ss")
+                version = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss"))
 
                 developers {
                     developer {

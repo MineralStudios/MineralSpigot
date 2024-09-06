@@ -1,3 +1,6 @@
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 plugins {
     java
     `java-library`
@@ -11,7 +14,7 @@ repositories {
 }
 
 group = "gg.mineral.mineralspigot"
-version = new Date().format("yyyyMMdd")
+version = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
 
 tasks {
     withType<JavaCompile>().configureEach {

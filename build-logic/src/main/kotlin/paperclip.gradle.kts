@@ -8,7 +8,7 @@ import java.util.Properties
 tasks {
     register<Jar>("paperclipJar") {
         outputs.upToDateWhen { false }
-        dependsOn("shadowJar", ":pandaspigot-server:remap")
+        dependsOn("shadowJar", ":mineralspigot-server:remap")
 
         from(zipTree((tasks["shadowJar"] as Jar).archiveFile.get()))
 
@@ -25,7 +25,7 @@ tasks {
         }
 
         doFirst {
-            val inTask = project(":pandaspigot-server").tasks["remap"] as RemapTask
+            val inTask = project(":mineralspigot-server").tasks["remap"] as RemapTask
             val diffFile = temporaryDir.resolve("pandaspigot.patch")
             val propertiesFile = temporaryDir.resolve("patch.properties")
 

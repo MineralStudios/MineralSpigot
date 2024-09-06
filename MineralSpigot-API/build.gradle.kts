@@ -1,5 +1,5 @@
 plugins {
-    id("pandaspigot.conventions")
+    id("mineralspigot.conventions")
     `maven-publish`
 }
 
@@ -42,7 +42,7 @@ tasks {
 
     jar {
         from(generateApiVersioningFile.map { it.outputs.files.singleFile }) {
-            into("META-INF/maven/${project.group}/${project.name.toLowerCase()}")
+            into("META-INF/maven/${project.group}/${project.name.lowercase()}")
         }
 
         manifest {
@@ -64,7 +64,7 @@ publishing {
             }
 
             pom {
-                url.set("https://github.com/Mineral-Industries/MineralSpigot-new")
+                url.set("https://github.com/MineralStudios/MineralSpigot")
                 description.set(project.description)
                 name.set(project.name)
                 // if this is a CI build, set version as the run id
@@ -83,18 +83,14 @@ publishing {
         }
     }
 
-    (System.getenv("REPO_USERNAME") ?: findProperty("repository.hpfxd.username")).let { repoUsername ->
-        if (repoUsername == null) return@let // don't declare repository if username not declared
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/MineralStudios/MineralSpigot")
 
-        repositories {
-            maven {
-                name = "hpfxd-repo"
-                url = uri("https://repo.hpfxd.com/releases/")
-
-                credentials {
-                    username = repoUsername as String
-                    password = System.getenv("REPO_PASSWORD") ?: findProperty("repository.hpfxd.password") as String
-                }
+            credentials {
+                username = (project.findProperty("gpr.user") as String?) ?: System.getenv("USERNAME")
+                password = (project.findProperty("gpr.token") as String?) ?: System.getenv("TOKEN")
             }
         }
     }

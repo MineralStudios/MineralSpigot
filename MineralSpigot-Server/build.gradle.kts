@@ -1,6 +1,7 @@
 plugins {
-    id("pandaspigot.conventions")
+    id("mineralspigot.conventions")
     id("com.github.johnrengelman.shadow") version "7.1.2"
+    `maven-publish`
 }
 
 val minecraftVersion = "1_8_R3"
@@ -58,7 +59,7 @@ dependencies {
 fun TaskContainer.registerRunTask(
     name: String, block: JavaExec.() -> Unit
 ): TaskProvider<JavaExec> = register<JavaExec>(name) {
-    group = "pandaspigot"
+    group = "mineralspigot"
     standardInput = System.`in`
     workingDir = rootProject.layout.projectDirectory.dir(
         providers.gradleProperty("runWorkDir").forUseAtConfigurationTime().orElse("run")
@@ -71,6 +72,49 @@ fun TaskContainer.registerRunTask(
         workingDir.mkdirs()
     }
     block(this)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            versionMapping {
+                usage("java-api") {
+                    fromResolutionOf("runtimeClasspath")
+                }
+            }
+
+            pom {
+                url.set("https://github.com/MineralStudios/MineralSpigot")
+                description.set(project.description)
+                name.set(project.name)
+                // if this is a CI build, set version as the run id
+                System.getenv("GITHUB_RUN_NUMBER").let { if (it != null) version = it }
+
+                developers {
+                    developer {
+                        id.set("jaiden")
+                        name.set("Jaiden")
+                        email.set("jaiden@mineral.gg")
+                    }
+                }
+
+                
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/MineralStudios/MineralSpigot")
+
+            credentials {
+                username = (project.findProperty("gpr.user") as String?) ?: System.getenv("USERNAME")
+                password = (project.findProperty("gpr.token") as String?) ?: System.getenv("TOKEN")
+            }
+        }
+    }
 }
 
 tasks {
@@ -165,4 +209,5 @@ tasks {
     assemble {
         dependsOn(named("remap"))
     }
+    
 }

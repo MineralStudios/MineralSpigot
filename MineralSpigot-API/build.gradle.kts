@@ -70,7 +70,7 @@ publishing {
                 url.set("https://github.com/MineralStudios/MineralSpigot")
                 description.set(project.description)
                 name.set(project.name)
-                version = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss"))
+                version = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HH.mm.ss"))
 
                 developers {
                     developer {

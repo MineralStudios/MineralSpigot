@@ -80,7 +80,7 @@ fun TaskContainer.registerRunTask(
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
-            from(components["java"])
+            artifact(tasks.shadowJar)
             versionMapping {
                 usage("java-api") {
                     fromResolutionOf("runtimeClasspath")
@@ -161,7 +161,6 @@ tasks {
     }
 
     jar {
-        archiveClassifier.set("original")
         manifest {
             val git = Git(rootProject.layout.projectDirectory)
             val gitHash = git("rev-parse", "--short=7", "HEAD").getText().trim()

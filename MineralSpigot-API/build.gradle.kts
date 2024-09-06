@@ -59,7 +59,7 @@ tasks {
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
-            from(components["java"])
+            artifact(tasks.jar)
             versionMapping {
                 usage("java-api") {
                     fromResolutionOf("runtimeClasspath")

@@ -67,8 +67,7 @@ publishing {
                 url.set("https://github.com/MineralStudios/MineralSpigot")
                 description.set(project.description)
                 name.set(project.name)
-                // if this is a CI build, set version as the run id
-                System.getenv("GITHUB_RUN_NUMBER").let { if (it != null) version = it }
+                version = new Date().format("yyyyMMdd-HH:mm:ss")
 
                 developers {
                     developer {

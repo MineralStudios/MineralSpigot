@@ -26,7 +26,7 @@ tasks {
 
         doFirst {
             val inTask = project(":mineralspigot-server").tasks["remap"] as RemapTask
-            val diffFile = temporaryDir.resolve("pandaspigot.patch")
+            val diffFile = temporaryDir.resolve("mineralspigot.patch")
             val propertiesFile = temporaryDir.resolve("patch.properties")
 
             val vanillaJar = project.rootProject.layout.projectDirectory.file("base/mc-dev/1.8.8.jar").asFile
@@ -50,8 +50,8 @@ tasks {
             val properties = Properties()
             properties.setProperty("originalHash", vanillaHash.toHex())
             properties.setProperty("patchedHash", patchedHash.toHex())
-            properties.setProperty("patch", "pandaspigot.patch")
-            properties.setProperty("sourceUrl", "https://launcher.mojang.com/v1/objects/${vanillaSha1.toHex().toLowerCase()}/server.jar")
+            properties.setProperty("patch", "mineralspigot.patch")
+            properties.setProperty("sourceUrl", "https://launcher.mojang.com/v1/objects/${vanillaSha1.toHex().lowercase()}/server.jar")
             properties.setProperty("version", "1.8.8")
 
             logger.info("Writing properties file")

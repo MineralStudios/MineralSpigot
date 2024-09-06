@@ -11,7 +11,7 @@ repositories {
 }
 
 group = "gg.mineral.mineralspigot"
-version = "1.8.8-R0.1-SNAPSHOT"
+version = new Date().format("yyyyMMdd")
 
 tasks {
     withType<JavaCompile>().configureEach {

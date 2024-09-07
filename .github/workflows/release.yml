@@ -34,9 +34,9 @@ jobs:
         CURRENT_DATE=$(date +'%Y-%m-%d')
         if [ "$LAST_COMMIT" != "$CURRENT_DATE" ]; then
           echo "No changes today"
-          echo "::set-output name=changes::false"
-        else:
-          echo "::set-output name=changes::true"
+          echo "changes=false" >> $GITHUB_OUTPUT
+        else
+          echo "changes=true" >> $GITHUB_OUTPUT
         fi
 
     # Step 5: Create a new release if there were changes
@@ -51,7 +51,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    # Step 6: Upload bot-standalone JAR to release
+    # Step 6: Upload mineralspigot-api JAR to release
     - name: Upload mineralspigot-api JAR to release
       if: steps.check_changes.outputs.changes == 'true'
       uses: actions/upload-release-asset@v1
@@ -61,7 +61,7 @@ jobs:
         asset_name: mineralspigot-api-${{ steps.release_tag.outputs.tag }}.jar
         asset_content_type: application/java-archive
 
-    # Step 7: Upload bot-bukkit JAR to release
+    # Step 7: Upload mineralspigot-server JAR to release
     - name: Upload mineralspigot-server JAR to release
       if: steps.check_changes.outputs.changes == 'true'
       uses: actions/upload-release-asset@v1
@@ -77,4 +77,4 @@ jobs:
       id: release_tag
       run: |
         TAG_NAME=$(date +'%Y.%m.%d')
-        echo "::set-output name=tag::$TAG_NAME"
+        echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT

@@ -2,7 +2,7 @@ name: Daily Build and Release
 
 on:
   schedule:
-    # Run at 11:59 PM UTC every day (adjust based on your time zone preference)
+    # Run at 11:59 PM UTC every day
     - cron: '59 23 * * *'
 
 jobs:
@@ -25,21 +25,41 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
-    # Step 4: Check for changes in the codebase since the last commit
-    - name: Check for changes since last commit
+    # Step 4: Check for changes since the last release
+    - name: Check for changes since the last release
       id: check_changes
       run: |
-        git fetch origin
-        LAST_COMMIT=$(git log -1 --format=%cd --date=short)
-        CURRENT_DATE=$(date +'%Y-%m-%d')
-        if [ "$LAST_COMMIT" != "$CURRENT_DATE" ]; then
-          echo "No changes today"
-          echo "changes=false" >> $GITHUB_OUTPUT
-        else
+        git fetch --tags origin
+
+        # Get the most recent release tag
+        LAST_RELEASE_TAG=$(git describe --tags --abbrev=0 --match "v*" 2>/dev/null || echo "")
+
+        if [ -z "$LAST_RELEASE_TAG" ]; then
+          echo "No previous releases found, treating this as a new release."
           echo "changes=true" >> $GITHUB_OUTPUT
+        else
+          # Get the latest commit date after the last release
+          LAST_COMMIT_DATE=$(git log -1 --format=%cd --date=short $LAST_RELEASE_TAG..HEAD)
+          CURRENT_DATE=$(date +'%Y-%m-%d')
+
+          if [ "$LAST_COMMIT_DATE" != "$CURRENT_DATE" ]; then
+            echo "No changes since the last release."
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected since the last release."
+            echo "changes=true" >> $GITHUB_OUTPUT
+          fi
         fi
 
-    # Step 5: Create a new release if there were changes
+    # Step 5: Set the release tag to the current date
+    - name: Set the release tag to the current date
+      if: steps.check_changes.outputs.changes == 'true'
+      id: release_tag
+      run: |
+        TAG_NAME=$(date +'%Y.%m.%d')
+        echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
+
+    # Step 6: Create a new release if there were changes
     - name: Create a release
       if: steps.check_changes.outputs.changes == 'true'
       id: create_release
@@ -51,7 +71,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    # Step 6: Upload mineralspigot-api JAR to release
+    # Step 7: Upload mineralspigot-api JAR to release
     - name: Upload mineralspigot-api JAR to release
       if: steps.check_changes.outputs.changes == 'true'
       uses: actions/upload-release-asset@v1
@@ -61,7 +81,7 @@ jobs:
         asset_name: mineralspigot-api-${{ steps.release_tag.outputs.tag }}.jar
         asset_content_type: application/java-archive
 
-    # Step 7: Upload mineralspigot-server JAR to release
+    # Step 8: Upload mineralspigot-server JAR to release
     - name: Upload mineralspigot-server JAR to release
       if: steps.check_changes.outputs.changes == 'true'
       uses: actions/upload-release-asset@v1
@@ -70,11 +90,3 @@ jobs:
         asset_path: MineralSpigot-Server/build/libs/mineralspigot-server-*.jar
         asset_name: mineralspigot-server-${{ steps.release_tag.outputs.tag }}.jar
         asset_content_type: application/java-archive
-
-    # Step 8: Set the release tag to the current date
-    - name: Set the release tag to the current date
-      if: steps.check_changes.outputs.changes == 'true'
-      id: release_tag
-      run: |
-        TAG_NAME=$(date +'%Y.%m.%d')
-        echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT

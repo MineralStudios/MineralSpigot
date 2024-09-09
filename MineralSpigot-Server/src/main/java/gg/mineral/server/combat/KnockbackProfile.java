@@ -44,13 +44,12 @@ public class KnockbackProfile extends Knockback {
 
     public KnockbackProfile(String scriptFilePath, String name) {
         super(name);
-        loadConfig(scriptFilePath);
         this.scriptFilePath = scriptFilePath;
         this.name = name;
     }
 
     @SuppressWarnings("unchecked")
-    private void loadConfig(String scriptFilePath) {
+    public void loadConfig() {
         Binding binding = new Binding();
         GroovyShell shell = new GroovyShell(binding);
 
@@ -94,7 +93,7 @@ public class KnockbackProfile extends Knockback {
     }
 
     public void reloadConfig() {
-        loadConfig(scriptFilePath);
+        loadConfig();
     }
 
     private void saveConfig() {

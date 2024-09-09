@@ -21,8 +21,12 @@ public class KnockbackProfileList {
             knockbackFolder.mkdir();
         // Load all Groovy files in the "knockback" folder
         getAllGroovyFiles("knockback")
-                .forEach(file -> profiles.put(file.getPath(),
-                        new KnockbackProfile(file.getPath(), getFileNameWithoutExtension(file))));
+                .forEach(file -> {
+                    KnockbackProfile profile = new KnockbackProfile(file.getPath(), getFileNameWithoutExtension(file));
+                    profile.loadConfig();
+                    profiles.put(file.getPath(),
+                            profile);
+                });
 
         if (profiles.isEmpty() || profiles.values().stream()
                 .noneMatch(profile -> profile.getName().equals("default_kb"))) {
@@ -33,8 +37,9 @@ public class KnockbackProfileList {
                     .getResourceAsStream("/knockback/default_kb.groovy");
             try {
                 Files.copy(inputStream, Paths.get("knockback/default_kb.groovy"));
-                profiles.put("knockback/default_kb.groovy", new KnockbackProfile("knockback/default_kb.groovy",
-                        "default_kb"));
+                KnockbackProfile profile = new KnockbackProfile("knockback/default_kb.groovy", "default_kb");
+                profile.loadConfig();
+                profiles.put("knockback/default_kb.groovy", profile);
             } catch (IOException e) {
                 e.printStackTrace();
             }

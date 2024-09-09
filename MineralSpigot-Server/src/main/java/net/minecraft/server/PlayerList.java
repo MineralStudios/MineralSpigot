@@ -350,11 +350,9 @@ public abstract class PlayerList {
 
         joinMessage = playerJoinEvent.getJoinMessage();
 
-        if (joinMessage != null && joinMessage.length() > 0) {
-            for (IChatBaseComponent line : org.bukkit.craftbukkit.util.CraftChatMessage.fromString(joinMessage)) {
+        if (joinMessage != null && joinMessage.length() > 0)
+            for (IChatBaseComponent line : org.bukkit.craftbukkit.util.CraftChatMessage.fromString(joinMessage))
                 server.getPlayerList().sendAll(new PacketPlayOutChat(line));
-            }
-        }
 
         ChunkIOExecutor.adjustPoolSize(getPlayerCount());
         // CraftBukkit end
@@ -373,14 +371,15 @@ public abstract class PlayerList {
         for (int i = 0; i < this.players.size(); ++i) {
             EntityPlayer entityplayer1 = (EntityPlayer) this.players.get(i);
 
-            if (entityplayer1.getBukkitEntity().canSee(entityplayer.getBukkitEntity())) {
+            if (entityplayer1.getBukkitEntity().canSeeOnTab(entityplayer.getBukkitEntity())) {
                 entityplayer1.playerConnection.sendPacket(packet);
             }
 
             if (entityplayer1 == entityplayer
-                    || !entityplayer.getBukkitEntity().canSee(entityplayer1.getBukkitEntity())) { // PandaSpigot - don't
-                                                                                                  // include joining
-                                                                                                  // player
+                    || !entityplayer.getBukkitEntity().canSeeOnTab(entityplayer1.getBukkitEntity())) { // PandaSpigot -
+                                                                                                       // don't
+                // include joining
+                // player
                 continue;
             }
 

@@ -1044,12 +1044,13 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         // remove this player from the hidden player's EntityTrackerEntry
         EntityTracker tracker = ((WorldServer) entity.world).tracker;
         // PandaSpigot end
-        EntityTrackerEntry entry = (EntityTrackerEntry) tracker.trackedEntities.get(other.getId());
-        if (entry != null)
-            entry.clear(getHandle());
+        if (hiddenPlayers.contains(other.getUniqueID())) {
+            EntityTrackerEntry entry = (EntityTrackerEntry) tracker.trackedEntities.get(other.getId());
+            if (entry != null)
+                entry.clear(getHandle());
+        }
 
-        // remove the hidden player from this player user list
-        if (!hiddenPlayersOnTab.contains(other.getUniqueID()))
+        if (hiddenPlayersOnTab.contains(other.getUniqueID()))
             getHandle().playerConnection.sendPacket(
                     new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, other));
     }
@@ -1067,6 +1068,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
         // PandaSpigot start
         EntityPlayer other = ((CraftPlayer) player).getHandle();
+        hiddenPlayersOnTab.remove(other.getUniqueID());
         this.registerPlayer(other);
     }
 
@@ -1074,20 +1076,37 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         EntityTracker tracker = ((WorldServer) entity.world).tracker;
         // PandaSpigot end
 
-        if (hiddenPlayersOnTab.remove(other.getUniqueID()))
+        if (!hiddenPlayersOnTab.contains(other.getUniqueID()))
             getHandle().playerConnection.sendPacket(
                     new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, other));
 
-        EntityTrackerEntry entry = (EntityTrackerEntry) tracker.trackedEntities.get(other.getId());
-        if (entry != null && !entry.trackedPlayers.contains(getHandle()))
-            entry.updatePlayer(getHandle());
+        if (!hiddenPlayers.contains(other.getUniqueID())) {
+            EntityTrackerEntry entry = (EntityTrackerEntry) tracker.trackedEntities.get(other.getId());
+            if (entry != null && !entry.trackedPlayers.contains(getHandle()))
+                entry.updatePlayer(getHandle());
+        }
     }
 
     // PandaSpigot start
     private void reregisterPlayer(EntityPlayer player) {
-        if (!hiddenPlayers.contains(player.getUniqueID())) {
-            unregisterPlayer(player);
-            registerPlayer(player);
+        if (!hiddenPlayers.contains(player.getUniqueID()) || !hiddenPlayersOnTab.contains(player.getUniqueID())) {
+            EntityPlayer other = player;
+            // remove this player from the hidden player's EntityTrackerEntry
+            EntityTracker tracker = ((WorldServer) entity.world).tracker;
+            // PandaSpigot end
+
+            EntityTrackerEntry entry = (EntityTrackerEntry) tracker.trackedEntities.get(other.getId());
+            if (entry != null)
+                entry.clear(getHandle());
+
+            getHandle().playerConnection.sendPacket(
+                    new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, other));
+            // PandaSpigot end
+
+            getHandle().playerConnection.sendPacket(
+                    new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, other));
+            if (entry != null && !entry.trackedPlayers.contains(getHandle()))
+                entry.updatePlayer(getHandle());
         }
     }
 

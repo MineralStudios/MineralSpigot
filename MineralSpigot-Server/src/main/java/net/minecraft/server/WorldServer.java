@@ -26,6 +26,9 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import gg.mineral.server.config.GlobalConfig;
+import it.unimi.dsi.fastutil.longs.Long2ShortMap.Entry;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
+
 import java.util.concurrent.Callable;
 
 public class WorldServer extends World implements IAsyncTaskHandler, Callable<WorldServer> {
@@ -392,11 +395,11 @@ public class WorldServer extends World implements IAsyncTaskHandler, Callable<Wo
         super.h();
         if (this.worldData.getType() == WorldType.DEBUG_ALL_BLOCK_STATES) {
             // Spigot start
-            gnu.trove.iterator.TLongShortIterator iterator = this.chunkTickList.iterator();
+            ObjectIterator<Entry> iterator = this.chunkTickList.long2ShortEntrySet().fastIterator();
 
             while (iterator.hasNext()) {
-                iterator.advance();
-                long chunkCoord = iterator.key();
+                Entry e = iterator.next();
+                long chunkCoord = e.getLongKey();
 
                 this.getChunkAt(World.keyToX(chunkCoord), World.keyToZ(chunkCoord)).b(false);
                 // Spigot end
@@ -413,9 +416,9 @@ public class WorldServer extends World implements IAsyncTaskHandler, Callable<Wo
             // int k = chunkcoordintpair1.x * 16;
             // int l = chunkcoordintpair1.z * 16;
             // Spigot start
-            for (gnu.trove.iterator.TLongShortIterator iter = chunkTickList.iterator(); iter.hasNext();) {
-                iter.advance();
-                long chunkCoord = iter.key();
+            for (ObjectIterator<Entry> iter = chunkTickList.long2ShortEntrySet().iterator(); iter.hasNext();) {
+                Entry e = iter.next();
+                long chunkCoord = e.getLongKey();
                 int chunkX = World.keyToX(chunkCoord);
                 int chunkZ = World.keyToZ(chunkCoord);
                 // If unloaded, or in procedd of being unloaded, drop it
@@ -1035,30 +1038,24 @@ public class WorldServer extends World implements IAsyncTaskHandler, Callable<Wo
 
     protected void a(Entity entity) {
         super.a(entity);
-        this.entitiesById.a(entity.getId(), entity);
+        this.entitiesById.put(entity.getId(), entity);
         this.entitiesByUUID.put(entity.getUniqueID(), entity);
         Entity[] aentity = entity.aB();
 
-        if (aentity != null) {
-            for (int i = 0; i < aentity.length; ++i) {
-                this.entitiesById.a(aentity[i].getId(), aentity[i]);
-            }
-        }
-
+        if (aentity != null)
+            for (int i = 0; i < aentity.length; ++i)
+                this.entitiesById.put(aentity[i].getId(), aentity[i]);
     }
 
     protected void b(Entity entity) {
         super.b(entity);
-        this.entitiesById.d(entity.getId());
+        this.entitiesById.remove(entity.getId());
         this.entitiesByUUID.remove(entity.getUniqueID());
         Entity[] aentity = entity.aB();
 
-        if (aentity != null) {
-            for (int i = 0; i < aentity.length; ++i) {
-                this.entitiesById.d(aentity[i].getId());
-            }
-        }
-
+        if (aentity != null)
+            for (int i = 0; i < aentity.length; ++i)
+                this.entitiesById.remove(aentity[i].getId());
     }
 
     public boolean strikeLightning(Entity entity) {

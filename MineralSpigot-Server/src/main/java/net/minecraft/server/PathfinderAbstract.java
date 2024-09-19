@@ -1,5 +1,8 @@
 package net.minecraft.server;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public abstract class PathfinderAbstract {
 
     protected IBlockAccess a;
@@ -7,8 +10,6 @@ public abstract class PathfinderAbstract {
     protected int c;
     protected int d;
     protected int e;
-
-    public PathfinderAbstract() {}
 
     public void a(IBlockAccess iblockaccess, Entity entity) {
         this.a = iblockaccess;
@@ -18,7 +19,8 @@ public abstract class PathfinderAbstract {
         this.e = MathHelper.d(entity.width + 1.0F);
     }
 
-    public void a() {}
+    public void a() {
+    }
 
     protected PathPoint a(int i, int j, int k) {
         int l = PathPoint.a(i, j, k);

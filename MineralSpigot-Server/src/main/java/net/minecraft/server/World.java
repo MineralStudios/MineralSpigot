@@ -1,9 +1,19 @@
 package net.minecraft.server;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+// PaperSpigot start
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.bukkit.Bukkit;
 import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.CraftServer;
@@ -14,22 +24,21 @@ import org.bukkit.event.block.BlockCanBuildEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.generator.ChunkGenerator;
-
-import java.util.*;
-import java.util.concurrent.Callable;
-
-// PaperSpigot start
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
-import gg.mineral.server.config.GlobalConfig;
-import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
-import lombok.Getter;
-
 import org.github.paperspigot.event.ServerExceptionEvent;
 import org.github.paperspigot.exception.ServerInternalException;
 // PaperSpigot end
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import gg.mineral.server.config.GlobalConfig;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ShortOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
+import lombok.Getter;
 
 // CraftBukkit start
 // CraftBukkit end
@@ -67,7 +76,7 @@ public abstract class World implements IBlockAccess {
     private final Set<TileEntity> c = Sets.newHashSet(); // Paper
     public final List<EntityHuman> players = Lists.newArrayList();
     public final List<Entity> k = Lists.newArrayList();
-    protected final IntHashMap<Entity> entitiesById = new IntHashMap();
+    protected final Int2ObjectOpenHashMap<Entity> entitiesById = new Int2ObjectOpenHashMap<>();
     private long d = 16777215L;
     private int I;
     protected int m = (new Random()).nextInt();
@@ -134,7 +143,7 @@ public abstract class World implements IBlockAccess {
 
     // Spigot start
     private boolean guardEntityList;
-    protected final gnu.trove.map.hash.TLongShortHashMap chunkTickList;
+    protected final Long2ShortOpenHashMap chunkTickList;
     protected float growthOdds = 100;
     protected float modifiedOdds = 100;
     private final byte chunkTickRadius;
@@ -193,10 +202,8 @@ public abstract class World implements IBlockAccess {
         // Spigot start
         this.chunkTickRadius = (byte) ((this.getServer().getViewDistance() < 7) ? this.getServer().getViewDistance()
                 : 7);
-        this.chunkTickList = new gnu.trove.map.hash.TLongShortHashMap(GlobalConfig.getInstance().getChunksPerTick() * 5,
-                0.7f,
-                Long.MIN_VALUE, Short.MIN_VALUE);
-        this.chunkTickList.setAutoCompactionFactor(0);
+        this.chunkTickList = new Long2ShortOpenHashMap(GlobalConfig.getInstance().getChunksPerTick() * 5, 0.7f);
+        this.chunkTickList.defaultReturnValue(Short.MIN_VALUE);
         // Spigot end
 
         this.L = this.random.nextInt(12000);
@@ -2444,7 +2451,7 @@ public abstract class World implements IBlockAccess {
                     int dx = (random.nextBoolean() ? 1 : -1) * random.nextInt(randRange);
                     int dz = (random.nextBoolean() ? 1 : -1) * random.nextInt(randRange);
                     long hash = chunkToKey(dx + j, dz + k);
-                    if (!chunkTickList.contains(hash) && this.chunkProvider.isChunkLoaded(dx + j, dz + k)) {
+                    if (!chunkTickList.containsKey(hash) && this.chunkProvider.isChunkLoaded(dx + j, dz + k)) {
                         chunkTickList.put(hash, (short) -1); // no players
                     }
                 }
@@ -2940,7 +2947,7 @@ public abstract class World implements IBlockAccess {
     }
 
     public Entity a(int i) {
-        return (Entity) this.entitiesById.get(i);
+        return this.entitiesById.get(i);
     }
 
     public void b(BlockPosition blockposition, TileEntity tileentity) {

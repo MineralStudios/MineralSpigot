@@ -87,8 +87,8 @@ publishing {
 
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/MineralStudios/MineralSpigot")
+            name = "mineral-dev-private"
+            url = uri("https://repo.mineral.gg/private")
 
             credentials {
                 username = (project.findProperty("gpr.user") as String?) ?: System.getenv("USERNAME")

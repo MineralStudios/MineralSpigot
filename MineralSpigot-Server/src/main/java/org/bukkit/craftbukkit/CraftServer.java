@@ -1587,10 +1587,9 @@ public final class CraftServer implements Server {
         List<String> completions = new ArrayList<String>();
         PlayerChatTabCompleteEvent event = new PlayerChatTabCompleteEvent(player, message, completions);
         String token = event.getLastToken();
-        if (player instanceof CraftPlayer cp)
-            for (Player p : getOnlinePlayers())
-                if (cp.canSeeOnTab(p) && StringUtil.startsWithIgnoreCase(p.getName(), token))
-                    completions.add(p.getName());
+        for (Player p : getOnlinePlayers())
+            if (player.canSeeOnTab(p) && StringUtil.startsWithIgnoreCase(p.getName(), token))
+                completions.add(p.getName());
 
         pluginManager.callEvent(event);
 

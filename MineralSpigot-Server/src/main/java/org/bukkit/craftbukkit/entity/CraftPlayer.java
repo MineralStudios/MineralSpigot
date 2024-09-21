@@ -1848,6 +1848,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     }
     // Spigot end
 
+    @Override
     public boolean canSeeOnTab(Player player) {
         return this.getUniqueId().equals(player.getUniqueId()) || !hiddenPlayersOnTab.contains(player.getUniqueId());
     }

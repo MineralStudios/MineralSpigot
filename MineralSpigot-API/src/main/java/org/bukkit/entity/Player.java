@@ -1384,4 +1384,6 @@ public interface Player extends HumanEntity, Conversable, CommandSender, Offline
 
     Spigot spigot();
     // Spigot end
+
+    public boolean canSeeOnTab(Player player);
 }

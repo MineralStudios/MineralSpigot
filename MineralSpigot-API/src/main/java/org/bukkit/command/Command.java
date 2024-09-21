@@ -103,7 +103,7 @@ public abstract class Command {
         ArrayList<String> matchedPlayers = new ArrayList<String>();
         for (Player player : sender.getServer().getOnlinePlayers()) {
             String name = player.getName();
-            if ((senderPlayer == null || senderPlayer.canSee(player))
+            if ((senderPlayer == null || senderPlayer.canSeeOnTab(player))
                     && StringUtil.startsWithIgnoreCase(name, lastWord)) {
                 matchedPlayers.add(name);
             }

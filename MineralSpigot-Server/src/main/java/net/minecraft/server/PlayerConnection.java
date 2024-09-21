@@ -1565,6 +1565,10 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
 
                     this.player.attack(entity);
 
+                    // Mineral: Fix blocking desync
+                    if (this.player.isBlocking())
+                        this.player.bU();
+
                     // CraftBukkit start
                     if (itemInHand != null && itemInHand.count <= -1) {
                         this.player.updateInventory(this.player.activeContainer);

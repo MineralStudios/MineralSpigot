@@ -10,16 +10,23 @@ import org.bukkit.entity.Player;
 
 public class VisibilityGroup {
     private final Map<UUID, Boolean> uuids = new HashMap<>();
+    private boolean destroyed = false;
 
     public boolean canSee(UUID p1, UUID p2) {
+        if (destroyed)
+            throw new IllegalStateException("This VisibilityGroup has been destroyed!");
         return uuids.containsKey(p1) && uuids.containsKey(p2);
     }
 
     public boolean canSeeOnTab(UUID player) {
+        if (destroyed)
+            throw new IllegalStateException("This VisibilityGroup has been destroyed!");
         return uuids.getOrDefault(player, false);
     }
 
     public void addUUID(UUID player, boolean visibleOnTab) {
+        if (destroyed)
+            throw new IllegalStateException("This VisibilityGroup has been destroyed!");
         Player p = Bukkit.getPlayer(player);
 
         if (p == null)
@@ -43,6 +50,9 @@ public class VisibilityGroup {
 
     public void removeUUID(UUID player) {
 
+        if (destroyed)
+            throw new IllegalStateException("This VisibilityGroup has been destroyed!");
+
         Player p = Bukkit.getPlayer(player);
 
         if (p != null) {
@@ -59,6 +69,13 @@ public class VisibilityGroup {
         }
 
         uuids.remove(player);
+    }
+
+    public void destroy() {
+        for (UUID uuid : uuids.keySet())
+            removeUUID(uuid);
+
+        destroyed = true;
     }
 
 }

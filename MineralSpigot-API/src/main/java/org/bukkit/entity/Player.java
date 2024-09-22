@@ -24,6 +24,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.github.paperspigot.Title;
 // PaperSpigot end
 
+import gg.mineral.api.entity.VisibilityGroup;
 import gg.mineral.api.knockback.Knockback;
 
 /**
@@ -1386,4 +1387,8 @@ public interface Player extends HumanEntity, Conversable, CommandSender, Offline
     // Spigot end
 
     public boolean canSeeOnTab(Player player);
+
+    public VisibilityGroup getVisibilityGroup();
+
+    public void setVisibilityGroup(VisibilityGroup group);
 }

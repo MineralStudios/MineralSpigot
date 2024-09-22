@@ -4,12 +4,15 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.authlib.GameProfile;
 
+import gg.mineral.api.entity.VisibilityGroup;
 import gg.mineral.api.knockback.Knockback;
 import gg.mineral.server.combat.KnockbackProfile;
 import gg.mineral.server.combat.KnockbackProfileList;
 import gg.mineral.server.config.GlobalConfig;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -1219,6 +1222,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public boolean canSee(Player player) {
+        if (getVisibilityGroup() != null)
+            return getVisibilityGroup().canSee(this.getUniqueId(), player.getUniqueId());
+
         return !hiddenPlayers.contains(player.getUniqueId());
     }
 
@@ -1850,6 +1856,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public boolean canSeeOnTab(Player player) {
+        if (player.getVisibilityGroup() != null)
+            return player.getVisibilityGroup().canSeeOnTab(player.getUniqueId());
         return this.getUniqueId().equals(player.getUniqueId()) || !hiddenPlayersOnTab.contains(player.getUniqueId());
     }
 
@@ -1878,4 +1886,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     public List<String> getBotIncompatiblePlugins() {
         return GlobalConfig.getInstance().getBotIncompatiblePlugins();
     }
+
+    @Setter
+    @Getter
+    VisibilityGroup visibilityGroup = null;
 }

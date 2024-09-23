@@ -1,27 +1,51 @@
 package net.minecraft.server;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Consumer;
+
 import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @NoArgsConstructor
 @Data
 public class PacketPlayOutPlayerInfo implements Packet<PacketListenerPlayOut> {
 
     private PacketPlayOutPlayerInfo.EnumPlayerInfoAction a;
-    private final List<PacketPlayOutPlayerInfo.PlayerInfoData> b = Lists.newArrayList();
+    private final List<PacketPlayOutPlayerInfo.PlayerInfoData> b = new ArrayList<PacketPlayOutPlayerInfo.PlayerInfoData>() {
+        private void logAccess(String operation) {
+            System.out
+                    .println("Thread " + Thread.currentThread().getName() + " performed " + operation + " on the list");
+        }
+
+        public boolean add(PacketPlayOutPlayerInfo.PlayerInfoData e) {
+            logAccess("add");
+            return super.add(e);
+        }
+
+        public boolean remove(Object o) {
+            logAccess("remove");
+            return super.remove(o);
+        }
+
+        public void forEach(Consumer<? super PacketPlayOutPlayerInfo.PlayerInfoData> action) {
+            logAccess("forEach");
+            super.forEach(action);
+        }
+    };
 
     public PacketPlayOutPlayerInfo(
             PacketPlayOutPlayerInfo.EnumPlayerInfoAction packetplayoutplayerinfo_enumplayerinfoaction,
             EntityPlayer... aentityplayer) {
+
         this.a = packetplayoutplayerinfo_enumplayerinfoaction;
         EntityPlayer[] aentityplayer1 = aentityplayer;
         int i = aentityplayer.length;
@@ -265,11 +289,8 @@ public class PacketPlayOutPlayerInfo implements Packet<PacketListenerPlayOut> {
         }
     }
 
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public static enum EnumPlayerInfoAction {
-
         ADD_PLAYER, UPDATE_GAME_MODE, UPDATE_LATENCY, UPDATE_DISPLAY_NAME, REMOVE_PLAYER;
-
-        private EnumPlayerInfoAction() {
-        }
     }
 }

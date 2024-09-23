@@ -1,12 +1,11 @@
 package net.minecraft.server;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
@@ -20,24 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class PacketPlayOutPlayerInfo implements Packet<PacketListenerPlayOut> {
 
     private PacketPlayOutPlayerInfo.EnumPlayerInfoAction a;
-    private final List<PacketPlayOutPlayerInfo.PlayerInfoData> b = new ArrayList<PacketPlayOutPlayerInfo.PlayerInfoData>() {
-        private void logAccess(String operation) {
-            if (Thread.currentThread().getName() == "Main Thread")
-                return;
-            System.out
-                    .println("Thread " + Thread.currentThread().getName() + " performed " + operation + " on the list");
-        }
-
-        public boolean remove(Object o) {
-            logAccess("remove");
-            return super.remove(o);
-        }
-
-        public PacketPlayOutPlayerInfo.PlayerInfoData get(int index) {
-            logAccess("get");
-            return super.get(index);
-        }
-    };
+    private final List<PacketPlayOutPlayerInfo.PlayerInfoData> b = Lists.newArrayList();
 
     public PacketPlayOutPlayerInfo(
             PacketPlayOutPlayerInfo.EnumPlayerInfoAction packetplayoutplayerinfo_enumplayerinfoaction,

@@ -1,15 +1,5 @@
 package net.minecraft.server;
 
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Doubles;
-import com.google.common.primitives.Floats;
-
-import gg.mineral.server.config.GlobalConfig;
-import io.netty.buffer.Unpooled;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,14 +7,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 // CraftBukkit start
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+import java.util.function.Function;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.craftbukkit.inventory.CraftInventoryView;
@@ -32,8 +23,6 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.craftbukkit.util.LazyPlayerSet;
 import org.bukkit.craftbukkit.util.Waitable;
-
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
@@ -48,8 +37,8 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -62,6 +51,17 @@ import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.util.NumberConversions;
 // CraftBukkit end
+
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Floats;
+
+import gg.mineral.server.config.GlobalConfig;
+import io.netty.buffer.Unpooled;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import lombok.Getter;
 
 public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerListBox {
 
@@ -1034,6 +1034,9 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
 
     }
 
+    @Getter
+    private List<Function<Packet<?>, Boolean>> outgoingPacketListeners = new ArrayList<>();
+
     public void sendPacket(final Packet packet) {
         if (packet instanceof PacketPlayOutChat) {
             PacketPlayOutChat packetplayoutchat = (PacketPlayOutChat) packet;
@@ -1059,6 +1062,11 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
         // CraftBukkit end
 
         try {
+
+            for (Function<Packet<?>, Boolean> packetListener : outgoingPacketListeners)
+                if (packetListener.apply(packet))
+                    return;
+
             this.networkManager.handle(packet);
         } catch (Throwable throwable) {
             System.out.println("Error sending packet " + packet);

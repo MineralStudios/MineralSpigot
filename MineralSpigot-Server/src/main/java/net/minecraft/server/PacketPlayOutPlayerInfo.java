@@ -22,13 +22,10 @@ public class PacketPlayOutPlayerInfo implements Packet<PacketListenerPlayOut> {
     private PacketPlayOutPlayerInfo.EnumPlayerInfoAction a;
     private final List<PacketPlayOutPlayerInfo.PlayerInfoData> b = new ArrayList<PacketPlayOutPlayerInfo.PlayerInfoData>() {
         private void logAccess(String operation) {
+            if (Thread.currentThread().getName() == "Main Thread")
+                return;
             System.out
                     .println("Thread " + Thread.currentThread().getName() + " performed " + operation + " on the list");
-        }
-
-        public boolean add(PacketPlayOutPlayerInfo.PlayerInfoData e) {
-            logAccess("add");
-            return super.add(e);
         }
 
         public boolean remove(Object o) {
@@ -36,9 +33,9 @@ public class PacketPlayOutPlayerInfo implements Packet<PacketListenerPlayOut> {
             return super.remove(o);
         }
 
-        public void forEach(Consumer<? super PacketPlayOutPlayerInfo.PlayerInfoData> action) {
-            logAccess("forEach");
-            super.forEach(action);
+        public PacketPlayOutPlayerInfo.PlayerInfoData get(int index) {
+            logAccess("get");
+            return super.get(index);
         }
     };
 

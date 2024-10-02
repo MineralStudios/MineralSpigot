@@ -82,9 +82,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     private boolean hasPlayedBefore = false;
     private final ConversationTracker conversationTracker = new ConversationTracker();
     private final Set<String> channels = new HashSet<String>();
-    @Getter
     private final Set<UUID> hiddenPlayers = new ObjectOpenHashSet<UUID>();
-    @Getter
     private final Set<UUID> hiddenPlayersOnTab = new ObjectOpenHashSet<UUID>();
     private int hash = 0;
     private double health = 20;

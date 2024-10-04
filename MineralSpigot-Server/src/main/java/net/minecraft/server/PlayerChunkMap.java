@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,6 +18,7 @@ import com.google.common.collect.Lists;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 public class PlayerChunkMap {
 
@@ -350,7 +352,7 @@ public class PlayerChunkMap {
 
     class PlayerChunk {
 
-        private final List<EntityPlayer> b = Lists.newArrayList();
+        private final Set<EntityPlayer> b = new ObjectOpenHashSet<>();
         private final ChunkCoordIntPair location;
         private short[] dirtyBlocks = new short[64];
         private int dirtyCount;

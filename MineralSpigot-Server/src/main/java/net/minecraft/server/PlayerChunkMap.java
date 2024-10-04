@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,8 +16,9 @@ import org.bukkit.craftbukkit.chunkio.ChunkIOExecutor;
 import com.google.common.collect.Lists;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 public class PlayerChunkMap {
 
@@ -149,7 +149,13 @@ public class PlayerChunkMap {
     }
 
     public void b(EntityPlayer entityplayer) {
-        ArrayList arraylist = Lists.newArrayList(entityplayer.chunkCoordIntPairQueue);
+        // Create a LongSet to store chunk coordinate pairs as long values
+        LongSet chunkCoordIntPairSet = new LongOpenHashSet();
+        for (ChunkCoordIntPair chunkCoordIntPair : entityplayer.chunkCoordIntPairQueue) {
+            long coordLong = chunkCoordIntPairToLong(chunkCoordIntPair.x, chunkCoordIntPair.z);
+            chunkCoordIntPairSet.add(coordLong);
+        }
+
         int i = 0;
         int j = entityplayer.viewDistance; // PaperSpigot - Player view distance API
         int k = (int) entityplayer.locX >> 4;
@@ -159,7 +165,8 @@ public class PlayerChunkMap {
         ChunkCoordIntPair chunkcoordintpair = this.a(k, l, true).location;
 
         entityplayer.chunkCoordIntPairQueue.clear();
-        if (arraylist.contains(chunkcoordintpair))
+        long centerCoordLong = chunkCoordIntPairToLong(chunkcoordintpair.x, chunkcoordintpair.z);
+        if (chunkCoordIntPairSet.contains(centerCoordLong))
             entityplayer.chunkCoordIntPairQueue.add(chunkcoordintpair);
 
         int k1;
@@ -172,7 +179,8 @@ public class PlayerChunkMap {
                     i1 += aint[0];
                     j1 += aint[1];
                     chunkcoordintpair = this.a(k + i1, l + j1, true).location;
-                    if (arraylist.contains(chunkcoordintpair)) {
+                    long coordLong = chunkCoordIntPairToLong(chunkcoordintpair.x, chunkcoordintpair.z);
+                    if (chunkCoordIntPairSet.contains(coordLong)) {
                         entityplayer.chunkCoordIntPairQueue.add(chunkcoordintpair);
                     }
                 }
@@ -185,11 +193,16 @@ public class PlayerChunkMap {
             i1 += this.i[i][0];
             j1 += this.i[i][1];
             chunkcoordintpair = this.a(k + i1, l + j1, true).location;
-            if (arraylist.contains(chunkcoordintpair)) {
+            long coordLong = chunkCoordIntPairToLong(chunkcoordintpair.x, chunkcoordintpair.z);
+            if (chunkCoordIntPairSet.contains(coordLong)) {
                 entityplayer.chunkCoordIntPairQueue.add(chunkcoordintpair);
             }
         }
+    }
 
+    // Helper method to convert chunk coordinates to a long value
+    public static long chunkCoordIntPairToLong(int x, int z) {
+        return (((long) x) << 32) | (((long) z) & 0xFFFFFFFFL);
     }
 
     public void removePlayer(EntityPlayer entityplayer) {
@@ -352,7 +365,7 @@ public class PlayerChunkMap {
 
     class PlayerChunk {
 
-        private final Set<EntityPlayer> b = new ObjectOpenHashSet<>();
+        private final List<EntityPlayer> b = Lists.newArrayList();
         private final ChunkCoordIntPair location;
         private short[] dirtyBlocks = new short[64];
         private int dirtyCount;

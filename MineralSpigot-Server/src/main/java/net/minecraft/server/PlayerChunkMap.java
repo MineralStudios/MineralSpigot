@@ -1,22 +1,24 @@
 package net.minecraft.server;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+// CraftBukkit start
+import java.util.Collections;
+import java.util.HashMap;
+// CraftBukkit end
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bukkit.craftbukkit.chunkio.ChunkIOExecutor;
+
 import com.google.common.collect.Lists;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-// CraftBukkit start
-import java.util.Collections;
-import java.util.Queue;
-import java.util.LinkedList;
-import org.bukkit.craftbukkit.chunkio.ChunkIOExecutor;
-import java.util.HashMap;
-// CraftBukkit end
+import it.unimi.dsi.fastutil.longs.LongComparator;
 
 public class PlayerChunkMap {
 
@@ -136,22 +138,11 @@ public class PlayerChunkMap {
         entityplayer.d = entityplayer.locX;
         entityplayer.e = entityplayer.locZ;
 
-        // CraftBukkit start - Load nearby chunks first
-        List<ChunkCoordIntPair> chunkList = new LinkedList<ChunkCoordIntPair>();
+        int viewDistance = entityplayer.viewDistance;
 
-        // PaperSpigot start - Player view distance API
-        for (int k = i - entityplayer.viewDistance; k <= i + entityplayer.viewDistance; ++k) {
-            for (int l = j - entityplayer.viewDistance; l <= j + entityplayer.viewDistance; ++l) {
-                // PaperSpigot end
-                chunkList.add(new ChunkCoordIntPair(k, l));
-            }
-        }
-
-        Collections.sort(chunkList, new ChunkCoordComparator(entityplayer));
-        for (ChunkCoordIntPair pair : chunkList) {
-            this.a(pair.x, pair.z, true).a(entityplayer);
-        }
-        // CraftBukkit end
+        for (int k = i - viewDistance; k <= i + viewDistance; ++k)
+            for (int l = j - viewDistance; l <= j + viewDistance; ++l)
+                this.a(k, l, true).a(entityplayer);
 
         this.managedPlayers.add(entityplayer);
         this.b(entityplayer);
@@ -168,9 +159,8 @@ public class PlayerChunkMap {
         ChunkCoordIntPair chunkcoordintpair = this.a(k, l, true).location;
 
         entityplayer.chunkCoordIntPairQueue.clear();
-        if (arraylist.contains(chunkcoordintpair)) {
+        if (arraylist.contains(chunkcoordintpair))
             entityplayer.chunkCoordIntPairQueue.add(chunkcoordintpair);
-        }
 
         int k1;
 

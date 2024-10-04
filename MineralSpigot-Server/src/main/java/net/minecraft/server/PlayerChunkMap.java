@@ -1,10 +1,8 @@
 package net.minecraft.server;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 // CraftBukkit start
 import java.util.Collections;
-import java.util.HashMap;
 // CraftBukkit end
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -18,7 +16,7 @@ import org.bukkit.craftbukkit.chunkio.ChunkIOExecutor;
 import com.google.common.collect.Lists;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongComparator;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class PlayerChunkMap {
 
@@ -360,7 +358,7 @@ public class PlayerChunkMap {
         private long g;
 
         // CraftBukkit start - add fields
-        private final HashMap<EntityPlayer, Runnable> players = new HashMap<EntityPlayer, Runnable>();
+        private final Object2ObjectOpenHashMap<EntityPlayer, Runnable> players = new Object2ObjectOpenHashMap<EntityPlayer, Runnable>();
         private boolean loaded = false;
         private Runnable loadedRunnable = new Runnable() {
             public void run() {

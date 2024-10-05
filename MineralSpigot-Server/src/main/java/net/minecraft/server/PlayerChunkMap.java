@@ -16,6 +16,8 @@ import org.bukkit.craftbukkit.chunkio.ChunkIOExecutor;
 import com.google.common.collect.Lists;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongArrays;
+import it.unimi.dsi.fastutil.longs.LongComparator;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -138,11 +140,65 @@ public class PlayerChunkMap {
         entityplayer.d = entityplayer.locX;
         entityplayer.e = entityplayer.locZ;
 
+        // Calculate the number of chunks within the view distance
         int viewDistance = entityplayer.viewDistance;
+        int chunkCount = (2 * viewDistance + 1) * (2 * viewDistance + 1);
+        long[] chunkArray = new long[chunkCount];
 
-        for (int k = i - viewDistance; k <= i + viewDistance; ++k)
-            for (int l = j - viewDistance; l <= j + viewDistance; ++l)
-                this.a(k, l, true).a(entityplayer);
+        // Pack chunk coordinates into longs
+        int index = 0;
+        for (int k = i - viewDistance; k <= i + viewDistance; ++k) {
+            for (int l = j - viewDistance; l <= j + viewDistance; ++l) {
+                long packed = (((long) k) << 32) | (l & 0xFFFFFFFFL);
+                chunkArray[index++] = packed;
+            }
+        }
+
+        // Sort the array based on distance to the player
+        LongArrays.quickSort(chunkArray, new LongComparator() {
+            private final int centerX = (int) entityplayer.locX >> 4;
+            private final int centerZ = (int) entityplayer.locZ >> 4;
+
+            @Override
+            public int compare(long a, long b) {
+                int x1 = (int) (a >> 32);
+                int z1 = (int) a;
+                int x2 = (int) (b >> 32);
+                int z2 = (int) b;
+
+                // Subtract current position to set center point
+                int ax = x1 - centerX;
+                int az = z1 - centerZ;
+                int bx = x2 - centerX;
+                int bz = z2 - centerZ;
+
+                int result = ((ax - bx) * (ax + bx)) + ((az - bz) * (az + bz));
+                if (result != 0) {
+                    return result;
+                }
+
+                if (ax < 0) {
+                    if (bx < 0) {
+                        return bz - az;
+                    } else {
+                        return -1;
+                    }
+                } else {
+                    if (bx < 0) {
+                        return 1;
+                    } else {
+                        return az - bz;
+                    }
+                }
+            }
+        });
+
+        // Load chunks and add the player
+        for (long packed : chunkArray) {
+            int x = (int) (packed >> 32);
+            int z = (int) packed;
+            this.a(x, z, true).a(entityplayer);
+        }
 
         this.managedPlayers.add(entityplayer);
         this.b(entityplayer);

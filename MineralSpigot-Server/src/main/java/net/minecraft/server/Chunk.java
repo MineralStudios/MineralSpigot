@@ -151,17 +151,16 @@ public class Chunk {
         this.locZ = j;
         this.heightMap = new int[256];
 
-        for (int k = 0; k < this.entitySlices.length; ++k) {
+        for (int k = 0; k < this.entitySlices.length; ++k)
             this.entitySlices[k] = new org.bukkit.craftbukkit.util.UnsafeList(); // Spigot
-        }
 
         Arrays.fill(this.f, -999);
         Arrays.fill(this.e, (byte) -1);
 
         // CraftBukkit start
-        if (!(this instanceof EmptyChunk)) {
+        if (!(this instanceof EmptyChunk))
             this.bukkitChunk = new org.bukkit.craftbukkit.CraftChunk(this);
-        }
+
         this.chunkCoords = new ChunkCoordIntPair(this.locX, this.locZ); // PandaSpigot
     }
 
@@ -183,9 +182,8 @@ public class Chunk {
                     if (iblockdata.getBlock().getMaterial() != Material.AIR) {
                         int k1 = i1 >> 4;
 
-                        if (this.sections[k1] == null) {
+                        if (this.sections[k1] == null)
                             this.sections[k1] = new ChunkSection(k1 << 4, flag);
-                        }
 
                         this.sections[k1].setType(k, i1 & 15, l, iblockdata);
                     }

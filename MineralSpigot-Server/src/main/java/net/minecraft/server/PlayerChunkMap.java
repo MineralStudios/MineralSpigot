@@ -496,15 +496,15 @@ public class PlayerChunkMap {
                 // CraftBukkit end
                 Chunk chunk = PlayerChunkMap.this.world.getChunkAt(this.location.x, this.location.z);
 
-                if (chunk.isReady()) {
+                if (chunk.isReady())
                     entityplayer.playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 0));
-                }
 
                 this.players.remove(entityplayer); // CraftBukkit
                 this.b.remove(entityplayer);
                 entityplayer.chunkCoordIntPairQueue.remove(this.location);
-                new io.papermc.paper.event.packet.PlayerChunkUnloadEvent(chunk.bukkitChunk,
-                        entityplayer.getBukkitEntity()).callEvent(); // PandaSpigot
+                if (chunk.bukkitChunk != null)
+                    new io.papermc.paper.event.packet.PlayerChunkUnloadEvent(chunk.bukkitChunk,
+                            entityplayer.getBukkitEntity()).callEvent(); // PandaSpigot
                 if (this.b.isEmpty()) {
                     long i = (long) this.location.x + 2147483647L | (long) this.location.z + 2147483647L << 32;
 
@@ -531,19 +531,16 @@ public class PlayerChunkMap {
         }
 
         public void a(int i, int j, int k) {
-            if (this.dirtyCount == 0) {
+            if (this.dirtyCount == 0)
                 PlayerChunkMap.this.e.add(this);
-            }
 
             this.f |= 1 << (j >> 4);
             if (this.dirtyCount < 64) {
                 short short0 = (short) (i << 12 | k << 8 | j);
 
-                for (int l = 0; l < this.dirtyCount; ++l) {
-                    if (this.dirtyBlocks[l] == short0) {
+                for (int l = 0; l < this.dirtyCount; ++l)
+                    if (this.dirtyBlocks[l] == short0)
                         return;
-                    }
-                }
 
                 this.dirtyBlocks[this.dirtyCount++] = short0;
             }
@@ -554,9 +551,8 @@ public class PlayerChunkMap {
             for (int i = 0; i < this.b.size(); ++i) {
                 EntityPlayer entityplayer = (EntityPlayer) this.b.get(i);
 
-                if (!entityplayer.chunkCoordIntPairQueue.contains(this.location)) {
+                if (!entityplayer.chunkCoordIntPairQueue.contains(this.location))
                     entityplayer.playerConnection.sendPacket(packet);
-                }
             }
 
         }
@@ -623,9 +619,8 @@ public class PlayerChunkMap {
             if (tileentity != null) {
                 Packet packet = tileentity.getUpdatePacket();
 
-                if (packet != null) {
+                if (packet != null)
                     this.a(packet);
-                }
             }
 
         }

@@ -17,8 +17,8 @@ import org.apache.logging.log4j.Logger;
 public class ChunkRegionLoader implements IChunkLoader, IAsyncChunkSaver {
 
     private static final Logger a = LogManager.getLogger();
-    private Map<ChunkCoordIntPair, NBTTagCompound> b = new ConcurrentHashMap();
-    private Set<ChunkCoordIntPair> c = Collections.newSetFromMap(new ConcurrentHashMap());
+    public Map<ChunkCoordIntPair, NBTTagCompound> b = new ConcurrentHashMap();
+    public Set<ChunkCoordIntPair> c = Collections.newSetFromMap(new ConcurrentHashMap());
     private final File d;
     private boolean e = false;
 
@@ -140,41 +140,29 @@ public class ChunkRegionLoader implements IChunkLoader, IAsyncChunkSaver {
             this.b.put(chunkcoordintpair, nbttagcompound);
         }
 
-        FileIOThread.a().a(this);
+        org.bukkit.craftbukkit.chunkio.ChunkIOExecutor.getAsyncExecutor().getPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                NBTTagCompound compound = ChunkRegionLoader.this.b.remove(chunkcoordintpair);
+                if (compound == null || ChunkRegionLoader.this.c.contains(chunkcoordintpair)) {
+                    return;
+                }
+
+                try {
+                    ChunkRegionLoader.this.c.add(chunkcoordintpair);
+                    ChunkRegionLoader.this.b(chunkcoordintpair, compound);
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                } finally {
+                    ChunkRegionLoader.this.c.remove(chunkcoordintpair);
+                }
+            }
+
+        });
     }
 
     public boolean c() {
-        if (this.b.isEmpty()) {
-            if (this.e) {
-                ChunkRegionLoader.a.info("ThreadedAnvilChunkStorage ({}): All chunks are saved",
-                        new Object[] { this.d.getName() });
-            }
-
-            return false;
-        } else {
-            ChunkCoordIntPair chunkcoordintpair = (ChunkCoordIntPair) this.b.keySet().iterator().next();
-
-            boolean flag;
-
-            try {
-                this.c.add(chunkcoordintpair);
-                NBTTagCompound nbttagcompound = (NBTTagCompound) this.b.remove(chunkcoordintpair);
-
-                if (nbttagcompound != null) {
-                    try {
-                        this.b(chunkcoordintpair, nbttagcompound);
-                    } catch (Exception exception) {
-                        ChunkRegionLoader.a.error("Failed to save chunk", exception);
-                    }
-                }
-
-                flag = true;
-            } finally {
-                this.c.remove(chunkcoordintpair);
-            }
-
-            return flag;
-        }
+        throw new java.lang.UnsupportedOperationException();
     }
 
     private void b(ChunkCoordIntPair chunkcoordintpair, NBTTagCompound nbttagcompound) throws IOException {
@@ -195,9 +183,11 @@ public class ChunkRegionLoader implements IChunkLoader, IAsyncChunkSaver {
             this.e = true;
 
             while (true) {
-                if (this.c()) {
+                if (false && this.c()) {
                     continue;
                 }
+
+                break;
             }
         } finally {
             this.e = false;

@@ -527,6 +527,14 @@ public abstract class MinecraftServer
                 this.Z.c();
             }
             // Spigot end
+
+            MinecraftServer.LOGGER.info("Waiting for Chunk I/O threads to complete all pending tasks...");
+            try {
+                org.bukkit.craftbukkit.chunkio.ChunkIOExecutor.getAsyncExecutor().getPool().shutdown();
+                org.bukkit.craftbukkit.chunkio.ChunkIOExecutor.getAsyncExecutor().getPool()
+                        .awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.DAYS);
+            } catch (InterruptedException exception) {
+            }
         }
     }
 

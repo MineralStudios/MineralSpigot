@@ -2,6 +2,8 @@ package net.minecraft.server;
 
 import java.io.File;
 
+import lombok.val;
+
 public class ServerNBTManager extends WorldNBTStorage {
 
     public ServerNBTManager(File file, String s, boolean flag) {
@@ -9,7 +11,7 @@ public class ServerNBTManager extends WorldNBTStorage {
     }
 
     public IChunkLoader createChunkLoader(WorldProvider worldprovider) {
-        File file = this.getDirectory();
+        val file = this.getDirectory();
         File file1;
 
         if (worldprovider instanceof WorldProviderHell) {
@@ -31,12 +33,6 @@ public class ServerNBTManager extends WorldNBTStorage {
     }
 
     public void a() {
-        try {
-            FileIOThread.a().b();
-        } catch (InterruptedException interruptedexception) {
-            interruptedexception.printStackTrace();
-        }
-
         RegionFileCache.a();
     }
 }

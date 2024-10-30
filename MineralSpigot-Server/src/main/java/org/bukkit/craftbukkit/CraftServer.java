@@ -8,10 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +17,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
@@ -42,8 +39,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
+
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.conversations.Conversable;
 import org.bukkit.craftbukkit.command.VanillaCommandWrapper;
@@ -87,7 +83,6 @@ import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginLoadOrder;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.SimpleServicesManager;
@@ -121,12 +116,13 @@ import lombok.Getter;
 //import jline.console.ConsoleReader; // PandaSpigot - comment out
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.minecraft.server.BlockPosition;
+import net.minecraft.server.ChunkProviderServer;
+import net.minecraft.server.ChunkRegionLoader;
 import net.minecraft.server.CommandAbstract;
 import net.minecraft.server.CommandDispatcher;
 import net.minecraft.server.Convertable;
 import net.minecraft.server.CraftingManager;
 import net.minecraft.server.DedicatedPlayerList;
-import net.minecraft.server.DedicatedServer;
 import net.minecraft.server.Enchantment;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.EntityTracker;
@@ -142,10 +138,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.MobEffectList;
 import net.minecraft.server.PersistentCollection;
 import net.minecraft.server.PlayerList;
-import net.minecraft.server.PropertyManager;
+
 import net.minecraft.server.RecipesFurnace;
-import net.minecraft.server.RegionFile;
-import net.minecraft.server.RegionFileCache;
 import net.minecraft.server.ServerCommand;
 import net.minecraft.server.ServerNBTManager;
 import net.minecraft.server.WorldData;
@@ -995,34 +989,20 @@ public final class CraftServer implements Server {
             } catch (ExceptionWorldConflict ex) {
                 getLogger().log(Level.SEVERE, null, ex);
             }
+        } else { // FlamePaper - Fix chunk memory leak
+            ChunkProviderServer chunkProviderServer = handle.chunkProviderServer;
+            ChunkRegionLoader regionLoader = (ChunkRegionLoader) chunkProviderServer.chunkLoader;
+
+            regionLoader.b.clear();
+            regionLoader.c.clear();
+
+            chunkProviderServer.chunkLoader = null;
+            chunkProviderServer.chunkProvider = null;
+            chunkProviderServer.chunks.clear();
         }
 
         worlds.remove(world.getName().toLowerCase());
         console.worlds.remove(console.worlds.indexOf(handle));
-
-        File parentFolder = world.getWorldFolder().getAbsoluteFile();
-
-        // Synchronized because access to RegionFileCache.a is guarded by this lock.
-        synchronized (RegionFileCache.class) {
-            // RegionFileCache.a should be RegionFileCache.cache
-            Iterator<Map.Entry<File, RegionFile>> i = RegionFileCache.a.entrySet().iterator();
-            while (i.hasNext()) {
-                Map.Entry<File, RegionFile> entry = i.next();
-                File child = entry.getKey().getAbsoluteFile();
-                while (child != null) {
-                    if (child.equals(parentFolder)) {
-                        i.remove();
-                        try {
-                            entry.getValue().c(); // Should be RegionFile.close();
-                        } catch (IOException ex) {
-                            getLogger().log(Level.SEVERE, null, ex);
-                        }
-                        break;
-                    }
-                    child = child.getParentFile();
-                }
-            }
-        }
 
         return true;
     }

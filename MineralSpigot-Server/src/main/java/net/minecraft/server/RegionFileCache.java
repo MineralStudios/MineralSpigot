@@ -1,8 +1,7 @@
 package net.minecraft.server;
 
-import com.google.common.collect.Maps;
-
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import lombok.val;
 
 import org.github.paperspigot.exception.ServerInternalException;
 
@@ -15,7 +14,26 @@ import java.util.Map;
 
 public class RegionFileCache {
 
-    public static final Map<File, RegionFile> a = new Object2ObjectOpenHashMap<>(); // Spigot - private -> public
+    private static final com.google.common.cache.LoadingCache<File, RegionFile> cache = com.google.common.cache.CacheBuilder
+            .newBuilder()
+            .expireAfterAccess(1, java.util.concurrent.TimeUnit.MINUTES)
+            .removalListener(new com.google.common.cache.RemovalListener<File, RegionFile>() {
+                @Override
+                public void onRemoval(
+                        com.google.common.cache.RemovalNotification<File, RegionFile> removalNotification) {
+                    try {
+                        removalNotification.getValue().c();
+                    } catch (IOException exception) {
+                        throw com.google.common.base.Throwables.propagate(exception);
+                    }
+                }
+            })
+            .build(new com.google.common.cache.CacheLoader<File, RegionFile>() {
+                @Override
+                public RegionFile load(File file) throws Exception {
+                    return new RegionFile(file);
+                }
+            });
 
     // PaperSpigot start
     public static synchronized RegionFile a(File file, int i, int j) {
@@ -24,9 +42,9 @@ public class RegionFileCache {
 
     public static synchronized RegionFile a(File file, int i, int j, boolean create) {
         // PaperSpigot end
-        File file1 = new File(file, "region");
-        File file2 = new File(file1, "r." + (i >> 5) + "." + (j >> 5) + ".mca");
-        RegionFile regionfile = RegionFileCache.a.get(file2);
+        val file1 = new File(file, "region");
+        val file2 = new File(file1, "r." + (i >> 5) + "." + (j >> 5) + ".mca");
+        val regionfile = RegionFileCache.cache.getIfPresent(file2);
 
         if (regionfile != null)
             return regionfile;
@@ -37,32 +55,20 @@ public class RegionFileCache {
         if (!file1.exists())
             file1.mkdirs();
 
-        if (RegionFileCache.a.size() >= 256)
-            a();
-
-        RegionFile regionfile1 = new RegionFile(file2);
-
-        RegionFileCache.a.put(file2, regionfile1);
-        return regionfile1;
-    }
-
-    public static synchronized void a() {
-        Iterator iterator = RegionFileCache.a.values().iterator();
-
-        while (iterator.hasNext()) {
-            RegionFile regionfile = (RegionFile) iterator.next();
-
+        if (true) {
             try {
-                if (regionfile != null) {
-                    regionfile.c();
-                }
-            } catch (IOException ioexception) {
-                ioexception.printStackTrace();
-                ServerInternalException.reportInternalException(ioexception); // Paper
+                return RegionFileCache.cache.get(file2);
+            } catch (Exception exception) {
+                throw com.google.common.base.Throwables.propagate(exception);
             }
         }
 
-        RegionFileCache.a.clear();
+        RegionFile regionfile1 = new RegionFile(file2);
+
+        return regionfile1;
+    }
+
+    public static void a() {
     }
 
     public static DataInputStream c(File file, int i, int j) {

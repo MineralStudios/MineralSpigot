@@ -9,11 +9,9 @@ import org.bukkit.Server;
 import org.bukkit.craftbukkit.util.AsynchronousExecutor;
 import org.bukkit.craftbukkit.util.LongHash;
 
+import lombok.val;
+
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import net.minecraft.server.Entity;
-import net.minecraft.server.EntitySlice;
 
 class ChunkIOProvider implements AsynchronousExecutor.CallBackProvider<QueuedChunk, Chunk, Runnable, RuntimeException> {
     private final AtomicInteger threadNumber = new AtomicInteger(1);
@@ -80,8 +78,8 @@ class ChunkIOProvider implements AsynchronousExecutor.CallBackProvider<QueuedChu
     }
 
     public Thread newThread(Runnable runnable) {
-        Thread thread = new Thread(runnable, "Chunk I/O Executor Thread-" + threadNumber.getAndIncrement());
-        thread.setDaemon(true);
+        val thread = new Thread(runnable, "Chunk I/O Executor Thread-" + threadNumber.getAndIncrement());
+        thread.setDaemon(false);
         return thread;
     }
 }

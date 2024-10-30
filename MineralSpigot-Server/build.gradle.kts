@@ -84,6 +84,7 @@ tasks {
     }
     
     shadowJar {
+        exclude("net/minecraft/server/FileIOThread.class")
         mergeServiceFiles()
         archiveClassifier.set("unmapped")
         append("META-INF/io.netty.versions.properties")

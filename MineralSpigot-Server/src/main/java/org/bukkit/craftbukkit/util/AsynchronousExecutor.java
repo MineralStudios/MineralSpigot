@@ -15,15 +15,25 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import org.apache.commons.lang.Validate;
 
 /**
- * Executes tasks using a multi-stage process executor. Synchronous executions are via {@link AsynchronousExecutor#finishActive()} or the {@link AsynchronousExecutor#get(Object)} methods.
- * <li \> Stage 1 creates the object from a parameter, and is usually called asynchronously.
- * <li \> Stage 2 takes the parameter and object from stage 1 and does any synchronous processing to prepare it.
- * <li \> Stage 3 takes the parameter and object from stage 1, as well as a callback that was registered, and performs any synchronous calculations.
+ * Executes tasks using a multi-stage process executor. Synchronous executions
+ * are via {@link AsynchronousExecutor#finishActive()} or the
+ * {@link AsynchronousExecutor#get(Object)} methods.
+ * <li \> Stage 1 creates the object from a parameter, and is usually called
+ * asynchronously.
+ * <li \> Stage 2 takes the parameter and object from stage 1 and does any
+ * synchronous processing to prepare it.
+ * <li \> Stage 3 takes the parameter and object from stage 1, as well as a
+ * callback that was registered, and performs any synchronous calculations.
  *
- * @param <P> The type of parameter you provide to make the object that will be created. It should implement {@link Object#hashCode()} and {@link Object#equals(Object)} if you want to get the value early.
- * @param <T> The type of object you provide. This is created in stage 1, and passed to stage 2, 3, and returned if get() is called.
- * @param <C> The type of callback you provide. You may register many of these to be passed to the provider in stage 3, one at a time.
- * @param <E> A type of exception you may throw and expect to be handled by the main thread
+ * @param <P> The type of parameter you provide to make the object that will be
+ *            created. It should implement {@link Object#hashCode()} and
+ *            {@link Object#equals(Object)} if you want to get the value early.
+ * @param <T> The type of object you provide. This is created in stage 1, and
+ *            passed to stage 2, 3, and returned if get() is called.
+ * @param <C> The type of callback you provide. You may register many of these
+ *            to be passed to the provider in stage 3, one at a time.
+ * @param <E> A type of exception you may throw and expect to be handled by the
+ *            main thread
  * @author Wesley Wolfe (c) 2012, 2014
  */
 public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
@@ -57,7 +67,8 @@ public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
     }
 
     @SuppressWarnings("rawtypes")
-    static final AtomicIntegerFieldUpdater STATE_FIELD = AtomicIntegerFieldUpdater.newUpdater(AsynchronousExecutor.Task.class, "state");
+    static final AtomicIntegerFieldUpdater STATE_FIELD = AtomicIntegerFieldUpdater
+            .newUpdater(AsynchronousExecutor.Task.class, "state");
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static boolean set(AsynchronousExecutor.Task $this, int expected, int value) {
@@ -107,7 +118,8 @@ public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
                             }
                             state = STAGE_1_COMPLETE; // They're already synchronized, atomic locks are not needed
                         }
-                        // We want to return false, because we know a synchronous task already handled the finish()
+                        // We want to return false, because we know a synchronous task already handled
+                        // the finish()
                         ret = false; // Don't return inside finally; VERY bad practice.
                     }
                 }
@@ -123,7 +135,8 @@ public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
                 // If we succeed that variable switch, good as done
                 init();
             } else if (set(this, STAGE_1_ASYNC, STAGE_1_SYNC)) {
-                // Async thread is running, but this shouldn't be likely; we need to sync to wait on them because of it.
+                // Async thread is running, but this shouldn't be likely; we need to sync to
+                // wait on them because of it.
                 synchronized (this) {
                     if (set(this, STAGE_1_SYNC, PENDING)) { // They might NOT synchronized yet, atomic lock IS needed
                         // We are the first into the lock
@@ -157,7 +170,8 @@ public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
         T get() throws E {
             initSync();
             if (callbacks.isEmpty()) {
-                // 'this' is a placeholder to prevent callbacks from being empty during finish call
+                // 'this' is a placeholder to prevent callbacks from being empty during finish
+                // call
                 // See get method below
                 callbacks.add((C) this);
             }
@@ -171,7 +185,8 @@ public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
                 case PENDING:
                 case STAGE_1_ASYNC:
                 case STAGE_1_SYNC:
-                    throw new IllegalStateException("Attempting to finish unprepared(" + state + ") task(" + parameter + ")");
+                    throw new IllegalStateException(
+                            "Attempting to finish unprepared(" + state + ") task(" + parameter + ")");
                 case STAGE_1_COMPLETE:
                     try {
                         if (t != null) {
@@ -221,6 +236,7 @@ public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
 
     /**
      * Uses a thread pool to pass executions to the provider.
+     * 
      * @see AsynchronousExecutor
      */
     public AsynchronousExecutor(final CallBackProvider<P, T, C, E> provider, final int coreSize) {
@@ -228,11 +244,13 @@ public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
         this.provider = provider;
 
         // We have an unbound queue size so do not need a max thread size
-        pool = new ThreadPoolExecutor(coreSize, Integer.MAX_VALUE, 60l, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), provider);
+        pool = new ThreadPoolExecutor(coreSize, Integer.MAX_VALUE, 60l, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<Runnable>(), provider);
     }
 
     /**
-     * Adds a callback to the parameter provided, adding parameter to the queue if needed.
+     * Adds a callback to the parameter provided, adding parameter to the queue if
+     * needed.
      * <p>
      * This should always be synchronous.
      */
@@ -248,17 +266,26 @@ public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
     /**
      * This removes a particular callback from the specified parameter.
      * <p>
-     * If no callbacks remain for a given parameter, then the {@link CallBackProvider CallBackProvider's} stages may be omitted from execution.
-     * Stage 3 will have no callbacks, stage 2 will be skipped unless a {@link #get(Object)} is used, and stage 1 will be avoided on a best-effort basis.
+     * If no callbacks remain for a given parameter, then the
+     * {@link CallBackProvider CallBackProvider's} stages may be omitted from
+     * execution.
+     * Stage 3 will have no callbacks, stage 2 will be skipped unless a
+     * {@link #get(Object)} is used, and stage 1 will be avoided on a best-effort
+     * basis.
      * <p>
      * Subsequent calls to {@link #getSkipQueue(Object)} will always work.
      * <p>
      * Subsequent calls to {@link #get(Object)} might work.
      * <p>
      * This should always be synchronous
-     * @return true if no further execution for the parameter is possible, such that, no exceptions will be thrown in {@link #finishActive()} for the parameter, and {@link #get(Object)} will throw an {@link IllegalStateException}, false otherwise
+     * 
+     * @return true if no further execution for the parameter is possible, such
+     *         that, no exceptions will be thrown in {@link #finishActive()} for the
+     *         parameter, and {@link #get(Object)} will throw an
+     *         {@link IllegalStateException}, false otherwise
      * @throws IllegalStateException if parameter is not in the queue anymore
-     * @throws IllegalStateException if the callback was not specified for given parameter
+     * @throws IllegalStateException if the callback was not specified for given
+     *                               parameter
      */
     public boolean drop(P parameter, C callback) throws IllegalStateException {
         final Task task = tasks.get(parameter);
@@ -278,7 +305,9 @@ public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
      * This method attempts to skip the waiting period for said parameter.
      * <p>
      * This should always be synchronous.
-     * @throws IllegalStateException if the parameter is not in the queue anymore, or sometimes if called from asynchronous thread
+     * 
+     * @throws IllegalStateException if the parameter is not in the queue anymore,
+     *                               or sometimes if called from asynchronous thread
      */
     public T get(P parameter) throws E, IllegalStateException {
         final Task task = tasks.get(parameter);
@@ -289,14 +318,16 @@ public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
     }
 
     /**
-     * Processes a parameter as if it was in the queue, without ever passing to another thread.
+     * Processes a parameter as if it was in the queue, without ever passing to
+     * another thread.
      */
     public T getSkipQueue(P parameter) throws E {
         return skipQueue(parameter);
     }
 
     /**
-     * Processes a parameter as if it was in the queue, without ever passing to another thread.
+     * Processes a parameter as if it was in the queue, without ever passing to
+     * another thread.
      */
     public T getSkipQueue(P parameter, C callback) throws E {
         final T object = skipQueue(parameter);
@@ -305,9 +336,10 @@ public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
     }
 
     /**
-     * Processes a parameter as if it was in the queue, without ever passing to another thread.
+     * Processes a parameter as if it was in the queue, without ever passing to
+     * another thread.
      */
-    public T getSkipQueue(P parameter, C...callbacks) throws E {
+    public T getSkipQueue(P parameter, C... callbacks) throws E {
         final CallBackProvider<P, T, C, E> provider = this.provider;
         final T object = skipQueue(parameter);
         for (C callback : callbacks) {
@@ -317,7 +349,8 @@ public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
     }
 
     /**
-     * Processes a parameter as if it was in the queue, without ever passing to another thread.
+     * Processes a parameter as if it was in the queue, without ever passing to
+     * another thread.
      */
     public T getSkipQueue(P parameter, Iterable<C> callbacks) throws E {
         final CallBackProvider<P, T, C, E> provider = this.provider;
@@ -339,7 +372,8 @@ public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
     }
 
     /**
-     * This is the 'heartbeat' that should be called synchronously to finish any pending tasks
+     * This is the 'heartbeat' that should be called synchronously to finish any
+     * pending tasks
      */
     public void finishActive() throws E {
         final Queue<Task> finished = this.finished;
@@ -350,5 +384,9 @@ public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
 
     public void setActiveThreads(final int coreSize) {
         pool.setCorePoolSize(coreSize);
+    }
+
+    public ThreadPoolExecutor getPool() {
+        return this.pool;
     }
 }

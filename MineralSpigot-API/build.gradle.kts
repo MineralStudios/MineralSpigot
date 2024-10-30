@@ -17,6 +17,9 @@ dependencies {
     api("net.md-5:bungeecord-chat:1.8-SNAPSHOT")
     compileOnlyApi("net.sf.trove4j:trove4j:3.0.3") // provided by server
 
+    compileOnly("org.projectlombok:lombok:1.18.32") 
+    annotationProcessor("org.projectlombok:lombok:1.18.32")
+
     // bundled with Minecraft, should be kept in sync
     api("com.google.guava:guava:18.0")
     api("com.google.code.gson:gson:2.2.4")

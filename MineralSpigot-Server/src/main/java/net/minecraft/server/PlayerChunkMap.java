@@ -21,6 +21,7 @@ import it.unimi.dsi.fastutil.longs.LongComparator;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import lombok.val;
 
 public class PlayerChunkMap {
 
@@ -494,7 +495,7 @@ public class PlayerChunkMap {
                     return;
                 }
                 // CraftBukkit end
-                Chunk chunk = PlayerChunkMap.this.world.getChunkAt(this.location.x, this.location.z);
+                val chunk = PlayerChunkMap.this.world.getChunkAt(this.location.x, this.location.z);
 
                 if (chunk.isReady())
                     entityplayer.playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 0));

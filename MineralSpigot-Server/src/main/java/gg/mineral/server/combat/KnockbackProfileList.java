@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.val;
 
 public class KnockbackProfileList {
     @Getter
@@ -16,28 +18,26 @@ public class KnockbackProfileList {
 
     static {
         // Check if knockback folder exists
-        File knockbackFolder = new File("knockback");
+        val knockbackFolder = new File("knockback");
         if (!knockbackFolder.exists())
             knockbackFolder.mkdir();
         // Load all Groovy files in the "knockback" folder
-        getAllGroovyFiles("knockback")
-                .forEach(file -> {
-                    KnockbackProfile profile = new KnockbackProfile(file.getPath(), getFileNameWithoutExtension(file));
-                    profile.loadConfig();
-                    profiles.put(file.getPath(),
-                            profile);
-                });
+        iterateAllGroovyFiles("knockback", file -> {
+            val profile = new KnockbackProfile(file.getPath(), getFileNameWithoutExtension(file));
+            profile.loadConfig();
+            profiles.put(file.getPath(),
+                    profile);
+        });
 
         if (profiles.isEmpty() || profiles.values().stream()
                 .noneMatch(profile -> profile.getName().equals("default_kb"))) {
             // export default from resources (knockback/default_kb.groovy)
             // and load it
 
-            java.io.InputStream inputStream = KnockbackProfile.class
-                    .getResourceAsStream("/knockback/default_kb.groovy");
-            try {
+            try (val inputStream = KnockbackProfile.class
+                    .getResourceAsStream("/knockback/default_kb.groovy")) {
                 Files.copy(inputStream, Paths.get("knockback/default_kb.groovy"));
-                KnockbackProfile profile = new KnockbackProfile("knockback/default_kb.groovy", "default_kb");
+                val profile = new KnockbackProfile("knockback/default_kb.groovy", "default_kb");
                 profile.loadConfig();
                 profiles.put("knockback/default_kb.groovy", profile);
             } catch (IOException e) {
@@ -50,11 +50,9 @@ public class KnockbackProfileList {
 
     public static KnockbackProfile getDefaultKnockbackProfile() {
 
-        for (KnockbackProfile profile : profiles.values()) {
-            if (profile.getName().equals("default_kb")) {
+        for (val profile : profiles.values())
+            if (profile.getName().equals("default_kb"))
                 return profile;
-            }
-        }
 
         try {
             return KnockbackProfile.createNew("default_kb");
@@ -65,41 +63,35 @@ public class KnockbackProfileList {
     }
 
     public static String getFileNameWithoutExtension(File file) {
-        String fileName = file.getName();
+        val fileName = file.getName();
         int dotIndex = fileName.lastIndexOf('.');
-        if (dotIndex != -1) {
+        if (dotIndex != -1)
             return fileName.substring(0, dotIndex);
-        }
+
         return fileName;
     }
 
     public static KnockbackProfile getComboKnockbackProfile() {
-        for (KnockbackProfile profile : profiles.values()) {
-            if (profile.getName().equals("combo_kb")) {
+        for (val profile : profiles.values())
+            if (profile.getName().equals("combo_kb"))
                 return profile;
-            }
-        }
+
         return getDefaultKnockbackProfile();
     }
 
     public static KnockbackProfile getKnockbackProfileByName(String name) {
-        for (KnockbackProfile profile : profiles.values()) {
-            if (profile.getName().equals(name)) {
+        for (val profile : profiles.values())
+            if (profile.getName().equals(name))
                 return profile;
-            }
-        }
+
         return null;
     }
 
-    public static Stream<File> getAllGroovyFiles(String folderPath) {
-        try {
-            return Files.list(Paths.get(folderPath))
-                    .filter(Files::isRegularFile)
-                    .filter(path -> path.toString().endsWith(".groovy"))
-                    .map(path -> path.toFile());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Stream.empty();
-        }
+    @SneakyThrows
+    public static void iterateAllGroovyFiles(String folderPath, Consumer<File> consumer) {
+        Files.list(Paths.get(folderPath))
+                .filter(Files::isRegularFile)
+                .filter(path -> path.toString().endsWith(".groovy"))
+                .map(path -> path.toFile()).forEach(consumer);
     }
 }

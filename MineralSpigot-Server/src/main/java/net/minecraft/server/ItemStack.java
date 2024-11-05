@@ -552,9 +552,8 @@ public final class ItemStack {
     }
 
     public void a(World world, Entity entity, int i, boolean flag) {
-        if (this.c > 0) {
+        if (this.c > 0)
             --this.c;
-        }
 
         this.item.a(this, world, entity, i, flag);
     }

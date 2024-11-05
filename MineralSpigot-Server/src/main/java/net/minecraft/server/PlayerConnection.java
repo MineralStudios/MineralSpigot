@@ -775,7 +775,8 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
         WorldServer worldserver = this.minecraftServer.getWorldServer(this.player.dimension);
         boolean throttled = false;
         // PaperSpigot - Allow disabling the player interaction limiter
-        if (GlobalConfig.getInstance().isInteractLimitEnabled() && lastPlace != -1
+        if (this.networkManager.channel != null && GlobalConfig.getInstance().isInteractLimitEnabled()
+                && lastPlace != -1
                 && packetplayinblockplace.timestamp - lastPlace < 30 && packets++ >= 4) {
             throttled = true;
         } else if (packetplayinblockplace.timestamp - lastPlace >= 30 || lastPlace == -1) {

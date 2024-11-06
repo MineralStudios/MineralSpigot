@@ -1859,11 +1859,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public void setKnockback(Knockback knockback) {
-        if (knockback == null) {
-            getHandle().setKbProfile(KnockbackProfileList.getDefaultKnockbackProfile());
-            return;
-        }
-        getHandle().setKbProfile((KnockbackProfile) knockback);
+        if (knockback instanceof KnockbackProfile profile)
+            getHandle().setKbProfile(profile);
     }
 
     @Override

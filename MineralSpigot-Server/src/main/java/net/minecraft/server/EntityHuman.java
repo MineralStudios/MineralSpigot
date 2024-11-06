@@ -4,12 +4,14 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
 
+import gg.mineral.server.combat.KnockbackProfileList;
 import gg.mineral.server.config.GlobalConfig;
+import lombok.val;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+
 import java.util.UUID;
 
 // CraftBukkit start
@@ -23,7 +25,7 @@ import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
-import org.bukkit.util.Vector;
+
 // CraftBukkit end
 
 public abstract class EntityHuman extends EntityLiving {
@@ -1049,17 +1051,15 @@ public abstract class EntityHuman extends EntityLiving {
                 byte b0 = 0;
                 float f1 = 0.0F;
 
-                if (entity instanceof EntityLiving) {
+                if (entity instanceof EntityLiving)
                     f1 = EnchantmentManager.a(this.bA(), ((EntityLiving) entity).getMonsterType());
-                } else {
+                else
                     f1 = EnchantmentManager.a(this.bA(), EnumMonsterType.UNDEFINED);
-                }
 
                 int i = b0 + EnchantmentManager.a((EntityLiving) this);
 
-                if (this.isSprinting()) {
+                if (this.isSprinting())
                     ++i;
-                }
 
                 if (f > 0.0F || f1 > 0.0F) {
                     boolean flag = !GlobalConfig.getInstance().isDisablePlayerCrits() && this.fallDistance > 0.0F
@@ -1095,9 +1095,11 @@ public abstract class EntityHuman extends EntityLiving {
                     if (flag2) {
                         if (i > 0) {
 
-                            if (entity instanceof EntityLiving) {
-                                EntityLiving victim = (EntityLiving) entity;
-                                victim.kbProfile.callSecondStage(
+                            if (entity instanceof EntityLiving victim) {
+                                val kbProfile = victim.kbProfile != null ? victim.kbProfile
+                                        : victim.maxNoDamageTicks < 10 ? KnockbackProfileList.getComboKnockbackProfile()
+                                                : KnockbackProfileList.getDefaultKnockbackProfile();
+                                kbProfile.callSecondStage(
                                         this, victim, EnchantmentManager.a((EntityLiving) this));
                             } else {
 
@@ -1130,8 +1132,8 @@ public abstract class EntityHuman extends EntityLiving {
                             // like most other
                             // things, doesn't affect server velocity at all.
 
-                            EntityPlayer attackedPlayer = (EntityPlayer) entity;
-                            PlayerVelocityEvent event = new PlayerVelocityEvent(attackedPlayer.getBukkitEntity(),
+                            val attackedPlayer = (EntityPlayer) entity;
+                            val event = new PlayerVelocityEvent(attackedPlayer.getBukkitEntity(),
                                     attackedPlayer.getBukkitEntity().getVelocity());
 
                             this.world.getServer().getPluginManager().callEvent(event);
@@ -1148,22 +1150,18 @@ public abstract class EntityHuman extends EntityLiving {
                             // PandaSpigot end
                         }
 
-                        if (flag) {
+                        if (flag)
                             this.b(entity);
-                        }
 
-                        if (f1 > 0.0F) {
+                        if (f1 > 0.0F)
                             this.c(entity);
-                        }
 
-                        if (f >= 18.0F) {
+                        if (f >= 18.0F)
                             this.b((Statistic) AchievementList.F);
-                        }
 
                         this.p(entity);
-                        if (entity instanceof EntityLiving) {
-                            EnchantmentManager.a((EntityLiving) entity, (Entity) this);
-                        }
+                        if (entity instanceof EntityLiving living)
+                            EnchantmentManager.a(living, (Entity) this);
 
                         EnchantmentManager.b(this, entity);
                         ItemStack itemstack = this.bZ();
@@ -1172,17 +1170,17 @@ public abstract class EntityHuman extends EntityLiving {
                         if (entity instanceof EntityComplexPart) {
                             IComplex icomplex = ((EntityComplexPart) entity).owner;
 
-                            if (icomplex instanceof EntityLiving) {
+                            if (icomplex instanceof EntityLiving)
                                 object = (EntityLiving) icomplex;
-                            }
+
                         }
 
                         if (itemstack != null && object instanceof EntityLiving) {
                             itemstack.a((EntityLiving) object, this);
                             // CraftBukkit - bypass infinite items; <= 0 -> == 0
-                            if (itemstack.count == 0) {
+                            if (itemstack.count == 0)
                                 this.ca();
-                            }
+
                         }
 
                         if (entity instanceof EntityLiving) {
@@ -1194,9 +1192,9 @@ public abstract class EntityHuman extends EntityLiving {
                                         this.getBukkitEntity(), entity.getBukkitEntity(), j * 4);
                                 org.bukkit.Bukkit.getPluginManager().callEvent(combustEvent);
 
-                                if (!combustEvent.isCancelled()) {
+                                if (!combustEvent.isCancelled())
                                     entity.setOnFire(combustEvent.getDuration());
-                                }
+
                                 // CraftBukkit end
                             }
                         }
@@ -1204,9 +1202,9 @@ public abstract class EntityHuman extends EntityLiving {
                         this.applyExhaustion(GlobalConfig.getInstance().getCombatExhaustion()); // Spigot - Change to
                                                                                                 // use
                         // configurable value
-                    } else if (flag1) {
+                    } else if (flag1)
                         entity.extinguish();
-                    }
+
                 }
 
             }
@@ -1222,9 +1220,8 @@ public abstract class EntityHuman extends EntityLiving {
     public void die() {
         super.die();
         this.defaultContainer.b(this);
-        if (this.activeContainer != null) {
+        if (this.activeContainer != null)
             this.activeContainer.b(this);
-        }
 
     }
 
@@ -1238,23 +1235,19 @@ public abstract class EntityHuman extends EntityLiving {
 
     public EntityHuman.EnumBedResult a(BlockPosition blockposition) {
         if (!this.world.isClientSide) {
-            if (this.isSleeping() || !this.isAlive()) {
+            if (this.isSleeping() || !this.isAlive())
                 return EntityHuman.EnumBedResult.OTHER_PROBLEM;
-            }
 
-            if (!this.world.worldProvider.d()) {
+            if (!this.world.worldProvider.d())
                 return EntityHuman.EnumBedResult.NOT_POSSIBLE_HERE;
-            }
 
-            if (this.world.w()) {
+            if (this.world.w())
                 return EntityHuman.EnumBedResult.NOT_POSSIBLE_NOW;
-            }
 
             if (Math.abs(this.locX - (double) blockposition.getX()) > 3.0D
                     || Math.abs(this.locY - (double) blockposition.getY()) > 2.0D
-                    || Math.abs(this.locZ - (double) blockposition.getZ()) > 3.0D) {
+                    || Math.abs(this.locZ - (double) blockposition.getZ()) > 3.0D)
                 return EntityHuman.EnumBedResult.TOO_FAR_AWAY;
-            }
 
             double d0 = 8.0D;
             double d1 = 5.0D;
@@ -1263,9 +1256,9 @@ public abstract class EntityHuman extends EntityLiving {
                             (double) blockposition.getZ() - d0, (double) blockposition.getX() + d0,
                             (double) blockposition.getY() + d1, (double) blockposition.getZ() + d0));
 
-            if (!list.isEmpty()) {
+            if (!list.isEmpty())
                 return EntityHuman.EnumBedResult.NOT_SAFE;
-            }
+
         }
 
         if (this.au()) {
@@ -1281,9 +1274,9 @@ public abstract class EntityHuman extends EntityLiving {
             PlayerBedEnterEvent event = new PlayerBedEnterEvent(player, bed);
             this.world.getServer().getPluginManager().callEvent(event);
 
-            if (event.isCancelled()) {
+            if (event.isCancelled())
                 return EnumBedResult.OTHER_PROBLEM;
-            }
+
         }
         // CraftBukkit end
 
@@ -1314,18 +1307,16 @@ public abstract class EntityHuman extends EntityLiving {
             this.a(enumdirection);
             this.setPosition((double) ((float) blockposition.getX() + f),
                     (double) ((float) blockposition.getY() + 0.6875F), (double) ((float) blockposition.getZ() + f1));
-        } else {
+        } else
             this.setPosition((double) ((float) blockposition.getX() + 0.5F),
                     (double) ((float) blockposition.getY() + 0.6875F), (double) ((float) blockposition.getZ() + 0.5F));
-        }
 
         this.sleeping = true;
         this.sleepTicks = 0;
         this.bx = blockposition;
         this.motX = this.motZ = this.motY = 0.0D;
-        if (!this.world.isClientSide) {
+        if (!this.world.isClientSide)
             this.world.everyoneSleeping();
-        }
 
         return EntityHuman.EnumBedResult.OK;
     }
@@ -1360,9 +1351,8 @@ public abstract class EntityHuman extends EntityLiving {
             this.world.setTypeAndData(this.bx, iblockdata.set(BlockBed.OCCUPIED, Boolean.valueOf(false)), 4);
             BlockPosition blockposition = BlockBed.a(this.world, this.bx, 0);
 
-            if (blockposition == null) {
+            if (blockposition == null)
                 blockposition = this.bx.up();
-            }
 
             this.setPosition((double) ((float) blockposition.getX() + 0.5F),
                     (double) ((float) blockposition.getY() + 0.1F), (double) ((float) blockposition.getZ() + 0.5F));
@@ -1392,9 +1382,8 @@ public abstract class EntityHuman extends EntityLiving {
         // CraftBukkit end
 
         this.sleepTicks = flag ? 0 : 100;
-        if (flag2) {
+        if (flag2)
             this.setRespawnPosition(this.bx, false);
-        }
 
     }
 
@@ -1417,17 +1406,15 @@ public abstract class EntityHuman extends EntityLiving {
         Block block = world.getType(blockposition).getBlock();
 
         if (block != Blocks.BED) {
-            if (!flag) {
+            if (!flag)
                 return null;
-            } else {
-                boolean flag1 = block.g();
-                boolean flag2 = world.getType(blockposition.up()).getBlock().g();
 
-                return flag1 && flag2 ? blockposition : null;
-            }
-        } else {
-            return BlockBed.a(world, blockposition, 0);
+            boolean flag1 = block.g();
+            boolean flag2 = world.getType(blockposition.up()).getBlock().g();
+
+            return flag1 && flag2 ? blockposition : null;
         }
+        return BlockBed.a(world, blockposition, 0);
     }
 
     public boolean isSleeping() {

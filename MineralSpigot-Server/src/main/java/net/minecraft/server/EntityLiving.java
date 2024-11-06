@@ -35,12 +35,14 @@ import gg.mineral.server.combat.KnockbackProfileList;
 import gg.mineral.server.config.GlobalConfig;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
 
 public abstract class EntityLiving extends Entity {
 
     @Getter
     @Setter
-    protected KnockbackProfile kbProfile = KnockbackProfileList.getDefaultKnockbackProfile();
+    @Nullable
+    protected KnockbackProfile kbProfile = null;
 
     private static final UUID a = UUID.fromString("662A6B8D-DA3E-4C1C-8813-96EA6097278D");
     private static final AttributeModifier b = (new AttributeModifier(EntityLiving.a, "Sprinting speed boost",
@@ -942,6 +944,10 @@ public abstract class EntityLiving extends Entity {
         if (this.random.nextDouble() >= this.getAttributeInstance(GenericAttributes.c).getValue()) {
             this.ai = true;
 
+            val kbProfile = this.kbProfile != null ? this.kbProfile
+                    : this.maxNoDamageTicks < 10 ? KnockbackProfileList.getComboKnockbackProfile()
+                            : KnockbackProfileList.getDefaultKnockbackProfile();
+
             if (entity instanceof EntityLiving)
                 kbProfile.callFirstStage((EntityLiving) entity, this);
             else {
@@ -957,9 +963,9 @@ public abstract class EntityLiving extends Entity {
                 this.motY += 0.35;
                 this.motZ -= d1 / magnitude * 0.35;
 
-                if (this.motY > 0.4) {
+                if (this.motY > 0.4)
                     this.motY = 0.4;
-                }
+
             }
 
         }

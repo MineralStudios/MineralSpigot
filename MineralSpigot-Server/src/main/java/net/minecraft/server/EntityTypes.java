@@ -1,14 +1,19 @@
 package net.minecraft.server;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import gg.mineral.server.config.GlobalConfig;
+import lombok.val;
 
 public class EntityTypes {
 
@@ -44,13 +49,16 @@ public class EntityTypes {
     }
 
     public static Entity createEntityByName(String s, World world) {
+        if (s.equalsIgnoreCase("ArmorStand") && GlobalConfig.getInstance().isDisableArmorStands())
+            return null;
         Entity entity = null;
 
         try {
             Class oclass = (Class) EntityTypes.c.get(s);
 
             if (oclass != null) {
-                entity = (Entity) oclass.getConstructor(new Class[] { World.class}).newInstance(new Object[] { world});
+                entity = (Entity) oclass.getConstructor(new Class[] { World.class })
+                        .newInstance(new Object[] { world });
             }
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -62,8 +70,14 @@ public class EntityTypes {
     public static Entity a(NBTTagCompound nbttagcompound, World world) {
         Entity entity = null;
 
-        if ("Minecart".equals(nbttagcompound.getString("id"))) {
-            nbttagcompound.setString("id", EntityMinecartAbstract.EnumMinecartType.a(nbttagcompound.getInt("Type")).b());
+        val id = nbttagcompound.getString("id");
+
+        if (id.equalsIgnoreCase("ArmorStand") && GlobalConfig.getInstance().isDisableArmorStands())
+            return null;
+
+        if ("Minecart".equals(id)) {
+            nbttagcompound.setString("id",
+                    EntityMinecartAbstract.EnumMinecartType.a(nbttagcompound.getInt("Type")).b());
             nbttagcompound.remove("Type");
         }
 
@@ -71,7 +85,8 @@ public class EntityTypes {
             Class oclass = (Class) EntityTypes.c.get(nbttagcompound.getString("id"));
 
             if (oclass != null) {
-                entity = (Entity) oclass.getConstructor(new Class[] { World.class}).newInstance(new Object[] { world});
+                entity = (Entity) oclass.getConstructor(new Class[] { World.class })
+                        .newInstance(new Object[] { world });
             }
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -87,13 +102,17 @@ public class EntityTypes {
     }
 
     public static Entity a(int i, World world) {
+
+        if (i == 30 && GlobalConfig.getInstance().isDisableArmorStands())
+            return null;
         Entity entity = null;
 
         try {
             Class oclass = a(i);
 
             if (oclass != null) {
-                entity = (Entity) oclass.getConstructor(new Class[] { World.class}).newInstance(new Object[] { world});
+                entity = (Entity) oclass.getConstructor(new Class[] { World.class })
+                        .newInstance(new Object[] { world });
             }
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -124,7 +143,8 @@ public class EntityTypes {
         return (String) EntityTypes.d.get(a(i));
     }
 
-    public static void a() {}
+    public static void a() {
+    }
 
     public static List<String> b() {
         Set set = EntityTypes.c.keySet();

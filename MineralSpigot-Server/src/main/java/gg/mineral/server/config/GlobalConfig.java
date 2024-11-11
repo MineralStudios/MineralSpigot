@@ -172,6 +172,8 @@ public class GlobalConfig {
     private int chunkGCLoadThresh = 0;
     @Setting("performance")
     private long maxTickTime = TimeUnit.MINUTES.toMillis(1L);
+    @Setting("performance")
+    private boolean disableArmorStands = true;
     @Setting("player")
     private boolean smoothTeleportation = false;
     @Setting("player")

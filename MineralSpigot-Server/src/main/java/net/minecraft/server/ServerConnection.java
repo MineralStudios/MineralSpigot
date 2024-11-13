@@ -5,19 +5,21 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import gg.mineral.server.config.GlobalConfig;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelException;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.local.LocalEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.MessageToMessageEncoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -134,7 +136,17 @@ public class ServerConnection {
                                     .addLast("decoder", new PacketDecoder(EnumProtocolDirection.SERVERBOUND))
                                     .addLast("prepender", PacketPrepender.INSTANCE) // PandaSpigot - Share
                                                                                     // PacketPrepender instance
+                                    .addLast("via-encoder", new MessageToMessageEncoder<ByteBuf>() {
+
+                                        @Override
+                                        protected void encode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out)
+                                                throws Exception {
+                                            out.add(msg.retain());
+                                        }
+
+                                    })
                                     .addLast("encoder", new PacketEncoder(EnumProtocolDirection.CLIENTBOUND));
+
                             // PandaSpigot end
                             NetworkManager networkmanager = new NetworkManager(EnumProtocolDirection.SERVERBOUND);
 

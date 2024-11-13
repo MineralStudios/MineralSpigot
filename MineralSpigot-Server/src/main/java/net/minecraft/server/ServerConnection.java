@@ -133,6 +133,15 @@ public class ServerConnection {
                             channel.pipeline().addLast("timeout", new ReadTimeoutHandler(30))
                                     .addLast("legacy_query", new LegacyPingHandler(ServerConnection.this))
                                     .addLast("splitter", new PacketSplitter())
+                                    .addLast("via-decoder", new MessageToMessageEncoder<ByteBuf>() {
+
+                                        @Override
+                                        protected void encode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out)
+                                                throws Exception {
+                                            out.add(msg.retain());
+                                        }
+
+                                    })
                                     .addLast("decoder", new PacketDecoder(EnumProtocolDirection.SERVERBOUND))
                                     .addLast("prepender", PacketPrepender.INSTANCE) // PandaSpigot - Share
                                                                                     // PacketPrepender instance

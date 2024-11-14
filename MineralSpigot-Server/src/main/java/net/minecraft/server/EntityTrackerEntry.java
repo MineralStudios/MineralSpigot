@@ -1,17 +1,18 @@
 package net.minecraft.server;
 
-import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 // CraftBukkit start
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerVelocityEvent;
 // CraftBukkit end
+
+import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 
 public class EntityTrackerEntry {
 
@@ -44,7 +45,7 @@ public class EntityTrackerEntry {
     // receives
     // their first update (which is forced to have absolute coordinates), false
     // afterward.
-    public java.util.Map<EntityPlayer, Boolean> trackedPlayerMap = new java.util.HashMap<EntityPlayer, Boolean>();
+    public Object2BooleanOpenHashMap<EntityPlayer> trackedPlayerMap = new Object2BooleanOpenHashMap<>();
     public Set<EntityPlayer> trackedPlayers = trackedPlayerMap.keySet();
     // PaperSpigot end
 

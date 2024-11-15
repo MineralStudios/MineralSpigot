@@ -1,6 +1,5 @@
 package org.bukkit.craftbukkit.inventory;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -22,6 +21,9 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
 import org.bukkit.Material;
 
 public class CraftInventory implements Inventory {
@@ -61,7 +63,8 @@ public class CraftInventory implements Inventory {
 
     public void setContents(ItemStack[] items) {
         if (getInventory().getContents().length < items.length) {
-            throw new IllegalArgumentException("Invalid inventory size; expected " + getInventory().getContents().length + " or less");
+            throw new IllegalArgumentException(
+                    "Invalid inventory size; expected " + getInventory().getContents().length + " or less");
         }
 
         net.minecraft.server.ItemStack[] mcItems = getInventory().getContents();
@@ -76,7 +79,8 @@ public class CraftInventory implements Inventory {
     }
 
     public void setItem(int index, ItemStack item) {
-        getInventory().setItem(index, ((item == null || item.getTypeId() == 0) ? null : CraftItemStack.asNMSCopy(item)));
+        getInventory().setItem(index,
+                ((item == null || item.getTypeId() == 0) ? null : CraftItemStack.asNMSCopy(item)));
     }
 
     public boolean contains(int materialId) {
@@ -154,8 +158,8 @@ public class CraftInventory implements Inventory {
         return false;
     }
 
-    public HashMap<Integer, ItemStack> all(int materialId) {
-        HashMap<Integer, ItemStack> slots = new HashMap<Integer, ItemStack>();
+    public Int2ObjectOpenHashMap<ItemStack> all(int materialId) {
+        Int2ObjectOpenHashMap<ItemStack> slots = new Int2ObjectOpenHashMap<>();
 
         ItemStack[] inventory = getContents();
         for (int i = 0; i < inventory.length; i++) {
@@ -167,13 +171,13 @@ public class CraftInventory implements Inventory {
         return slots;
     }
 
-    public HashMap<Integer, ItemStack> all(Material material) {
+    public Int2ObjectOpenHashMap<ItemStack> all(Material material) {
         Validate.notNull(material, "Material cannot be null");
         return all(material.getId());
     }
 
-    public HashMap<Integer, ItemStack> all(ItemStack item) {
-        HashMap<Integer, ItemStack> slots = new HashMap<Integer, ItemStack>();
+    public Int2ObjectOpenHashMap<ItemStack> all(ItemStack item) {
+        Int2ObjectOpenHashMap<ItemStack> slots = new Int2ObjectOpenHashMap<ItemStack>();
         if (item != null) {
             ItemStack[] inventory = getContents();
             for (int i = 0; i < inventory.length; i++) {
@@ -211,7 +215,8 @@ public class CraftInventory implements Inventory {
         }
         ItemStack[] inventory = getContents();
         for (int i = 0; i < inventory.length; i++) {
-            if (inventory[i] == null) continue;
+            if (inventory[i] == null)
+                continue;
 
             if (withAmount ? item.equals(inventory[i]) : item.isSimilar(inventory[i])) {
                 return i;
@@ -261,14 +266,15 @@ public class CraftInventory implements Inventory {
         return -1;
     }
 
-    public HashMap<Integer, ItemStack> addItem(ItemStack... items) {
+    public Int2ObjectOpenHashMap<ItemStack> addItem(ItemStack... items) {
         Validate.noNullElements(items, "Item cannot be null");
-        HashMap<Integer, ItemStack> leftover = new HashMap<Integer, ItemStack>();
+        Int2ObjectOpenHashMap<ItemStack> leftover = new Int2ObjectOpenHashMap<ItemStack>();
 
-        /* TODO: some optimization
-         *  - Create a 'firstPartial' with a 'fromIndex'
-         *  - Record the lastPartial per Material
-         *  - Cache firstEmpty result
+        /*
+         * TODO: some optimization
+         * - Create a 'firstPartial' with a 'fromIndex'
+         * - Record the lastPartial per Material
+         * - Cache firstEmpty result
          */
 
         for (int i = 0; i < items.length; i++) {
@@ -326,9 +332,9 @@ public class CraftInventory implements Inventory {
         return leftover;
     }
 
-    public HashMap<Integer, ItemStack> removeItem(ItemStack... items) {
+    public Int2ObjectOpenHashMap<ItemStack> removeItem(ItemStack... items) {
         Validate.notNull(items, "Items cannot be null");
-        HashMap<Integer, ItemStack> leftover = new HashMap<Integer, ItemStack>();
+        Int2ObjectOpenHashMap<ItemStack> leftover = new Int2ObjectOpenHashMap<ItemStack>();
 
         // TODO: optimization
 
@@ -438,7 +444,7 @@ public class CraftInventory implements Inventory {
         } else if (inventory instanceof TileEntityFurnace) {
             return InventoryType.FURNACE;
         } else if (this instanceof CraftInventoryEnchanting) {
-           return InventoryType.ENCHANTING;
+            return InventoryType.ENCHANTING;
         } else if (inventory instanceof TileEntityBrewingStand) {
             return InventoryType.BREWING;
         } else if (inventory instanceof CraftInventoryCustom.MinecraftInventory) {
@@ -450,7 +456,7 @@ public class CraftInventory implements Inventory {
         } else if (inventory instanceof TileEntityBeacon) {
             return InventoryType.BEACON;
         } else if (this instanceof CraftInventoryAnvil) {
-           return InventoryType.ANVIL;
+            return InventoryType.ANVIL;
         } else if (inventory instanceof IHopper) {
             return InventoryType.HOPPER;
         } else {

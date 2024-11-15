@@ -1,6 +1,5 @@
 package org.bukkit.event.enchantment;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.block.Block;
@@ -12,6 +11,8 @@ import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+
 /**
  * Called when an ItemStack is successfully enchanted (currently at
  * enchantment table)
@@ -22,17 +23,18 @@ public class EnchantItemEvent extends InventoryEvent implements Cancellable {
     private final ItemStack item;
     private int level;
     private boolean cancelled;
-    private final Map<Enchantment,Integer> enchants;
+    private final Map<Enchantment, Integer> enchants;
     private final Player enchanter;
     private int button;
 
-    public EnchantItemEvent(final Player enchanter, final InventoryView view, final Block table, final ItemStack item, final int level, final Map<Enchantment, Integer> enchants, final int i) {
+    public EnchantItemEvent(final Player enchanter, final InventoryView view, final Block table, final ItemStack item,
+            final int level, final Object2IntOpenHashMap<Enchantment> enchants, final int i) {
         super(view);
         this.enchanter = enchanter;
         this.table = table;
         this.item = item;
         this.level = level;
-        this.enchants = new HashMap<Enchantment, Integer>(enchants);
+        this.enchants = new Object2IntOpenHashMap<>(enchants);
         this.cancelled = false;
         this.button = i;
     }

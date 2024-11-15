@@ -5,7 +5,6 @@ import static org.bukkit.util.Java15Compat.Arrays_copyOfRange;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -14,16 +13,22 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.Server;
-import org.bukkit.command.defaults.*;
+import org.bukkit.command.defaults.HelpCommand;
+import org.bukkit.command.defaults.PluginsCommand;
+import org.bukkit.command.defaults.ReloadCommand;
+import org.bukkit.command.defaults.VanillaCommand;
+import org.bukkit.command.defaults.VersionCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 import org.github.paperspigot.event.ServerExceptionEvent;
 import org.github.paperspigot.exception.ServerCommandException;
 import org.github.paperspigot.exception.ServerTabCompleteException;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 public class SimpleCommandMap implements CommandMap {
     private static final Pattern PATTERN_ON_SPACE = Pattern.compile(" ", Pattern.LITERAL);
-    protected final Map<String, Command> knownCommands = new HashMap<String, Command>();
+    protected final Map<String, Command> knownCommands = new Object2ObjectOpenHashMap<String, Command>();
     private final Server server;
 
     public SimpleCommandMap(final Server server) {

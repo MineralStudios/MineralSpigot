@@ -1,13 +1,13 @@
 package org.bukkit;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.block.Block;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.util.NumberConversions;
-import static org.bukkit.util.NumberConversions.checkFinite;
 import org.bukkit.util.Vector;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 /**
  * Represents a 3-dimensional position in a world
@@ -24,9 +24,9 @@ public class Location implements Cloneable, ConfigurationSerializable {
      * Constructs a new Location with the given coordinates
      *
      * @param world The world in which this location resides
-     * @param x The x-coordinate of this new location
-     * @param y The y-coordinate of this new location
-     * @param z The z-coordinate of this new location
+     * @param x     The x-coordinate of this new location
+     * @param y     The y-coordinate of this new location
+     * @param z     The z-coordinate of this new location
      */
     public Location(final World world, final double x, final double y, final double z) {
         this(world, x, y, z, 0, 0);
@@ -36,13 +36,14 @@ public class Location implements Cloneable, ConfigurationSerializable {
      * Constructs a new Location with the given coordinates and direction
      *
      * @param world The world in which this location resides
-     * @param x The x-coordinate of this new location
-     * @param y The y-coordinate of this new location
-     * @param z The z-coordinate of this new location
-     * @param yaw The absolute rotation on the x-plane, in degrees
+     * @param x     The x-coordinate of this new location
+     * @param y     The y-coordinate of this new location
+     * @param z     The z-coordinate of this new location
+     * @param yaw   The absolute rotation on the x-plane, in degrees
      * @param pitch The absolute rotation on the y-plane, in degrees
      */
-    public Location(final World world, final double x, final double y, final double z, final float yaw, final float pitch) {
+    public Location(final World world, final double x, final double y, final double z, final float yaw,
+            final float pitch) {
         this.world = world;
         this.x = x;
         this.y = y;
@@ -212,7 +213,7 @@ public class Location implements Cloneable, ConfigurationSerializable {
      * <ul>
      * <li>A pitch of 0 represents level forward facing.
      * <li>A pitch of 90 represents downward facing, or negative y
-     *     direction.
+     * direction.
      * <li>A pitch of -90 represents upward facing, or positive y direction.
      * </ul>
      * Increasing pitch values the equivalent of looking down.
@@ -228,7 +229,7 @@ public class Location implements Cloneable, ConfigurationSerializable {
      * <ul>
      * <li>A pitch of 0 represents level forward facing.
      * <li>A pitch of 90 represents downward facing, or negative y
-     *     direction.
+     * direction.
      * <li>A pitch of -90 represents upward facing, or positive y direction.
      * </ul>
      * Increasing pitch values the equivalent of looking down.
@@ -244,7 +245,7 @@ public class Location implements Cloneable, ConfigurationSerializable {
      * facing.
      *
      * @return a vector pointing the direction of this location's {@link
-     *     #getPitch() pitch} and {@link #getYaw() yaw}
+     *         #getPitch() pitch} and {@link #getYaw() yaw}
      */
     public Vector getDirection() {
         Vector vector = new Vector();
@@ -453,10 +454,12 @@ public class Location implements Cloneable, ConfigurationSerializable {
         } else if (o.getWorld() == null || getWorld() == null) {
             throw new IllegalArgumentException("Cannot measure distance to a null world");
         } else if (o.getWorld() != getWorld()) {
-            throw new IllegalArgumentException("Cannot measure distance between " + getWorld().getName() + " and " + o.getWorld().getName());
+            throw new IllegalArgumentException(
+                    "Cannot measure distance between " + getWorld().getName() + " and " + o.getWorld().getName());
         }
 
-        return NumberConversions.square(x - o.x) + NumberConversions.square(y - o.y) + NumberConversions.square(z - o.z);
+        return NumberConversions.square(x - o.x) + NumberConversions.square(y - o.y)
+                + NumberConversions.square(z - o.z);
     }
 
     /**
@@ -533,14 +536,15 @@ public class Location implements Cloneable, ConfigurationSerializable {
 
     @Override
     public String toString() {
-        return "Location{" + "world=" + world + ",x=" + x + ",y=" + y + ",z=" + z + ",pitch=" + pitch + ",yaw=" + yaw + '}';
+        return "Location{" + "world=" + world + ",x=" + x + ",y=" + y + ",z=" + z + ",pitch=" + pitch + ",yaw=" + yaw
+                + '}';
     }
 
     /**
      * Constructs a new {@link Vector} based on this Location
      *
      * @return New Vector containing the coordinates represented by this
-     *     Location
+     *         Location
      */
     public Vector toVector() {
         return new Vector(x, y, z);
@@ -566,22 +570,22 @@ public class Location implements Cloneable, ConfigurationSerializable {
         return NumberConversions.floor(loc);
     }
 
-	@Utility
-	public Map<String, Object> serialize() {
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("world", this.world.getName());
+    @Utility
+    public Map<String, Object> serialize() {
+        Map<String, Object> data = new Object2ObjectOpenHashMap<String, Object>();
+        data.put("world", this.world.getName());
 
-		data.put("x", this.x);
-		data.put("y", this.y);
-		data.put("z", this.z);
+        data.put("x", this.x);
+        data.put("y", this.y);
+        data.put("z", this.z);
 
-		data.put("yaw", this.yaw);
-		data.put("pitch", this.pitch);
+        data.put("yaw", this.yaw);
+        data.put("pitch", this.pitch);
 
-		return data;
-	}
-	
-	 /**
+        return data;
+    }
+
+    /**
      * Required method for deserialization
      *
      * @param args map to deserialize
@@ -589,12 +593,14 @@ public class Location implements Cloneable, ConfigurationSerializable {
      * @throws IllegalArgumentException if the world don't exists
      * @see ConfigurationSerializable
      */
-	public static Location deserialize(Map<String, Object> args) {
-		World world = Bukkit.getWorld((String) args.get("world"));
-		if (world == null) {
-			throw new IllegalArgumentException("unknown world");
-		}
+    public static Location deserialize(Map<String, Object> args) {
+        World world = Bukkit.getWorld((String) args.get("world"));
+        if (world == null) {
+            throw new IllegalArgumentException("unknown world");
+        }
 
-		return new Location(world, NumberConversions.toDouble(args.get("x")), NumberConversions.toDouble(args.get("y")), NumberConversions.toDouble(args.get("z")), NumberConversions.toFloat(args.get("yaw")), NumberConversions.toFloat(args.get("pitch")));
-	}
+        return new Location(world, NumberConversions.toDouble(args.get("x")), NumberConversions.toDouble(args.get("y")),
+                NumberConversions.toDouble(args.get("z")), NumberConversions.toFloat(args.get("yaw")),
+                NumberConversions.toFloat(args.get("pitch")));
+    }
 }

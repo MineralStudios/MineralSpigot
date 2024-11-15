@@ -1,22 +1,25 @@
 package org.bukkit.entity;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.entity.minecart.CommandMinecart;
-import org.bukkit.entity.minecart.HopperMinecart;
-import org.bukkit.entity.minecart.SpawnerMinecart;
-import org.bukkit.entity.minecart.RideableMinecart;
-import org.bukkit.entity.minecart.ExplosiveMinecart;
-import org.bukkit.entity.minecart.PoweredMinecart;
-import org.bukkit.entity.minecart.StorageMinecart;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.minecart.CommandMinecart;
+import org.bukkit.entity.minecart.ExplosiveMinecart;
+import org.bukkit.entity.minecart.HopperMinecart;
+import org.bukkit.entity.minecart.PoweredMinecart;
+import org.bukkit.entity.minecart.RideableMinecart;
+import org.bukkit.entity.minecart.SpawnerMinecart;
+import org.bukkit.entity.minecart.StorageMinecart;
+import org.bukkit.inventory.ItemStack;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 
 public enum EntityType {
 
-    // These strings MUST match the strings in nms.EntityTypes and are case sensitive.
+    // These strings MUST match the strings in nms.EntityTypes and are case
+    // sensitive.
     /**
      * An item resting on the ground.
      * <p>
@@ -179,8 +182,8 @@ public enum EntityType {
     private short typeId;
     private boolean independent, living;
 
-    private static final Map<String, EntityType> NAME_MAP = new HashMap<String, EntityType>();
-    private static final Map<Short, EntityType> ID_MAP = new HashMap<Short, EntityType>();
+    private static final Map<String, EntityType> NAME_MAP = new Object2ObjectOpenHashMap<String, EntityType>();
+    private static final Short2ObjectOpenHashMap<EntityType> ID_MAP = new Short2ObjectOpenHashMap<>();
 
     static {
         for (EntityType type : values()) {
@@ -223,7 +226,7 @@ public enum EntityType {
 
     /**
      *
-     * @return the raw type id 
+     * @return the raw type id
      * @deprecated Magic value
      */
     @Deprecated

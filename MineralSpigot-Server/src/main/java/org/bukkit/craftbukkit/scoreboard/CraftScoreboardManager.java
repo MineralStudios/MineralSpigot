@@ -2,12 +2,19 @@ package org.bukkit.craftbukkit.scoreboard;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.Validate;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.util.WeakCollection;
+import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.ScoreboardManager;
+
+import gg.mineral.server.config.GlobalConfig;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.IScoreboardCriteria;
 import net.minecraft.server.MinecraftServer;
@@ -19,19 +26,11 @@ import net.minecraft.server.ScoreboardScore;
 import net.minecraft.server.ScoreboardServer;
 import net.minecraft.server.ScoreboardTeam;
 
-import org.apache.commons.lang.Validate;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
-import org.bukkit.craftbukkit.util.WeakCollection;
-import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.ScoreboardManager;
-
-import gg.mineral.server.config.GlobalConfig;
-
 public final class CraftScoreboardManager implements ScoreboardManager {
     private final CraftScoreboard mainScoreboard;
     private final MinecraftServer server;
     private final Collection<CraftScoreboard> scoreboards = new WeakCollection<CraftScoreboard>();
-    private final Map<CraftPlayer, CraftScoreboard> playerBoards = new HashMap<CraftPlayer, CraftScoreboard>();
+    private final Map<CraftPlayer, CraftScoreboard> playerBoards = new Object2ObjectOpenHashMap<CraftPlayer, CraftScoreboard>();
 
     public CraftScoreboardManager(MinecraftServer minecraftserver, net.minecraft.server.Scoreboard scoreboardServer) {
         mainScoreboard = new CraftScoreboard(scoreboardServer);

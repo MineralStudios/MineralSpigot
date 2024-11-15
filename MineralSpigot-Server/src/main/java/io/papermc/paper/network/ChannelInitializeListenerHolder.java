@@ -1,27 +1,29 @@
 package io.papermc.paper.network;
 
 import io.netty.channel.Channel;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.kyori.adventure.key.Key;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Internal API to register channel initialization listeners.
  * <p>
- * This is not officially supported API and we make no guarantees to the existence or state of this class.
+ * This is not officially supported API and we make no guarantees to the
+ * existence or state of this class.
  */
 public final class ChannelInitializeListenerHolder {
 
-    private static final Map<Key, ChannelInitializeListener> LISTENERS = new HashMap<>();
+    private static final Map<Key, ChannelInitializeListener> LISTENERS = new Object2ObjectOpenHashMap<>();
     private static final Map<Key, ChannelInitializeListener> IMMUTABLE_VIEW = Collections.unmodifiableMap(LISTENERS);
 
     private ChannelInitializeListenerHolder() {
     }
 
     /**
-     * Registers whether an initialization listener is registered under the given key.
+     * Registers whether an initialization listener is registered under the given
+     * key.
      *
      * @param key key
      * @return whether an initialization listener is registered under the given key
@@ -31,7 +33,8 @@ public final class ChannelInitializeListenerHolder {
     }
 
     /**
-     * Registers a channel initialization listener called after ServerConnection is initialized.
+     * Registers a channel initialization listener called after ServerConnection is
+     * initialized.
      *
      * @param key      key
      * @param listener initialization listeners
@@ -41,7 +44,8 @@ public final class ChannelInitializeListenerHolder {
     }
 
     /**
-     * Removes and returns an initialization listener registered by the given key if present.
+     * Removes and returns an initialization listener registered by the given key if
+     * present.
      *
      * @param key key
      * @return removed initialization listener if present

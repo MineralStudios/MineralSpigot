@@ -25,7 +25,7 @@ dependencies {
     // Minecraft libraries:
     implementation("io.netty:netty-all:4.1.112.Final") // PandaSpigot - Update Netty to 4.1.x
     implementation("com.mojang:authlib:1.5.21")
-    implementation("it.unimi.dsi:fastutil:8.5.14")
+    compileOnly("it.unimi.dsi:fastutil:8.5.14")
     // PandaSpigot start - Update log4j
     implementation("org.apache.logging.log4j:log4j-api:2.17.1")
     implementation("org.apache.logging.log4j:log4j-core:2.17.1")

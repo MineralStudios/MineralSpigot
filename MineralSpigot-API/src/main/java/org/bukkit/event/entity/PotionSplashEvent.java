@@ -2,7 +2,6 @@ package org.bukkit.event.entity;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.LivingEntity;
@@ -10,15 +9,17 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+
 /**
  * Called when a splash potion hits an area
  */
 public class PotionSplashEvent extends ProjectileHitEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private boolean cancelled;
-    private final Map<LivingEntity, Double> affectedEntities;
+    private final Object2DoubleOpenHashMap<LivingEntity> affectedEntities;
 
-    public PotionSplashEvent(final ThrownPotion potion, final Map<LivingEntity, Double> affectedEntities) {
+    public PotionSplashEvent(final ThrownPotion potion, final Object2DoubleOpenHashMap<LivingEntity> affectedEntities) {
         super(potion);
 
         this.affectedEntities = affectedEntities;
@@ -53,23 +54,23 @@ public class PotionSplashEvent extends ProjectileHitEvent implements Cancellable
      *
      * @param entity Which entity to get intensity for
      * @return intensity relative to maximum effect; 0.0: not affected; 1.0:
-     *     fully hit by potion effects
+     *         fully hit by potion effects
      */
     public double getIntensity(LivingEntity entity) {
-        Double intensity = affectedEntities.get(entity);
-        return intensity != null ? intensity : 0.0;
+        double intensity = affectedEntities.getDouble(entity);
+        return intensity;
     }
 
     /**
      * Overwrites the intensity for a given entity
      *
-     * @param entity For which entity to define a new intensity
+     * @param entity    For which entity to define a new intensity
      * @param intensity relative to maximum effect
      */
     public void setIntensity(LivingEntity entity, double intensity) {
         Validate.notNull(entity, "You must specify a valid entity.");
         if (intensity <= 0.0) {
-            affectedEntities.remove(entity);
+            affectedEntities.removeDouble(entity);
         } else {
             affectedEntities.put(entity, Math.min(intensity, 1.0));
         }

@@ -1,5 +1,11 @@
 package org.bukkit.craftbukkit.inventory;
 
+// Spigot start
+import static org.spigotmc.ValidateUtils.limit;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -7,17 +13,18 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import net.minecraft.server.NBTBase;
-import net.minecraft.server.NBTTagCompound;
-import net.minecraft.server.NBTTagList;
-import net.minecraft.server.NBTTagString;
-
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -35,26 +42,18 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import net.minecraft.server.NBTCompressedStreamTools;
-import org.apache.commons.codec.binary.Base64;
-
-// Spigot start
-import static org.spigotmc.ValidateUtils.*;
 import net.minecraft.server.GenericAttributes;
 import net.minecraft.server.IAttribute;
 // Spigot end
+import net.minecraft.server.NBTBase;
+import net.minecraft.server.NBTCompressedStreamTools;
+import net.minecraft.server.NBTTagCompound;
+import net.minecraft.server.NBTTagList;
+import net.minecraft.server.NBTTagString;
 
 /**
  * Children must include the following:
@@ -232,13 +231,13 @@ class CraftMetaItem implements ItemMeta, Repairable {
 
     private String displayName;
     private List<String> lore;
-    private Map<Enchantment, Integer> enchantments;
+    private Object2IntOpenHashMap<Enchantment> enchantments;
     private int repairCost;
     private int hideFlag;
 
     private static final Set<String> HANDLED_TAGS = Sets.newHashSet();
 
-    private final Map<String, NBTBase> unhandledTags = new HashMap<String, NBTBase>();
+    private final Map<String, NBTBase> unhandledTags = new Object2ObjectOpenHashMap<String, NBTBase>();
 
     CraftMetaItem(CraftMetaItem meta) {
         if (meta == null)
@@ -250,7 +249,7 @@ class CraftMetaItem implements ItemMeta, Repairable {
             this.lore = new ArrayList<String>(meta.lore);
 
         if (meta.enchantments != null) // Spigot
-            this.enchantments = new HashMap<Enchantment, Integer>(meta.enchantments);
+            this.enchantments = new Object2IntOpenHashMap<Enchantment>(meta.enchantments);
 
         this.repairCost = meta.repairCost;
         this.hideFlag = meta.hideFlag;
@@ -291,7 +290,7 @@ class CraftMetaItem implements ItemMeta, Repairable {
             // Spigot start
             gnu.trove.map.hash.TObjectDoubleHashMap<String> attributeTracker = new gnu.trove.map.hash.TObjectDoubleHashMap<String>();
             gnu.trove.map.hash.TObjectDoubleHashMap<String> attributeTrackerX = new gnu.trove.map.hash.TObjectDoubleHashMap<String>();
-            Map<String, IAttribute> attributesByName = new HashMap<String, IAttribute>();
+            Map<String, IAttribute> attributesByName = new Object2ObjectOpenHashMap<String, IAttribute>();
             attributeTracker.put("generic.maxHealth", 20.0);
             attributesByName.put("generic.maxHealth", GenericAttributes.maxHealth);
             attributeTracker.put("generic.followRange", 32.0);
@@ -449,12 +448,12 @@ class CraftMetaItem implements ItemMeta, Repairable {
         // Spigot end
     }
 
-    static Map<Enchantment, Integer> buildEnchantments(NBTTagCompound tag, ItemMetaKey key) {
+    static Object2IntOpenHashMap<Enchantment> buildEnchantments(NBTTagCompound tag, ItemMetaKey key) {
         if (!tag.hasKey(key.NBT))
             return null;
 
         NBTTagList ench = tag.getList(key.NBT, 10);
-        Map<Enchantment, Integer> enchantments = new HashMap<Enchantment, Integer>(ench.size());
+        Object2IntOpenHashMap<Enchantment> enchantments = new Object2IntOpenHashMap<>(ench.size());
 
         for (int i = 0; i < ench.size(); i++) {
             int id = 0xffff & ((NBTTagCompound) ench.get(i)).getShort(ENCHANTMENTS_ID.NBT);
@@ -525,17 +524,17 @@ class CraftMetaItem implements ItemMeta, Repairable {
     void deserializeInternal(NBTTagCompound tag) {
     }
 
-    static Map<Enchantment, Integer> buildEnchantments(Map<String, Object> map, ItemMetaKey key) {
+    static Object2IntOpenHashMap<Enchantment> buildEnchantments(Map<String, Object> map, ItemMetaKey key) {
         Map<?, ?> ench = SerializableMeta.getObject(Map.class, map, key.BUKKIT, true);
         if (ench == null)
             return null;
 
-        Map<Enchantment, Integer> enchantments = new HashMap<Enchantment, Integer>(ench.size());
+        Object2IntOpenHashMap<Enchantment> enchantments = new Object2IntOpenHashMap<>(ench.size());
         for (Map.Entry<?, ?> entry : ench.entrySet()) {
             Enchantment enchantment = Enchantment.getByName(entry.getKey().toString());
 
             if ((enchantment != null) && (entry.getValue() instanceof Integer))
-                enchantments.put(enchantment, (Integer) entry.getValue());
+                enchantments.put(enchantment, ((Integer) entry.getValue()).intValue());
         }
 
         return enchantments;
@@ -641,9 +640,7 @@ class CraftMetaItem implements ItemMeta, Repairable {
     }
 
     public int getEnchantLevel(Enchantment ench) {
-        Integer level = hasEnchants() ? enchantments.get(ench) : null;
-        if (level == null)
-            return 0;
+        int level = hasEnchants() ? enchantments.getInt(ench) : 0;
 
         return level;
     }
@@ -654,7 +651,7 @@ class CraftMetaItem implements ItemMeta, Repairable {
 
     public boolean addEnchant(Enchantment ench, int level, boolean ignoreRestrictions) {
         if (enchantments == null)
-            enchantments = new HashMap<Enchantment, Integer>(4);
+            enchantments = new Object2IntOpenHashMap<Enchantment>(4);
 
         if (ignoreRestrictions || level >= ench.getStartLevel() && level <= ench.getMaxLevel()) {
             Integer old = enchantments.put(ench, level);
@@ -665,7 +662,7 @@ class CraftMetaItem implements ItemMeta, Repairable {
 
     public boolean removeEnchant(Enchantment ench) {
         // Spigot start
-        boolean b = hasEnchants() && enchantments.remove(ench) != null;
+        boolean b = hasEnchants() && enchantments.removeInt(ench) != 0;
         if (enchantments != null && enchantments.isEmpty())
             this.enchantments = null;
 
@@ -813,7 +810,7 @@ class CraftMetaItem implements ItemMeta, Repairable {
                 clone.lore = new ArrayList<String>(this.lore);
             }
             if (this.enchantments != null) {
-                clone.enchantments = new HashMap<Enchantment, Integer>(this.enchantments);
+                clone.enchantments = new Object2IntOpenHashMap<Enchantment>(this.enchantments);
             }
             clone.hideFlag = this.hideFlag;
             return clone;
@@ -859,7 +856,7 @@ class CraftMetaItem implements ItemMeta, Repairable {
             builder.put(HIDEFLAGS.BUKKIT, hideFlags);
         }
 
-        final Map<String, NBTBase> internalTags = new HashMap<String, NBTBase>(unhandledTags);
+        final Map<String, NBTBase> internalTags = new Object2ObjectOpenHashMap<String, NBTBase>(unhandledTags);
         serializeInternal(internalTags);
         if (!internalTags.isEmpty()) {
             NBTTagCompound internal = new NBTTagCompound();

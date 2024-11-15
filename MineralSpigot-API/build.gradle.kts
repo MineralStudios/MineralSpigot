@@ -15,6 +15,7 @@ dependencies {
     api("com.googlecode.json-simple:json-simple:1.1.1")
     api("org.yaml:snakeyaml:1.15")
     api("net.md-5:bungeecord-chat:1.8-SNAPSHOT")
+    implementation("it.unimi.dsi:fastutil:8.5.14")
     compileOnlyApi("net.sf.trove4j:trove4j:3.0.3") // provided by server
 
     compileOnly("org.projectlombok:lombok:1.18.32") 

@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -39,27 +38,31 @@ import org.github.paperspigot.exception.ServerPluginEnableDisableException;
 
 import com.google.common.collect.ImmutableSet;
 
+import it.unimi.dsi.fastutil.bytes.Byte2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+
 /**
  * Handles all plugin management from the Server
  */
 public final class SimplePluginManager implements PluginManager {
     private final Server server;
-    private final Map<Pattern, PluginLoader> fileAssociations = new HashMap<Pattern, PluginLoader>();
+    private final Map<Pattern, PluginLoader> fileAssociations = new Object2ObjectOpenHashMap<Pattern, PluginLoader>();
     private final List<Plugin> plugins = new ArrayList<Plugin>();
-    private final Map<String, Plugin> lookupNames = new HashMap<String, Plugin>();
+    private final Map<String, Plugin> lookupNames = new Object2ObjectOpenHashMap<String, Plugin>();
     private static File updateDirectory = null;
     private final SimpleCommandMap commandMap;
-    private final Map<String, Permission> permissions = new HashMap<String, Permission>();
-    private final Map<Boolean, Set<Permission>> defaultPerms = new LinkedHashMap<Boolean, Set<Permission>>();
-    private final Map<String, Map<Permissible, Boolean>> permSubs = new HashMap<String, Map<Permissible, Boolean>>();
-    private final Map<Boolean, Map<Permissible, Boolean>> defSubs = new HashMap<Boolean, Map<Permissible, Boolean>>();
+    private final Map<String, Permission> permissions = new Object2ObjectOpenHashMap<String, Permission>();
+    private final Byte2ObjectLinkedOpenHashMap<Set<Permission>> defaultPerms = new Byte2ObjectLinkedOpenHashMap<Set<Permission>>();
+    private final Map<String, Map<Permissible, Boolean>> permSubs = new Object2ObjectOpenHashMap<String, Map<Permissible, Boolean>>();
+    private final Byte2ObjectLinkedOpenHashMap<Map<Permissible, Boolean>> defSubs = new Byte2ObjectLinkedOpenHashMap<Map<Permissible, Boolean>>();
 
     public SimplePluginManager(Server instance, SimpleCommandMap commandMap) {
         server = instance;
         this.commandMap = commandMap;
 
-        defaultPerms.put(true, new HashSet<Permission>());
-        defaultPerms.put(false, new HashSet<Permission>());
+        defaultPerms.put((byte) 1, new ObjectOpenHashSet<Permission>());
+        defaultPerms.put((byte) 0, new ObjectOpenHashSet<Permission>());
     }
 
     /**
@@ -127,10 +130,10 @@ public final class SimplePluginManager implements PluginManager {
             updateDirectory = new File(directory, server.getUpdateFolder());
         }
 
-        Map<String, File> plugins = new HashMap<String, File>();
-        Set<String> loadedPlugins = new HashSet<String>();
-        Map<String, Collection<String>> dependencies = new HashMap<String, Collection<String>>();
-        Map<String, Collection<String>> softDependencies = new HashMap<String, Collection<String>>();
+        Map<String, File> plugins = new Object2ObjectOpenHashMap<String, File>();
+        Set<String> loadedPlugins = new ObjectOpenHashSet<String>();
+        Map<String, Collection<String>> dependencies = new Object2ObjectOpenHashMap<String, Collection<String>>();
+        Map<String, Collection<String>> softDependencies = new Object2ObjectOpenHashMap<String, Collection<String>>();
 
         // This is where it figures out all possible plugins
         // PandaSpigot start - extra jars
@@ -545,8 +548,8 @@ public final class SimplePluginManager implements PluginManager {
             HandlerList.unregisterAll();
             fileAssociations.clear();
             permissions.clear();
-            defaultPerms.get(true).clear();
-            defaultPerms.get(false).clear();
+            defaultPerms.get((byte) 1).clear();
+            defaultPerms.get((byte) 0).clear();
         }
     }
 
@@ -713,7 +716,7 @@ public final class SimplePluginManager implements PluginManager {
     }
 
     public Set<Permission> getDefaultPermissions(boolean op) {
-        return ImmutableSet.copyOf(defaultPerms.get(op));
+        return ImmutableSet.copyOf(defaultPerms.get(op ? (byte) 1 : (byte) 0));
     }
 
     public void removePermission(Permission perm) {
@@ -726,8 +729,8 @@ public final class SimplePluginManager implements PluginManager {
 
     public void recalculatePermissionDefaults(Permission perm) {
         if (perm != null && permissions.containsKey(perm.getName().toLowerCase())) {
-            defaultPerms.get(true).remove(perm);
-            defaultPerms.get(false).remove(perm);
+            defaultPerms.get((byte) 1).remove(perm);
+            defaultPerms.get((byte) 0).remove(perm);
 
             calculatePermissionDefault(perm);
         }
@@ -735,11 +738,11 @@ public final class SimplePluginManager implements PluginManager {
 
     private void calculatePermissionDefault(Permission perm) {
         if ((perm.getDefault() == PermissionDefault.OP) || (perm.getDefault() == PermissionDefault.TRUE)) {
-            defaultPerms.get(true).add(perm);
+            defaultPerms.get((byte) 1).add(perm);
             dirtyPermissibles(true);
         }
         if ((perm.getDefault() == PermissionDefault.NOT_OP) || (perm.getDefault() == PermissionDefault.TRUE)) {
-            defaultPerms.get(false).add(perm);
+            defaultPerms.get((byte) 0).add(perm);
             dirtyPermissibles(false);
         }
     }
@@ -789,30 +792,30 @@ public final class SimplePluginManager implements PluginManager {
     }
 
     public void subscribeToDefaultPerms(boolean op, Permissible permissible) {
-        Map<Permissible, Boolean> map = defSubs.get(op);
+        Map<Permissible, Boolean> map = defSubs.get(op ? (byte) 1 : (byte) 0);
 
         if (map == null) {
             map = new WeakHashMap<Permissible, Boolean>();
-            defSubs.put(op, map);
+            defSubs.put(op ? (byte) 1 : (byte) 0, map);
         }
 
         map.put(permissible, true);
     }
 
     public void unsubscribeFromDefaultPerms(boolean op, Permissible permissible) {
-        Map<Permissible, Boolean> map = defSubs.get(op);
+        Map<Permissible, Boolean> map = defSubs.get(op ? (byte) 1 : (byte) 0);
 
         if (map != null) {
             map.remove(permissible);
 
             if (map.isEmpty()) {
-                defSubs.remove(op);
+                defSubs.remove(op ? (byte) 1 : (byte) 0);
             }
         }
     }
 
     public Set<Permissible> getDefaultPermSubscriptions(boolean op) {
-        Map<Permissible, Boolean> map = defSubs.get(op);
+        Map<Permissible, Boolean> map = defSubs.get(op ? (byte) 1 : (byte) 0);
 
         if (map == null) {
             return ImmutableSet.of();
@@ -822,6 +825,6 @@ public final class SimplePluginManager implements PluginManager {
     }
 
     public Set<Permission> getPermissions() {
-        return new HashSet<Permission>(permissions.values());
+        return new ObjectOpenHashSet<Permission>(permissions.values());
     }
 }

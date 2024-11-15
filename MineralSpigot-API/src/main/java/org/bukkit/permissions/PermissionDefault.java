@@ -1,7 +1,8 @@
 package org.bukkit.permissions;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 /**
  * Represents the possible default values for permissions
@@ -13,7 +14,7 @@ public enum PermissionDefault {
     NOT_OP("!op", "notop", "!operator", "notoperator", "!admin", "notadmin");
 
     private final String[] names;
-    private final static Map<String, PermissionDefault> lookup = new HashMap<String, PermissionDefault>();
+    private final static Map<String, PermissionDefault> lookup = new Object2ObjectOpenHashMap<String, PermissionDefault>();
 
     private PermissionDefault(String... names) {
         this.names = names;
@@ -28,16 +29,16 @@ public enum PermissionDefault {
      */
     public boolean getValue(boolean op) {
         switch (this) {
-        case TRUE:
-            return true;
-        case FALSE:
-            return false;
-        case OP:
-            return op;
-        case NOT_OP:
-            return !op;
-        default:
-            return false;
+            case TRUE:
+                return true;
+            case FALSE:
+                return false;
+            case OP:
+                return op;
+            case NOT_OP:
+                return !op;
+            default:
+                return false;
         }
     }
 

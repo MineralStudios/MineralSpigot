@@ -7,9 +7,10 @@ import org.bukkit.event.server.ServiceUnregisterEvent;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.List;
@@ -24,15 +25,15 @@ public class SimpleServicesManager implements ServicesManager {
     /**
      * Map of providers.
      */
-    private final Map<Class<?>, List<RegisteredServiceProvider<?>>> providers = new HashMap<Class<?>, List<RegisteredServiceProvider<?>>>();
+    private final Map<Class<?>, List<RegisteredServiceProvider<?>>> providers = new Object2ObjectOpenHashMap<Class<?>, List<RegisteredServiceProvider<?>>>();
 
     /**
      * Register a provider of a service.
      *
-     * @param <T> Provider
-     * @param service service class
+     * @param <T>      Provider
+     * @param service  service class
      * @param provider provider to register
-     * @param plugin plugin with the provider
+     * @param plugin   plugin with the provider
      * @param priority priority of the provider
      */
     public <T> void register(Class<T> service, T provider, Plugin plugin, ServicePriority priority) {
@@ -92,7 +93,8 @@ public class SimpleServicesManager implements ServicesManager {
                         it.remove();
                     }
                 }
-            } catch (NoSuchElementException e) {}
+            } catch (NoSuchElementException e) {
+            }
         }
         for (ServiceUnregisterEvent event : unregisteredEvents) {
             Bukkit.getServer().getPluginManager().callEvent(event);
@@ -102,7 +104,7 @@ public class SimpleServicesManager implements ServicesManager {
     /**
      * Unregister a particular provider for a particular service.
      *
-     * @param service The service interface
+     * @param service  The service interface
      * @param provider The service provider implementation
      */
     public void unregister(Class<?> service, Object provider) {
@@ -140,7 +142,8 @@ public class SimpleServicesManager implements ServicesManager {
                         it.remove();
                     }
                 }
-            } catch (NoSuchElementException e) {}
+            } catch (NoSuchElementException e) {
+            }
         }
         for (ServiceUnregisterEvent event : unregisteredEvents) {
             Bukkit.getServer().getPluginManager().callEvent(event);
@@ -181,7 +184,8 @@ public class SimpleServicesManager implements ServicesManager {
                         it.remove();
                     }
                 }
-            } catch (NoSuchElementException e) {}
+            } catch (NoSuchElementException e) {
+            }
         }
         for (ServiceUnregisterEvent event : unregisteredEvents) {
             Bukkit.getServer().getPluginManager().callEvent(event);
@@ -192,7 +196,7 @@ public class SimpleServicesManager implements ServicesManager {
      * Queries for a provider. This may return if no provider has been
      * registered for a service. The highest priority provider is returned.
      *
-     * @param <T> The service interface
+     * @param <T>     The service interface
      * @param service The service interface
      * @return provider or null
      */
@@ -213,7 +217,7 @@ public class SimpleServicesManager implements ServicesManager {
      * Queries for a provider registration. This may return if no provider
      * has been registered for a service.
      *
-     * @param <T> The service interface
+     * @param <T>     The service interface
      * @param service The service interface
      * @return provider registration or null
      */
@@ -255,7 +259,7 @@ public class SimpleServicesManager implements ServicesManager {
      * Get registrations of providers for a service. The returned list is
      * an unmodifiable copy.
      *
-     * @param <T> The service interface
+     * @param <T>     The service interface
      * @param service The service interface
      * @return a copy of the list of registrations
      */
@@ -294,7 +298,7 @@ public class SimpleServicesManager implements ServicesManager {
     /**
      * Returns whether a provider has been registered for a service.
      *
-     * @param <T> service
+     * @param <T>     service
      * @param service service to check
      * @return true if and only if there are registered providers
      */

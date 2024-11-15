@@ -2,13 +2,15 @@ package org.bukkit.configuration;
 
 import org.bukkit.Material;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.junit.Test;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 import static org.junit.Assert.*;
 
 public abstract class ConfigurationSectionTest {
@@ -26,8 +28,12 @@ public abstract class ConfigurationSectionTest {
         section.set("42", true);
 
         assertArrayEquals(new String[] { "key", "subsection", "key2", "42" }, section.getKeys(false).toArray());
-        assertArrayEquals(new String[] { "key", "subsection", "subsection.subkey", "subsection.subkey2", "subsection.subsubsection", "subsection.subsubsection.key", "key2", "42" }, section.getKeys(true).toArray());
-        assertArrayEquals(new String[] { "subkey", "subkey2", "subsubsection", "subsubsection.key" }, section.getConfigurationSection("subsection").getKeys(true).toArray());
+        assertArrayEquals(
+                new String[] { "key", "subsection", "subsection.subkey", "subsection.subkey2",
+                        "subsection.subsubsection", "subsection.subsubsection.key", "key2", "42" },
+                section.getKeys(true).toArray());
+        assertArrayEquals(new String[] { "subkey", "subkey2", "subsubsection", "subsubsection.key" },
+                section.getConfigurationSection("subsection").getKeys(true).toArray());
     }
 
     @Test
@@ -42,8 +48,11 @@ public abstract class ConfigurationSectionTest {
         section.addDefault("key2", true);
 
         assertArrayEquals(new String[] { "subsection", "key2", "key" }, section.getKeys(false).toArray());
-        assertArrayEquals(new String[] { "subsection", "subsection.subkey", "subsection.subkey2", "subsection.subsubsection", "subsection.subsubsection.key", "key2", "key" }, section.getKeys(true).toArray());
-        assertArrayEquals(new String[] { "subkey", "subkey2", "subsubsection", "subsubsection.key" }, section.getConfigurationSection("subsection").getKeys(true).toArray());
+        assertArrayEquals(new String[] { "subsection", "subsection.subkey", "subsection.subkey2",
+                "subsection.subsubsection", "subsection.subsubsection.key", "key2", "key" },
+                section.getKeys(true).toArray());
+        assertArrayEquals(new String[] { "subkey", "subkey2", "subsubsection", "subsubsection.key" },
+                section.getConfigurationSection("subsection").getKeys(true).toArray());
     }
 
     @Test
@@ -57,11 +66,15 @@ public abstract class ConfigurationSectionTest {
 
         Map<String, Object> shallowValues = section.getValues(false);
         assertArrayEquals(new String[] { "bool", "subsection", "int" }, shallowValues.keySet().toArray());
-        assertArrayEquals(new Object[] { true, section.getConfigurationSection("subsection"), 42 }, shallowValues.values().toArray());
+        assertArrayEquals(new Object[] { true, section.getConfigurationSection("subsection"), 42 },
+                shallowValues.values().toArray());
 
         Map<String, Object> deepValues = section.getValues(true);
-        assertArrayEquals(new String[] { "bool", "subsection", "subsection.string", "subsection.long", "int" }, deepValues.keySet().toArray());
-        assertArrayEquals(new Object[] { true, section.getConfigurationSection("subsection"), "test", Long.MAX_VALUE, 42 }, deepValues.values().toArray());
+        assertArrayEquals(new String[] { "bool", "subsection", "subsection.string", "subsection.long", "int" },
+                deepValues.keySet().toArray());
+        assertArrayEquals(
+                new Object[] { true, section.getConfigurationSection("subsection"), "test", Long.MAX_VALUE, 42 },
+                deepValues.values().toArray());
     }
 
     @Test
@@ -76,11 +89,15 @@ public abstract class ConfigurationSectionTest {
 
         Map<String, Object> shallowValues = section.getValues(false);
         assertArrayEquals(new String[] { "subsection", "int", "bool" }, shallowValues.keySet().toArray());
-        assertArrayEquals(new Object[] { section.getConfigurationSection("subsection"), 42, true }, shallowValues.values().toArray());
+        assertArrayEquals(new Object[] { section.getConfigurationSection("subsection"), 42, true },
+                shallowValues.values().toArray());
 
         Map<String, Object> deepValues = section.getValues(true);
-        assertArrayEquals(new String[] { "subsection", "subsection.long", "int", "bool", "subsection.string" }, deepValues.keySet().toArray());
-        assertArrayEquals(new Object[] { section.getConfigurationSection("subsection"), Long.MAX_VALUE, 42, true, "test" }, deepValues.values().toArray());
+        assertArrayEquals(new String[] { "subsection", "subsection.long", "int", "bool", "subsection.string" },
+                deepValues.keySet().toArray());
+        assertArrayEquals(
+                new Object[] { section.getConfigurationSection("subsection"), Long.MAX_VALUE, 42, true, "test" },
+                deepValues.values().toArray());
     }
 
     @Test
@@ -397,7 +414,7 @@ public abstract class ConfigurationSectionTest {
     public void testGetList_String() {
         ConfigurationSection section = getConfigurationSection();
         String key = "exists";
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new Object2ObjectOpenHashMap<String, Object>();
 
         map.put("one", 1);
         map.put("two", "two");
@@ -408,7 +425,8 @@ public abstract class ConfigurationSectionTest {
         section.set(key, value);
 
         assertEquals(value, section.getList(key));
-        assertEquals(Arrays.asList((Object) "One", "Two", "Three", "4", "5", "6.0", "true", "false"), section.getStringList(key));
+        assertEquals(Arrays.asList((Object) "One", "Two", "Three", "4", "5", "6.0", "true", "false"),
+                section.getStringList(key));
         assertEquals(Arrays.asList((Object) 4, 5, 6), section.getIntegerList(key));
         assertEquals(Arrays.asList((Object) true, false), section.getBooleanList(key));
         assertEquals(Arrays.asList((Object) 4.0, 5.0, 6.0), section.getDoubleList(key));

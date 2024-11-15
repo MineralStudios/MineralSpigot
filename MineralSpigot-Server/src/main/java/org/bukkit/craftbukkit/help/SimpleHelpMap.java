@@ -1,17 +1,35 @@
 package org.bukkit.craftbukkit.help;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Collections2;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.MultipleCommandAlias;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.command.defaults.VanillaCommand;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.command.VanillaCommandWrapper;
-import org.bukkit.help.*;
+import org.bukkit.help.GenericCommandHelpTopic;
+import org.bukkit.help.HelpMap;
+import org.bukkit.help.HelpTopic;
+import org.bukkit.help.HelpTopicComparator;
+import org.bukkit.help.HelpTopicFactory;
+import org.bukkit.help.IndexHelpTopic;
 
-import java.util.*;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 /**
  * Standard implementation of {@link HelpMap} for CraftBukkit servers.
@@ -26,8 +44,13 @@ public class SimpleHelpMap implements HelpMap {
 
     @SuppressWarnings("unchecked")
     public SimpleHelpMap(CraftServer server) {
-        this.helpTopics = new TreeMap<String, HelpTopic>(HelpTopicComparator.topicNameComparatorInstance()); // Using a TreeMap for its explicit sorting on key
-        this.topicFactoryMap = new HashMap<Class, HelpTopicFactory<Command>>();
+        this.helpTopics = new TreeMap<String, HelpTopic>(HelpTopicComparator.topicNameComparatorInstance()); // Using a
+                                                                                                             // TreeMap
+                                                                                                             // for its
+                                                                                                             // explicit
+                                                                                                             // sorting
+                                                                                                             // on key
+        this.topicFactoryMap = new Object2ObjectOpenHashMap<Class, HelpTopicFactory<Command>>();
         this.server = server;
         this.yaml = new HelpYamlReader(server);
 
@@ -36,7 +59,8 @@ public class SimpleHelpMap implements HelpMap {
             indexFilter = Predicates.and(indexFilter, Predicates.not(new IsCommandTopicPredicate()));
         }
 
-        this.defaultTopic = new IndexHelpTopic("Index", null, null, Collections2.filter(helpTopics.values(), indexFilter), "Use /help [n] to get page n of help.");
+        this.defaultTopic = new IndexHelpTopic("Index", null, null,
+                Collections2.filter(helpTopics.values(), indexFilter), "Use /help [n] to get page n of help.");
 
         registerHelpTopicFactory(MultipleCommandAlias.class, new MultipleCommandAliasHelpTopicFactory());
     }
@@ -94,7 +118,8 @@ public class SimpleHelpMap implements HelpMap {
     }
 
     /**
-     * Processes all the commands registered in the server and creates help topics for them.
+     * Processes all the commands registered in the server and creates help topics
+     * for them.
      */
     public synchronized void initializeCommands() {
         // ** Load topics from highest to lowest priority order **
@@ -115,12 +140,15 @@ public class SimpleHelpMap implements HelpMap {
             for (Class c : topicFactoryMap.keySet()) {
                 if (c.isAssignableFrom(command.getClass())) {
                     HelpTopic t = topicFactoryMap.get(c).createTopic(command);
-                    if (t != null) addTopic(t);
+                    if (t != null)
+                        addTopic(t);
                     continue outer;
                 }
-                if (command instanceof PluginCommand && c.isAssignableFrom(((PluginCommand)command).getExecutor().getClass())) {
+                if (command instanceof PluginCommand
+                        && c.isAssignableFrom(((PluginCommand) command).getExecutor().getClass())) {
                     HelpTopic t = topicFactoryMap.get(c).createTopic(command);
-                    if (t != null) addTopic(t);
+                    if (t != null)
+                        addTopic(t);
                     continue outer;
                 }
             }
@@ -141,17 +169,19 @@ public class SimpleHelpMap implements HelpMap {
         }
 
         // Add alias sub-index
-        Collection<HelpTopic> filteredTopics = Collections2.filter(helpTopics.values(), Predicates.instanceOf(CommandAliasHelpTopic.class));
+        Collection<HelpTopic> filteredTopics = Collections2.filter(helpTopics.values(),
+                Predicates.instanceOf(CommandAliasHelpTopic.class));
         if (!filteredTopics.isEmpty()) {
             addTopic(new IndexHelpTopic("Aliases", "Lists command aliases", null, filteredTopics));
         }
 
         // Initialize plugin-level sub-topics
-        Map<String, Set<HelpTopic>> pluginIndexes = new HashMap<String, Set<HelpTopic>>();
+        Map<String, Set<HelpTopic>> pluginIndexes = new Object2ObjectOpenHashMap<String, Set<HelpTopic>>();
         fillPluginIndexes(pluginIndexes, server.getCommandMap().getCommands());
 
         for (Map.Entry<String, Set<HelpTopic>> entry : pluginIndexes.entrySet()) {
-            addTopic(new IndexHelpTopic(entry.getKey(), "All commands for " + entry.getKey(), null, entry.getValue(), "Below is a list of all " + entry.getKey() + " commands:"));
+            addTopic(new IndexHelpTopic(entry.getKey(), "All commands for " + entry.getKey(), null, entry.getValue(),
+                    "Below is a list of all " + entry.getKey() + " commands:"));
         }
 
         // Amend help topics from the help.yml file
@@ -172,7 +202,11 @@ public class SimpleHelpMap implements HelpMap {
                 HelpTopic topic = getHelpTopic("/" + command.getLabel());
                 if (topic != null) {
                     if (!pluginIndexes.containsKey(pluginName)) {
-                        pluginIndexes.put(pluginName, new TreeSet<HelpTopic>(HelpTopicComparator.helpTopicComparatorInstance())); //keep things in topic order
+                        pluginIndexes.put(pluginName,
+                                new TreeSet<HelpTopic>(HelpTopicComparator.helpTopicComparatorInstance())); // keep
+                                                                                                            // things in
+                                                                                                            // topic
+                                                                                                            // order
                     }
                     pluginIndexes.get(pluginName).add(topic);
                 }
@@ -188,16 +222,18 @@ public class SimpleHelpMap implements HelpMap {
             return "Bukkit";
         }
         if (command instanceof PluginIdentifiableCommand) {
-            return ((PluginIdentifiableCommand)command).getPlugin().getName();
+            return ((PluginIdentifiableCommand) command).getPlugin().getName();
         }
         return null;
     }
 
     private boolean commandInIgnoredPlugin(Command command, Set<String> ignoredPlugins) {
-        if ((command instanceof BukkitCommand || command instanceof VanillaCommand) && ignoredPlugins.contains("Bukkit")) {
+        if ((command instanceof BukkitCommand || command instanceof VanillaCommand)
+                && ignoredPlugins.contains("Bukkit")) {
             return true;
         }
-        if (command instanceof PluginIdentifiableCommand && ignoredPlugins.contains(((PluginIdentifiableCommand)command).getPlugin().getName())) {
+        if (command instanceof PluginIdentifiableCommand
+                && ignoredPlugins.contains(((PluginIdentifiableCommand) command).getPlugin().getName())) {
             return true;
         }
         return false;

@@ -1,12 +1,13 @@
 package org.bukkit.inventory;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryType;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * Interface to the various inventories. Behavior relating to {@link
@@ -37,9 +38,9 @@ public interface Inventory extends Iterable<ItemStack> {
      * <li>Not all inventories respect this value.
      * <li>Stacks larger than 127 may be clipped when the world is saved.
      * <li>This value is not guaranteed to be preserved; be sure to set it
-     *     before every time you want to set a slot over the max stack size.
+     * before every time you want to set a slot over the max stack size.
      * <li>Stacks larger than the default max size for this type of inventory
-     *     may not display correctly in the client.
+     * may not display correctly in the client.
      * </ul>
      *
      * @param size The new maximum stack size for items in this inventory.
@@ -65,7 +66,7 @@ public interface Inventory extends Iterable<ItemStack> {
      * Stores the ItemStack at the given index of the inventory.
      *
      * @param index The index where to put the ItemStack
-     * @param item The ItemStack to set
+     * @param item  The ItemStack to set
      */
     public void setItem(int index, ItemStack item);
 
@@ -89,7 +90,7 @@ public interface Inventory extends Iterable<ItemStack> {
      * @return A HashMap containing items that didn't fit.
      * @throws IllegalArgumentException if items or any element in it is null
      */
-    public HashMap<Integer, ItemStack> addItem(ItemStack... items) throws IllegalArgumentException;
+    public Int2ObjectOpenHashMap<ItemStack> addItem(ItemStack... items) throws IllegalArgumentException;
 
     /**
      * Removes the given ItemStacks from the inventory.
@@ -106,7 +107,7 @@ public interface Inventory extends Iterable<ItemStack> {
      * @return A HashMap containing items that couldn't be removed.
      * @throws IllegalArgumentException if items is null
      */
-    public HashMap<Integer, ItemStack> removeItem(ItemStack... items) throws IllegalArgumentException;
+    public Int2ObjectOpenHashMap<ItemStack> removeItem(ItemStack... items) throws IllegalArgumentException;
 
     /**
      * Returns all ItemStacks from the inventory
@@ -120,9 +121,9 @@ public interface Inventory extends Iterable<ItemStack> {
      * contents and replaces it with the ItemStacks given in the array.
      *
      * @param items A complete replacement for the contents; the length must
-     *     be less than or equal to {@link #getSize()}.
+     *              be less than or equal to {@link #getSize()}.
      * @throws IllegalArgumentException If the array has more items than the
-     *     inventory.
+     *                                  inventory.
      */
     public void setContents(ItemStack[] items) throws IllegalArgumentException;
 
@@ -156,7 +157,7 @@ public interface Inventory extends Iterable<ItemStack> {
      *
      * @param item The ItemStack to match against
      * @return false if item is null, true if any exactly matching ItemStacks
-     *     were found
+     *         were found
      */
     public boolean contains(ItemStack item);
 
@@ -165,9 +166,9 @@ public interface Inventory extends Iterable<ItemStack> {
      * materialId, adding to at least the minimum amount specified.
      *
      * @param materialId The materialId to check for
-     * @param amount The minimum amount to look for
+     * @param amount     The minimum amount to look for
      * @return true if this contains any matching ItemStack with the given
-     *     materialId and amount
+     *         materialId and amount
      * @deprecated Magic value
      */
     @Deprecated
@@ -178,9 +179,9 @@ public interface Inventory extends Iterable<ItemStack> {
      * material, adding to at least the minimum amount specified.
      *
      * @param material The material to check for
-     * @param amount The minimum amount
+     * @param amount   The minimum amount
      * @return true if amount is less than 1, true if enough ItemStacks were
-     *     found to add to the given amount
+     *         found to add to the given amount
      * @throws IllegalArgumentException if material is null
      */
     public boolean contains(Material material, int amount) throws IllegalArgumentException;
@@ -192,10 +193,10 @@ public interface Inventory extends Iterable<ItemStack> {
      * An ItemStack only counts if both the type and the amount of the stack
      * match.
      *
-     * @param item the ItemStack to match against
+     * @param item   the ItemStack to match against
      * @param amount how many identical stacks to check for
      * @return false if item is null, true if amount less than 1, true if
-     *     amount of exactly matching ItemStacks were found
+     *         amount of exactly matching ItemStacks were found
      * @see #containsAtLeast(ItemStack, int)
      */
     public boolean contains(ItemStack item, int amount);
@@ -204,10 +205,10 @@ public interface Inventory extends Iterable<ItemStack> {
      * Checks if the inventory contains ItemStacks matching the given
      * ItemStack whose amounts sum to at least the minimum amount specified.
      *
-     * @param item the ItemStack to match against
+     * @param item   the ItemStack to match against
      * @param amount the minimum amount
      * @return false if item is null, true if amount less than 1, true if
-     *     enough ItemStacks were found to add to the given amount
+     *         enough ItemStacks were found to add to the given amount
      */
     public boolean containsAtLeast(ItemStack item, int amount);
 
@@ -224,7 +225,7 @@ public interface Inventory extends Iterable<ItemStack> {
      * @deprecated Magic value
      */
     @Deprecated
-    public HashMap<Integer, ? extends ItemStack> all(int materialId);
+    public Int2ObjectOpenHashMap<? extends ItemStack> all(int materialId);
 
     /**
      * Returns a HashMap with all slots and ItemStacks in the inventory with
@@ -238,7 +239,7 @@ public interface Inventory extends Iterable<ItemStack> {
      * @return A HashMap containing the slot index, ItemStack pairs
      * @throws IllegalArgumentException if material is null
      */
-    public HashMap<Integer, ? extends ItemStack> all(Material material) throws IllegalArgumentException;
+    public Int2ObjectOpenHashMap<? extends ItemStack> all(Material material) throws IllegalArgumentException;
 
     /**
      * Finds all slots in the inventory containing any ItemStacks with the
@@ -252,7 +253,7 @@ public interface Inventory extends Iterable<ItemStack> {
      * @param item The ItemStack to match against
      * @return A map from slot indexes to item at index
      */
-    public HashMap<Integer, ? extends ItemStack> all(ItemStack item);
+    public Int2ObjectOpenHashMap<? extends ItemStack> all(ItemStack item);
 
     /**
      * Finds the first slot in the inventory containing an ItemStack with the

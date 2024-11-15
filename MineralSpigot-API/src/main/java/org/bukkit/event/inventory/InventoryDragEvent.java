@@ -17,10 +17,12 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 import com.google.common.collect.ImmutableSet;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
 /**
  * This event is called when the player drags an item in their cursor across
  * the inventory. The ItemStack is distributed across the slots the
- * HumanEntity dragged over. The method of distribution is described by the 
+ * HumanEntity dragged over. The method of distribution is described by the
  * DragType returned by {@link #getType()}.
  * <p>
  * Canceling this event will result in none of the changes described in
@@ -39,9 +41,9 @@ import com.google.common.collect.ImmutableSet;
  * <li>{@link HumanEntity#openEnchanting(Location, boolean)}
  * <li>{@link InventoryView#close()}
  * </ul>
- * To invoke one of these methods, schedule a task using 
+ * To invoke one of these methods, schedule a task using
  * {@link BukkitScheduler#runTask(Plugin, Runnable)}, which will run the task
- * on the next tick.  Also be aware that this is not an exhaustive list, and
+ * on the next tick. Also be aware that this is not an exhaustive list, and
  * other methods could potentially create issues as well.
  * <p>
  * Assuming the EntityHuman associated with this event is an instance of a
@@ -62,7 +64,8 @@ public class InventoryDragEvent extends InventoryInteractEvent {
     private final ItemStack oldCursor;
     private ItemStack newCursor;
 
-    public InventoryDragEvent(InventoryView what, ItemStack newCursor, ItemStack oldCursor, boolean right, Map<Integer, ItemStack> slots) {
+    public InventoryDragEvent(InventoryView what, ItemStack newCursor, ItemStack oldCursor, boolean right,
+            Int2ObjectOpenHashMap<ItemStack> slots) {
         super(what);
 
         Validate.notNull(oldCursor);
@@ -73,7 +76,7 @@ public class InventoryDragEvent extends InventoryInteractEvent {
         this.oldCursor = oldCursor;
         this.addedItems = slots;
         ImmutableSet.Builder<Integer> b = ImmutableSet.builder();
-        for (Integer slot : slots.keySet()) {
+        for (int slot : slots.keySet()) {
             b.add(what.convertSlot(slot));
         }
         this.containerSlots = b.build();
@@ -101,7 +104,7 @@ public class InventoryDragEvent extends InventoryInteractEvent {
      * Gets the slots to be changed in this drag.
      *
      * @return list of converted slot ids, suitable for {@link
-     *     org.bukkit.inventory.Inventory#getItem(int)}.
+     *         org.bukkit.inventory.Inventory#getItem(int)}.
      */
     public Set<Integer> getInventorySlots() {
         return containerSlots;

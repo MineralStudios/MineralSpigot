@@ -3,14 +3,12 @@ package net.minecraft.server;
 import java.util.Iterator;
 import java.util.List;
 
-// CraftBukkit start
-import java.util.HashMap;
-
 import org.bukkit.craftbukkit.entity.CraftLivingEntity;
 import org.bukkit.entity.LivingEntity;
 // CraftBukkit end
 
 import gg.mineral.server.config.GlobalConfig;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
 public class EntityPotion extends EntityProjectile {
 
@@ -74,7 +72,7 @@ public class EntityPotion extends EntityProjectile {
                     Iterator iterator = list1.iterator();
 
                     // CraftBukkit
-                    HashMap<LivingEntity, Double> affected = new HashMap<LivingEntity, Double>();
+                    Object2DoubleOpenHashMap<LivingEntity> affected = new Object2DoubleOpenHashMap<>();
 
                     while (iterator.hasNext()) {
                         EntityLiving entityliving = (EntityLiving) iterator.next();

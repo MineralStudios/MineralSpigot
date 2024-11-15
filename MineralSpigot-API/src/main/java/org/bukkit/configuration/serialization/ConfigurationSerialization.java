@@ -4,7 +4,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,13 +19,15 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 /**
  * Utility class for storing and retrieving classes for {@link Configuration}.
  */
 public class ConfigurationSerialization {
     public static final String SERIALIZED_TYPE_KEY = "==";
     private final Class<? extends ConfigurationSerializable> clazz;
-    private static Map<String, Class<? extends ConfigurationSerializable>> aliases = new HashMap<String, Class<? extends ConfigurationSerializable>>();
+    private static Map<String, Class<? extends ConfigurationSerializable>> aliases = new Object2ObjectOpenHashMap<String, Class<? extends ConfigurationSerializable>>();
 
     static {
         registerClass(Vector.class);
@@ -77,7 +78,8 @@ public class ConfigurationSerialization {
             ConfigurationSerializable result = (ConfigurationSerializable) method.invoke(null, args);
 
             if (result == null) {
-                Logger.getLogger(ConfigurationSerialization.class.getName()).log(Level.SEVERE, "Could not call method '" + method.toString() + "' of " + clazz + " for deserialization: method returned null");
+                Logger.getLogger(ConfigurationSerialization.class.getName()).log(Level.SEVERE, "Could not call method '"
+                        + method.toString() + "' of " + clazz + " for deserialization: method returned null");
             } else {
                 return result;
             }
@@ -91,7 +93,8 @@ public class ConfigurationSerialization {
         return null;
     }
 
-    protected ConfigurationSerializable deserializeViaCtor(Constructor<? extends ConfigurationSerializable> ctor, Map<String, ?> args) {
+    protected ConfigurationSerializable deserializeViaCtor(Constructor<? extends ConfigurationSerializable> ctor,
+            Map<String, ?> args) {
         try {
             return ctor.newInstance(args);
         } catch (Throwable ex) {
@@ -148,11 +151,12 @@ public class ConfigurationSerialization {
      * If a new instance could not be made, an example being the class not
      * fully implementing the interface, null will be returned.
      *
-     * @param args Arguments for deserialization
+     * @param args  Arguments for deserialization
      * @param clazz Class to deserialize into
      * @return New instance of the specified class
      */
-    public static ConfigurationSerializable deserializeObject(Map<String, ?> args, Class<? extends ConfigurationSerializable> clazz) {
+    public static ConfigurationSerializable deserializeObject(Map<String, ?> args,
+            Class<? extends ConfigurationSerializable> clazz) {
         return new ConfigurationSerialization(clazz).deserialize(args);
     }
 

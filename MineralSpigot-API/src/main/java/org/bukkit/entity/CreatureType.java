@@ -1,8 +1,10 @@
 package org.bukkit.entity;
 
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Map;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 
 /**
  * Represents a type of creature.
@@ -11,7 +13,8 @@ import java.util.Map;
  */
 @Deprecated
 public enum CreatureType {
-    // These strings MUST match the strings in nms.EntityTypes and are case sensitive.
+    // These strings MUST match the strings in nms.EntityTypes and are case
+    // sensitive.
     CREEPER("Creeper", Creeper.class, 50),
     SKELETON("Skeleton", Skeleton.class, 51),
     SPIDER("Spider", Spider.class, 52),
@@ -43,8 +46,8 @@ public enum CreatureType {
     private Class<? extends Entity> clazz;
     private short typeId;
 
-    private static final Map<String, CreatureType> NAME_MAP = new HashMap<String, CreatureType>();
-    private static final Map<Short, CreatureType> ID_MAP = new HashMap<Short, CreatureType>();
+    private static final Map<String, CreatureType> NAME_MAP = new Object2ObjectOpenHashMap<String, CreatureType>();
+    private static final Short2ObjectOpenHashMap<CreatureType> ID_MAP = new Short2ObjectOpenHashMap<>();
 
     static {
         for (CreatureType type : EnumSet.allOf(CreatureType.class)) {

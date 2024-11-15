@@ -1,12 +1,13 @@
 package org.bukkit.inventory;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.Validate;
-
 import org.bukkit.Material;
 import org.bukkit.material.MaterialData;
+
+import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
+import lombok.val;
 
 /**
  * Represents a shaped (ie normal) crafting recipe.
@@ -14,7 +15,7 @@ import org.bukkit.material.MaterialData;
 public class ShapedRecipe implements Recipe {
     private ItemStack output;
     private String[] rows;
-    private Map<Character, ItemStack> ingredients = new HashMap<Character, ItemStack>();
+    private Char2ObjectOpenHashMap<ItemStack> ingredients = new Char2ObjectOpenHashMap<>();
 
     /**
      * Create a shaped recipe to craft the specified ItemStack. The
@@ -44,11 +45,13 @@ public class ShapedRecipe implements Recipe {
      */
     public ShapedRecipe shape(final String... shape) {
         Validate.notNull(shape, "Must provide a shape");
-        Validate.isTrue(shape.length > 0 && shape.length < 4, "Crafting recipes should be 1, 2, 3 rows, not ", shape.length);
+        Validate.isTrue(shape.length > 0 && shape.length < 4, "Crafting recipes should be 1, 2, 3 rows, not ",
+                shape.length);
 
         for (String row : shape) {
             Validate.notNull(row, "Shape cannot have null rows");
-            Validate.isTrue(row.length() > 0 && row.length() < 4, "Crafting rows should be 1, 2, or 3 characters, not ", row.length());
+            Validate.isTrue(row.length() > 0 && row.length() < 4, "Crafting rows should be 1, 2, or 3 characters, not ",
+                    row.length());
         }
         this.rows = new String[shape.length];
         for (int i = 0; i < shape.length; i++) {
@@ -56,9 +59,9 @@ public class ShapedRecipe implements Recipe {
         }
 
         // Remove character mappings for characters that no longer exist in the shape
-        HashMap<Character, ItemStack> newIngredients = new HashMap<Character, ItemStack>();
+        Char2ObjectOpenHashMap<ItemStack> newIngredients = new Char2ObjectOpenHashMap<ItemStack>();
         for (String row : shape) {
-            for (Character c : row.toCharArray()) {
+            for (char c : row.toCharArray()) {
                 newIngredients.put(c, ingredients.get(c));
             }
         }
@@ -70,7 +73,7 @@ public class ShapedRecipe implements Recipe {
     /**
      * Sets the material that a character in the recipe shape refers to.
      *
-     * @param key The character that represents the ingredient in the shape.
+     * @param key        The character that represents the ingredient in the shape.
      * @param ingredient The ingredient.
      * @return The changed recipe, so you can chain calls.
      */
@@ -81,7 +84,7 @@ public class ShapedRecipe implements Recipe {
     /**
      * Sets the material that a character in the recipe shape refers to.
      *
-     * @param key The character that represents the ingredient in the shape.
+     * @param key        The character that represents the ingredient in the shape.
      * @param ingredient The ingredient.
      * @return The changed recipe, so you can chain calls.
      */
@@ -92,9 +95,9 @@ public class ShapedRecipe implements Recipe {
     /**
      * Sets the material that a character in the recipe shape refers to.
      *
-     * @param key The character that represents the ingredient in the shape.
+     * @param key        The character that represents the ingredient in the shape.
      * @param ingredient The ingredient.
-     * @param raw The raw material data as an integer.
+     * @param raw        The raw material data as an integer.
      * @return The changed recipe, so you can chain calls.
      * @deprecated Magic value
      */
@@ -117,12 +120,12 @@ public class ShapedRecipe implements Recipe {
      * @return The mapping of character to ingredients.
      */
     public Map<Character, ItemStack> getIngredientMap() {
-        HashMap<Character, ItemStack> result = new HashMap<Character, ItemStack>();
-        for (Map.Entry<Character, ItemStack> ingredient : ingredients.entrySet()) {
+        Char2ObjectOpenHashMap<ItemStack> result = new Char2ObjectOpenHashMap<ItemStack>();
+        for (val ingredient : ingredients.char2ObjectEntrySet()) {
             if (ingredient.getValue() == null) {
-                result.put(ingredient.getKey(), null);
+                result.put(ingredient.getCharKey(), null);
             } else {
-                result.put(ingredient.getKey(), ingredient.getValue().clone());
+                result.put(ingredient.getCharKey(), ingredient.getValue().clone());
             }
         }
         return result;

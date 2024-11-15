@@ -1,7 +1,8 @@
 package org.bukkit.block.banner;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public enum PatternType {
     BASE("b"),
@@ -45,7 +46,7 @@ public enum PatternType {
     MOJANG("moj");
 
     private final String identifier;
-    private static final Map<String, PatternType> byString = new HashMap<String, PatternType>();
+    private static final Map<String, PatternType> byString = new Object2ObjectOpenHashMap<String, PatternType>();
 
     static {
         for (PatternType p : values()) {

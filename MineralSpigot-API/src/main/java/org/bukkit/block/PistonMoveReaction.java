@@ -1,7 +1,6 @@
 package org.bukkit.block;
 
-import java.util.HashMap;
-import java.util.Map;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 public enum PistonMoveReaction {
 
@@ -19,7 +18,7 @@ public enum PistonMoveReaction {
     BLOCK(2);
 
     private int id;
-    private static Map<Integer, PistonMoveReaction> byId = new HashMap<Integer, PistonMoveReaction>();
+    private static Int2ObjectOpenHashMap<PistonMoveReaction> byId = new Int2ObjectOpenHashMap<>();
     static {
         for (PistonMoveReaction reaction : PistonMoveReaction.values()) {
             byId.put(reaction.id, reaction);

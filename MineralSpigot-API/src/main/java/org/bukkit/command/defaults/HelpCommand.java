@@ -2,9 +2,7 @@ package org.bukkit.command.defaults;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -24,6 +22,8 @@ import org.bukkit.util.ChatPaginator;
 
 import com.google.common.collect.ImmutableList;
 
+import it.unimi.dsi.fastutil.chars.Char2IntOpenHashMap;
+
 public class HelpCommand extends VanillaCommand {
     public HelpCommand() {
         super("help");
@@ -35,7 +35,8 @@ public class HelpCommand extends VanillaCommand {
 
     @Override
     public boolean execute(CommandSender sender, String currentAlias, String[] args) {
-        if (!testPermission(sender)) return true;
+        if (!testPermission(sender))
+            return true;
 
         String command;
         int pageNumber;
@@ -84,7 +85,8 @@ public class HelpCommand extends VanillaCommand {
             return true;
         }
 
-        ChatPaginator.ChatPage page = ChatPaginator.paginate(topic.getFullText(sender), pageNumber, pageWidth, pageHeight);
+        ChatPaginator.ChatPage page = ChatPaginator.paginate(topic.getFullText(sender), pageNumber, pageWidth,
+                pageHeight);
 
         StringBuilder header = new StringBuilder();
         header.append(ChatColor.YELLOW);
@@ -151,7 +153,8 @@ public class HelpCommand extends VanillaCommand {
                 continue;
             }
 
-            if (damerauLevenshteinDistance(searchString, trimmedTopic.substring(0, searchString.length())) < maxDistance) {
+            if (damerauLevenshteinDistance(searchString,
+                    trimmedTopic.substring(0, searchString.length())) < maxDistance) {
                 possibleMatches.add(topic);
             }
         }
@@ -165,12 +168,14 @@ public class HelpCommand extends VanillaCommand {
 
     /**
      * Computes the Dameraur-Levenshtein Distance between two strings. Adapted
-     * from the algorithm at <a href="http://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance">Wikipedia: Damerau–Levenshtein distance</a>
+     * from the algorithm at <a href=
+     * "http://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance">Wikipedia:
+     * Damerau–Levenshtein distance</a>
      *
      * @param s1 The first string being compared.
      * @param s2 The second string being compared.
      * @return The number of substitutions, deletions, insertions, and
-     * transpositions required to get from s1 to s2.
+     *         transpositions required to get from s1 to s2.
      */
     protected static int damerauLevenshteinDistance(String s1, String s2) {
         if (s1 == null && s2 == null) {
@@ -198,7 +203,8 @@ public class HelpCommand extends VanillaCommand {
             H[0][j + 1] = INF;
         }
 
-        Map<Character, Integer> sd = new HashMap<Character, Integer>();
+        Char2IntOpenHashMap sd = new Char2IntOpenHashMap();
+
         for (char Letter : (s1 + s2).toCharArray()) {
             if (!sd.containsKey(Letter)) {
                 sd.put(Letter, 0);

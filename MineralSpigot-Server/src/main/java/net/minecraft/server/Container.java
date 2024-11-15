@@ -1,15 +1,13 @@
 package net.minecraft.server;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 // CraftBukkit start
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.event.Event.Result;
@@ -17,6 +15,12 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryView;
 // CraftBukkit end
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import lombok.val;
 
 public abstract class Container {
 
@@ -32,7 +36,9 @@ public abstract class Container {
 
     // CraftBukkit start
     public boolean checkReachable = true;
+
     public abstract InventoryView getBukkitView();
+
     public void transferTo(Container other, org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
         InventoryView source = this.getBukkitView(), destination = other.getBukkitView();
         ((CraftInventory) source.getTopInventory()).getInventory().onClose(player);
@@ -42,7 +48,8 @@ public abstract class Container {
     }
     // CraftBukkit end
 
-    public Container() {}
+    public Container() {
+    }
 
     protected Slot a(Slot slot) {
         slot.rawSlotIndex = this.c.size();
@@ -76,7 +83,8 @@ public abstract class Container {
             ItemStack itemstack = ((Slot) this.c.get(i)).getItem();
             ItemStack itemstack1 = (ItemStack) this.b.get(i);
 
-            if (!ItemStack.fastMatches(itemstack1, itemstack) || (tickCount % 20 == 0 && !ItemStack.matches(itemstack1, itemstack))) { // Spigot
+            if (!ItemStack.fastMatches(itemstack1, itemstack)
+                    || (tickCount % 20 == 0 && !ItemStack.matches(itemstack1, itemstack))) { // Spigot
                 itemstack1 = itemstack == null ? null : itemstack.cloneItemStack();
                 this.b.set(i, itemstack1);
 
@@ -140,7 +148,9 @@ public abstract class Container {
             } else if (this.g == 1) {
                 Slot slot = i < this.c.size() ? this.c.get(i) : null; // Paper - Ensure drag in bounds
 
-                if (slot != null && a(slot, playerinventory.getCarried(), true) && slot.isAllowed(playerinventory.getCarried()) && playerinventory.getCarried().count > this.h.size() && this.b(slot)) {
+                if (slot != null && a(slot, playerinventory.getCarried(), true)
+                        && slot.isAllowed(playerinventory.getCarried())
+                        && playerinventory.getCarried().count > this.h.size() && this.b(slot)) {
                     this.h.add(slot);
                 }
             } else if (this.g == 2) {
@@ -149,11 +159,20 @@ public abstract class Container {
                     l = playerinventory.getCarried().count;
                     Iterator iterator = this.h.iterator();
 
-                    Map<Integer, ItemStack> draggedSlots = new HashMap<Integer, ItemStack>(); // CraftBukkit - Store slots from drag in map (raw slot id -> new stack)
+                    Int2ObjectOpenHashMap<ItemStack> draggedSlots = new Int2ObjectOpenHashMap<ItemStack>(); // CraftBukkit
+                                                                                                            // - Store
+                                                                                                            // slots
+                                                                                                            // from drag
+                                                                                                            // in map
+                                                                                                            // (raw slot
+                                                                                                            // id -> new
+                                                                                                            // stack)
                     while (iterator.hasNext()) {
                         Slot slot1 = (Slot) iterator.next();
 
-                        if (slot1 != null && a(slot1, playerinventory.getCarried(), true) && slot1.isAllowed(playerinventory.getCarried()) && playerinventory.getCarried().count >= this.h.size() && this.b(slot1)) {
+                        if (slot1 != null && a(slot1, playerinventory.getCarried(), true)
+                                && slot1.isAllowed(playerinventory.getCarried())
+                                && playerinventory.getCarried().count >= this.h.size() && this.b(slot1)) {
                             ItemStack itemstack2 = itemstack1.cloneItemStack();
                             int j1 = slot1.hasItem() ? slot1.getItem().count : 0;
 
@@ -168,7 +187,8 @@ public abstract class Container {
 
                             l -= itemstack2.count - j1;
                             // slot1.set(itemstack2);
-                            draggedSlots.put(slot1.rawSlotIndex, itemstack2); // CraftBukkit - Put in map instead of setting
+                            draggedSlots.put(slot1.rawSlotIndex, itemstack2); // CraftBukkit - Put in map instead of
+                                                                              // setting
                         }
                     }
 
@@ -176,27 +196,32 @@ public abstract class Container {
                     InventoryView view = getBukkitView();
                     org.bukkit.inventory.ItemStack newcursor = CraftItemStack.asCraftMirror(itemstack1);
                     newcursor.setAmount(l);
-                    Map<Integer, org.bukkit.inventory.ItemStack> eventmap = new HashMap<Integer, org.bukkit.inventory.ItemStack>();
-                    for (Map.Entry<Integer, ItemStack> ditem : draggedSlots.entrySet()) {
-                        eventmap.put(ditem.getKey(), CraftItemStack.asBukkitCopy(ditem.getValue()));
+                    Int2ObjectOpenHashMap<org.bukkit.inventory.ItemStack> eventmap = new Int2ObjectOpenHashMap<org.bukkit.inventory.ItemStack>();
+                    for (val ditem : draggedSlots.int2ObjectEntrySet()) {
+                        eventmap.put(ditem.getIntKey(), CraftItemStack.asBukkitCopy(ditem.getValue()));
                     }
 
-                    // It's essential that we set the cursor to the new value here to prevent item duplication if a plugin closes the inventory.
+                    // It's essential that we set the cursor to the new value here to prevent item
+                    // duplication if a plugin closes the inventory.
                     ItemStack oldCursor = playerinventory.getCarried();
                     playerinventory.setCarried(CraftItemStack.asNMSCopy(newcursor));
 
-                    InventoryDragEvent event = new InventoryDragEvent(view, (newcursor.getType() != org.bukkit.Material.AIR ? newcursor : null), CraftItemStack.asBukkitCopy(oldCursor), this.dragType == 1, eventmap);
+                    InventoryDragEvent event = new InventoryDragEvent(view,
+                            (newcursor.getType() != org.bukkit.Material.AIR ? newcursor : null),
+                            CraftItemStack.asBukkitCopy(oldCursor), this.dragType == 1, eventmap);
                     entityhuman.world.getServer().getPluginManager().callEvent(event);
 
                     // Whether or not a change was made to the inventory that requires an update.
                     boolean needsUpdate = event.getResult() != Result.DEFAULT;
 
                     if (event.getResult() != Result.DENY) {
-                        for (Map.Entry<Integer, ItemStack> dslot : draggedSlots.entrySet()) {
-                            view.setItem(dslot.getKey(), CraftItemStack.asBukkitCopy(dslot.getValue()));
+                        for (val dslot : draggedSlots.int2ObjectEntrySet()) {
+                            view.setItem(dslot.getIntKey(), CraftItemStack.asBukkitCopy(dslot.getValue()));
                         }
-                        // The only time the carried item will be set to null is if the inventory is closed by the server.
-                        // If the inventory is closed by the server, then the cursor items are dropped.  This is why we change the cursor early.
+                        // The only time the carried item will be set to null is if the inventory is
+                        // closed by the server.
+                        // If the inventory is closed by the server, then the cursor items are dropped.
+                        // This is why we change the cursor early.
                         if (playerinventory.getCarried() != null) {
                             playerinventory.setCarried(CraftItemStack.asNMSCopy(event.getCursor()));
                             needsUpdate = true;
@@ -287,9 +312,10 @@ public abstract class Container {
 
                                 if (itemstack4.count == 0) {
                                     playerinventory.setCarried((ItemStack) null);
-                                // CraftBukkit start - Update client cursor if we didn't empty it
+                                    // CraftBukkit start - Update client cursor if we didn't empty it
                                 } else if (entityhuman instanceof EntityPlayer) {
-                                    ((EntityPlayer) entityhuman).playerConnection.sendPacket(new PacketPlayOutSetSlot(-1, -1, entityhuman.inventory.getCarried()));
+                                    ((EntityPlayer) entityhuman).playerConnection.sendPacket(
+                                            new PacketPlayOutSetSlot(-1, -1, entityhuman.inventory.getCarried()));
                                 }
                                 // CraftBukkit end
                             }
@@ -304,7 +330,9 @@ public abstract class Container {
 
                                 slot2.a(entityhuman, playerinventory.getCarried());
                             } else if (slot2.isAllowed(itemstack4)) {
-                                if (itemstack1.getItem() == itemstack4.getItem() && itemstack1.getData() == itemstack4.getData() && ItemStack.equals(itemstack1, itemstack4)) {
+                                if (itemstack1.getItem() == itemstack4.getItem()
+                                        && itemstack1.getData() == itemstack4.getData()
+                                        && ItemStack.equals(itemstack1, itemstack4)) {
                                     k1 = j == 0 ? itemstack4.count : 1;
                                     if (k1 > slot2.getMaxStackSize(itemstack4) - itemstack1.count) {
                                         k1 = slot2.getMaxStackSize(itemstack4) - itemstack1.count;
@@ -317,9 +345,10 @@ public abstract class Container {
                                     itemstack4.cloneAndSubtract(k1);
                                     if (itemstack4.count == 0) {
                                         playerinventory.setCarried((ItemStack) null);
-                                    // CraftBukkit start - Update client cursor if we didn't empty it
+                                        // CraftBukkit start - Update client cursor if we didn't empty it
                                     } else if (entityhuman instanceof EntityPlayer) {
-                                        ((EntityPlayer) entityhuman).playerConnection.sendPacket(new PacketPlayOutSetSlot(-1, -1, entityhuman.inventory.getCarried()));
+                                        ((EntityPlayer) entityhuman).playerConnection.sendPacket(
+                                                new PacketPlayOutSetSlot(-1, -1, entityhuman.inventory.getCarried()));
                                     }
                                     // CraftBukkit end
 
@@ -328,7 +357,9 @@ public abstract class Container {
                                     slot2.set(itemstack4);
                                     playerinventory.setCarried(itemstack1);
                                 }
-                            } else if (itemstack1.getItem() == itemstack4.getItem() && itemstack4.getMaxStackSize() > 1 && (!itemstack1.usesData() || itemstack1.getData() == itemstack4.getData()) && ItemStack.equals(itemstack1, itemstack4)) {
+                            } else if (itemstack1.getItem() == itemstack4.getItem() && itemstack4.getMaxStackSize() > 1
+                                    && (!itemstack1.usesData() || itemstack1.getData() == itemstack4.getData())
+                                    && ItemStack.equals(itemstack1, itemstack4)) {
                                 k1 = itemstack1.count;
                                 // CraftBukkit start - itemstack4.getMaxStackSize() -> maxStack
                                 int maxStack = Math.min(itemstack4.getMaxStackSize(), slot2.getMaxStackSize());
@@ -340,9 +371,10 @@ public abstract class Container {
                                     }
 
                                     slot2.a(entityhuman, playerinventory.getCarried());
-                                // CraftBukkit start - Update client cursor if we didn't empty it
+                                    // CraftBukkit start - Update client cursor if we didn't empty it
                                 } else if (entityhuman instanceof EntityPlayer) {
-                                    ((EntityPlayer) entityhuman).playerConnection.sendPacket(new PacketPlayOutSetSlot(-1, -1, entityhuman.inventory.getCarried()));
+                                    ((EntityPlayer) entityhuman).playerConnection.sendPacket(
+                                            new PacketPlayOutSetSlot(-1, -1, entityhuman.inventory.getCarried()));
                                 }
                                 // CraftBukkit end
                             }
@@ -351,10 +383,14 @@ public abstract class Container {
                         slot2.f();
                         // CraftBukkit start - Make sure the client has the right slot contents
                         if (entityhuman instanceof EntityPlayer && slot2.getMaxStackSize() != 64) {
-                            ((EntityPlayer) entityhuman).playerConnection.sendPacket(new PacketPlayOutSetSlot(this.windowId, slot2.rawSlotIndex, slot2.getItem()));
-                            // Updating a crafting inventory makes the client reset the result slot, have to send it again
-                            if (this.getBukkitView().getType() == InventoryType.WORKBENCH || this.getBukkitView().getType() == InventoryType.CRAFTING) {
-                                ((EntityPlayer) entityhuman).playerConnection.sendPacket(new PacketPlayOutSetSlot(this.windowId, 0, this.getSlot(0).getItem()));
+                            ((EntityPlayer) entityhuman).playerConnection.sendPacket(
+                                    new PacketPlayOutSetSlot(this.windowId, slot2.rawSlotIndex, slot2.getItem()));
+                            // Updating a crafting inventory makes the client reset the result slot, have to
+                            // send it again
+                            if (this.getBukkitView().getType() == InventoryType.WORKBENCH
+                                    || this.getBukkitView().getType() == InventoryType.CRAFTING) {
+                                ((EntityPlayer) entityhuman).playerConnection.sendPacket(
+                                        new PacketPlayOutSetSlot(this.windowId, 0, this.getSlot(0).getItem()));
                             }
                         }
                         // CraftBukkit end
@@ -364,7 +400,8 @@ public abstract class Container {
                 slot2 = (Slot) this.c.get(i);
                 if (slot2.isAllowed(entityhuman)) {
                     itemstack1 = playerinventory.getItem(j);
-                    boolean flag = itemstack1 == null || slot2.inventory == playerinventory && slot2.isAllowed(itemstack1);
+                    boolean flag = itemstack1 == null
+                            || slot2.inventory == playerinventory && slot2.isAllowed(itemstack1);
 
                     k1 = -1;
                     if (!flag) {
@@ -375,7 +412,8 @@ public abstract class Container {
                     if (slot2.hasItem() && flag) {
                         itemstack3 = slot2.getItem();
                         playerinventory.setItem(j, itemstack3.cloneItemStack());
-                        if ((slot2.inventory != playerinventory || !slot2.isAllowed(itemstack1)) && itemstack1 != null) {
+                        if ((slot2.inventory != playerinventory || !slot2.isAllowed(itemstack1))
+                                && itemstack1 != null) {
                             if (k1 > -1) {
                                 playerinventory.pickup(itemstack1);
                                 slot2.a(itemstack3.count);
@@ -392,7 +430,8 @@ public abstract class Container {
                         slot2.set(itemstack1);
                     }
                 }
-            } else if (k == 3 && entityhuman.abilities.canInstantlyBuild && playerinventory.getCarried() == null && i >= 0) {
+            } else if (k == 3 && entityhuman.abilities.canInstantlyBuild && playerinventory.getCarried() == null
+                    && i >= 0) {
                 slot2 = (Slot) this.c.get(i);
                 if (slot2 != null && slot2.hasItem()) {
                     itemstack1 = slot2.getItem().cloneItemStack();
@@ -414,11 +453,15 @@ public abstract class Container {
                     k1 = j == 0 ? 1 : -1;
 
                     for (int l1 = 0; l1 < 2; ++l1) {
-                        for (int i2 = l; i2 >= 0 && i2 < this.c.size() && itemstack1.count < itemstack1.getMaxStackSize(); i2 += k1) {
+                        for (int i2 = l; i2 >= 0 && i2 < this.c.size()
+                                && itemstack1.count < itemstack1.getMaxStackSize(); i2 += k1) {
                             Slot slot3 = (Slot) this.c.get(i2);
 
-                            if (slot3.hasItem() && a(slot3, itemstack1, true) && slot3.isAllowed(entityhuman) && this.a(itemstack1, slot3) && (l1 != 0 || slot3.getItem().count != slot3.getItem().getMaxStackSize())) {
-                                int j2 = Math.min(itemstack1.getMaxStackSize() - itemstack1.count, slot3.getItem().count);
+                            if (slot3.hasItem() && a(slot3, itemstack1, true) && slot3.isAllowed(entityhuman)
+                                    && this.a(itemstack1, slot3)
+                                    && (l1 != 0 || slot3.getItem().count != slot3.getItem().getMaxStackSize())) {
+                                int j2 = Math.min(itemstack1.getMaxStackSize() - itemstack1.count,
+                                        slot3.getItem().count);
                                 ItemStack itemstack5 = slot3.a(j2);
 
                                 itemstack1.count += j2;
@@ -495,7 +538,9 @@ public abstract class Container {
             while (itemstack.count > 0 && (!flag && k < j || flag && k >= i)) {
                 slot = (Slot) this.c.get(k);
                 itemstack1 = slot.getItem();
-                if (itemstack1 != null && itemstack1.getItem() == itemstack.getItem() && (!itemstack.usesData() || itemstack.getData() == itemstack1.getData()) && ItemStack.equals(itemstack, itemstack1)) {
+                if (itemstack1 != null && itemstack1.getItem() == itemstack.getItem()
+                        && (!itemstack.usesData() || itemstack.getData() == itemstack1.getData())
+                        && ItemStack.equals(itemstack, itemstack1)) {
                     int l = itemstack1.count + itemstack.count;
 
                     // CraftBukkit start - itemstack.getMaxStackSize() -> maxStack
@@ -571,7 +616,8 @@ public abstract class Container {
     public static boolean a(Slot slot, ItemStack itemstack, boolean flag) {
         boolean flag1 = slot == null || !slot.hasItem();
 
-        if (slot != null && slot.hasItem() && itemstack != null && itemstack.doMaterialsMatch(slot.getItem()) && ItemStack.equals(slot.getItem(), itemstack)) {
+        if (slot != null && slot.hasItem() && itemstack != null && itemstack.doMaterialsMatch(slot.getItem())
+                && ItemStack.equals(slot.getItem(), itemstack)) {
             flag1 |= slot.getItem().count + (flag ? 0 : itemstack.count) <= itemstack.getMaxStackSize();
         }
 
@@ -580,16 +626,16 @@ public abstract class Container {
 
     public static void a(Set<Slot> set, int i, ItemStack itemstack, int j) {
         switch (i) {
-        case 0:
-            itemstack.count = MathHelper.d((float) itemstack.count / (float) set.size());
-            break;
+            case 0:
+                itemstack.count = MathHelper.d((float) itemstack.count / (float) set.size());
+                break;
 
-        case 1:
-            itemstack.count = 1;
-            break;
+            case 1:
+                itemstack.count = 1;
+                break;
 
-        case 2:
-            itemstack.count = itemstack.getItem().getMaxStackSize();
+            case 2:
+                itemstack.count = itemstack.getItem().getMaxStackSize();
         }
 
         itemstack.count += j;
@@ -614,7 +660,8 @@ public abstract class Container {
                 ItemStack itemstack = iinventory.getItem(j);
 
                 if (itemstack != null) {
-                    f += (float) itemstack.count / (float) Math.min(iinventory.getMaxStackSize(), itemstack.getMaxStackSize());
+                    f += (float) itemstack.count
+                            / (float) Math.min(iinventory.getMaxStackSize(), itemstack.getMaxStackSize());
                     ++i;
                 }
             }

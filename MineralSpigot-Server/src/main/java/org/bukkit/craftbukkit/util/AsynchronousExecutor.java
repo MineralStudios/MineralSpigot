@@ -1,6 +1,5 @@
 package org.bukkit.craftbukkit.util;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 import org.apache.commons.lang.Validate;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 /**
  * Executes tasks using a multi-stage process executor. Synchronous executions
@@ -231,7 +232,7 @@ public final class AsynchronousExecutor<P, T, C, E extends Throwable> {
 
     final CallBackProvider<P, T, C, E> provider;
     final Queue<Task> finished = new ConcurrentLinkedQueue<Task>();
-    final Map<P, Task> tasks = new HashMap<P, Task>();
+    final Map<P, Task> tasks = new Object2ObjectOpenHashMap<P, Task>();
     final ThreadPoolExecutor pool;
 
     /**

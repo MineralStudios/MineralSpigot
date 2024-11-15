@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -39,6 +38,8 @@ import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.UnknownDependencyException;
 import org.yaml.snakeyaml.error.YAMLException;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 /**
  * Represents a Java plugin loader, allowing plugins in the form of .jar
@@ -230,7 +231,7 @@ public final class JavaPluginLoader implements PluginLoader {
         Validate.notNull(plugin, "Plugin can not be null");
         Validate.notNull(listener, "Listener can not be null");
 
-        Map<Class<? extends Event>, Set<RegisteredListener>> ret = new HashMap<Class<? extends Event>, Set<RegisteredListener>>();
+        Map<Class<? extends Event>, Set<RegisteredListener>> ret = new Object2ObjectOpenHashMap<Class<? extends Event>, Set<RegisteredListener>>();
         Set<Method> methods;
         try {
             Method[] publicMethods = listener.getClass().getMethods();

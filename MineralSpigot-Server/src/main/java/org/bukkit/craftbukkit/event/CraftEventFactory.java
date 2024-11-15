@@ -9,6 +9,7 @@ import java.util.Map;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import net.minecraft.server.*;
 
 import org.bukkit.Bukkit;
@@ -352,7 +353,7 @@ public class CraftEventFactory {
      * PotionSplashEvent
      */
     public static PotionSplashEvent callPotionSplashEvent(EntityPotion potion,
-            Map<LivingEntity, Double> affectedEntities) {
+            Object2DoubleOpenHashMap<LivingEntity> affectedEntities) {
         ThrownPotion thrownPotion = (ThrownPotion) potion.getBukkitEntity();
 
         PotionSplashEvent event = new PotionSplashEvent(thrownPotion, affectedEntities);

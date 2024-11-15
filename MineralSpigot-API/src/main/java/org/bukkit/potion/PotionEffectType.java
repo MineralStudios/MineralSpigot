@@ -1,9 +1,10 @@
 package org.bukkit.potion;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.Validate;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 /**
  * Represents a type of potion and its effect on an entity.
@@ -137,7 +138,7 @@ public abstract class PotionEffectType {
      * modifiers and checks.
      *
      * @see PotionBrewer#createEffect(PotionEffectType, int, int)
-     * @param duration time in ticks
+     * @param duration  time in ticks
      * @param amplifier the effect's amplifier
      * @return a resulting potion effect
      */
@@ -203,7 +204,7 @@ public abstract class PotionEffectType {
     }
 
     private static final PotionEffectType[] byId = new PotionEffectType[24];
-    private static final Map<String, PotionEffectType> byName = new HashMap<String, PotionEffectType>();
+    private static final Map<String, PotionEffectType> byName = new Object2ObjectOpenHashMap<String, PotionEffectType>();
     // will break on updates.
     private static boolean acceptingNew = true;
 

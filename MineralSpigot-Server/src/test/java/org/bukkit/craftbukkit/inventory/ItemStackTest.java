@@ -65,7 +65,8 @@ public class ItemStackTest extends AbstractTestingBase {
 
         /**
          * For each item in parameterList, it will apply nameFormat at nameIndex.
-         * For each item in parameterList for each item in materials, it will create a stack provider at each array index that contains an Operator.
+         * For each item in parameterList for each item in materials, it will create a
+         * stack provider at each array index that contains an Operator.
          *
          * @param parameterList
          * @param nameFormat
@@ -73,7 +74,8 @@ public class ItemStackTest extends AbstractTestingBase {
          * @param materials
          * @return
          */
-        static List<Object[]> compound(final List<Object[]> parameterList, final String nameFormat, final int nameIndex, final Material...materials) {
+        static List<Object[]> compound(final List<Object[]> parameterList, final String nameFormat, final int nameIndex,
+                final Material... materials) {
             final List<Object[]> out = new ArrayList<Object[]>();
             for (Object[] params : parameterList) {
                 final int len = params.length;
@@ -112,7 +114,8 @@ public class ItemStackTest extends AbstractTestingBase {
             final List<Object[]> out;
             final List<Object[]>[] lists;
 
-            RecursiveContainer(Joiner joiner, Object[] strings, int nameParameter, List<Object[]> stack, List<Object[]> out, List<Object[]>[] lists) {
+            RecursiveContainer(Joiner joiner, Object[] strings, int nameParameter, List<Object[]> stack,
+                    List<Object[]> out, List<Object[]>[] lists) {
                 this.joiner = joiner;
                 this.strings = strings;
                 this.nameParameter = nameParameter;
@@ -121,9 +124,10 @@ public class ItemStackTest extends AbstractTestingBase {
                 this.lists = lists;
             }
         }
+
         final Operator[] operators;
 
-        CompoundOperator(Operator...operators) {
+        CompoundOperator(Operator... operators) {
             this.operators = operators;
         }
 
@@ -139,19 +143,26 @@ public class ItemStackTest extends AbstractTestingBase {
             return Arrays.toString(operators);
         }
 
-
         /**
-         * This combines different tests into one large collection, combining no two tests from the same list.
-         * @param joiner used to join names
-         * @param nameParameter index of the name parameter
-         * @param singletonBitmask a list of bits representing the 'singletons' located in your originalLists. Lowest order bits represent the first items in originalLists.
-         *      Singletons are exponentially linked with each other, such that,
-         *      the output will contain every unique subset of only items from the singletons,
-         *      as well as every unique subset that contains at least one item from each non-singleton.
+         * This combines different tests into one large collection, combining no two
+         * tests from the same list.
+         * 
+         * @param joiner           used to join names
+         * @param nameParameter    index of the name parameter
+         * @param singletonBitmask a list of bits representing the 'singletons' located
+         *                         in your originalLists. Lowest order bits represent
+         *                         the first items in originalLists.
+         *                         Singletons are exponentially linked with each other,
+         *                         such that,
+         *                         the output will contain every unique subset of only
+         *                         items from the singletons,
+         *                         as well as every unique subset that contains at least
+         *                         one item from each non-singleton.
          * @param originalLists
          * @return
          */
-        static List<Object[]> compound(final Joiner joiner, final int nameParameter, final long singletonBitmask, final List<Object[]>...originalLists) {
+        static List<Object[]> compound(final Joiner joiner, final int nameParameter, final long singletonBitmask,
+                final List<Object[]>... originalLists) {
 
             final List<Object[]> out = new ArrayList<Object[]>();
             final List<List<Object[]>> singletons = new ArrayList<List<Object[]>>();
@@ -197,7 +208,8 @@ public class ItemStackTest extends AbstractTestingBase {
             notSingletons.toArray(lists);
             lists[lists.length - 1] = out;
 
-            final RecursiveContainer methodParams = new RecursiveContainer(joiner, new Object[lists.length], nameParameter, new ArrayList<Object[]>(lists.length), new ArrayList<Object[]>(), lists);
+            final RecursiveContainer methodParams = new RecursiveContainer(joiner, new Object[lists.length],
+                    nameParameter, new ArrayList<Object[]>(lists.length), new ArrayList<Object[]>(), lists);
 
             recursivelyCompound(methodParams, 0);
             methodParams.out.addAll(out);
@@ -304,7 +316,7 @@ public class ItemStackTest extends AbstractTestingBase {
         }
     }
 
-    @Parameters(name="[{index}]:{" + NAME_PARAMETER + "}")
+    @Parameters(name = "[{index}]:{" + NAME_PARAMETER + "}")
     public static List<Object[]> data() {
         return ImmutableList.of(); // TODO, test basic durability issues
     }
@@ -329,9 +341,12 @@ public class ItemStackTest extends AbstractTestingBase {
         COMPOUND_MATERIALS = possibleMaterials.values().toArray(new Material[possibleMaterials.size()]);
     }
 
-    @Parameter(0) public StackProvider provider;
-    @Parameter(1) public StackProvider unequalProvider;
-    @Parameter(NAME_PARAMETER) public String name;
+    @Parameter(0)
+    public StackProvider provider;
+    @Parameter(1)
+    public StackProvider unequalProvider;
+    @Parameter(NAME_PARAMETER)
+    public String name;
 
     @Test
     public void testBukkitInequality() {
@@ -389,13 +404,15 @@ public class ItemStackTest extends AbstractTestingBase {
         final ItemStack newUnequalStack = new ItemStack(unequalStack2);
         assertThat(newUnequalStack, allOf(equalTo(unequalStack), sameHash(unequalStack)));
         assertThat(newUnequalStack, is(not(stack)));
-        assertThat(newUnequalStack.getItemMeta(), allOf(equalTo(unequalStack.getItemMeta()), sameHash(unequalStack.getItemMeta())));
+        assertThat(newUnequalStack.getItemMeta(),
+                allOf(equalTo(unequalStack.getItemMeta()), sameHash(unequalStack.getItemMeta())));
         assertThat(newUnequalStack.getItemMeta(), is(not(stack.getItemMeta())));
 
         final ItemStack newUnequalCraftStack = CraftItemStack.asCraftCopy(unequalStack2);
         assertThat(newUnequalCraftStack, allOf(equalTo(unequalStack), sameHash(unequalStack)));
         assertThat(newUnequalCraftStack, is(not(stack)));
-        assertThat(newUnequalCraftStack.getItemMeta(), allOf(equalTo(unequalStack.getItemMeta()), sameHash(unequalStack.getItemMeta())));
+        assertThat(newUnequalCraftStack.getItemMeta(),
+                allOf(equalTo(unequalStack.getItemMeta()), sameHash(unequalStack.getItemMeta())));
         assertThat(newUnequalCraftStack.getItemMeta(), is(not(stack.getItemMeta())));
     }
 
@@ -484,7 +501,8 @@ public class ItemStackTest extends AbstractTestingBase {
         testEqualities(out, configIn.getItemStack("provider"), configIn.getItemStack("unequal"), stack, unequalStack);
     }
 
-    static void testEqualities(String information, ItemStack primaryRead, ItemStack unequalRead, ItemStack primaryOriginal, ItemStack unequalOriginal) {
+    static void testEqualities(String information, ItemStack primaryRead, ItemStack unequalRead,
+            ItemStack primaryOriginal, ItemStack unequalOriginal) {
         assertThat(information, primaryRead, allOf(equalTo(primaryOriginal), sameHash(primaryOriginal)));
         assertThat(information, unequalRead, allOf(equalTo(unequalOriginal), sameHash(unequalOriginal)));
         assertThat(information, primaryRead, is(not(unequalOriginal)));

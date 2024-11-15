@@ -1,14 +1,16 @@
 package org.bukkit.permissions;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 /**
  * Base Permissible for use in any Permissible object via proxy or extension
@@ -17,7 +19,7 @@ public class PermissibleBase implements Permissible {
     private ServerOperator opable = null;
     private Permissible parent = this;
     private final List<PermissionAttachment> attachments = new LinkedList<PermissionAttachment>();
-    private final Map<String, PermissionAttachmentInfo> permissions = new HashMap<String, PermissionAttachmentInfo>();
+    private final Map<String, PermissionAttachmentInfo> permissions = new Object2ObjectOpenHashMap<String, PermissionAttachmentInfo>();
 
     public PermissibleBase(ServerOperator opable) {
         this.opable = opable;
@@ -175,7 +177,8 @@ public class PermissibleBase implements Permissible {
         permissions.clear();
     }
 
-    private void calculateChildPermissions(Map<String, Boolean> children, boolean invert, PermissionAttachment attachment) {
+    private void calculateChildPermissions(Map<String, Boolean> children, boolean invert,
+            PermissionAttachment attachment) {
         Set<String> keys = children.keySet();
 
         for (String name : keys) {
@@ -219,8 +222,10 @@ public class PermissibleBase implements Permissible {
 
         PermissionAttachment result = addAttachment(plugin);
 
-        if (Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new RemoveAttachmentRunnable(result), ticks) == -1) {
-            Bukkit.getServer().getLogger().log(Level.WARNING, "Could not add PermissionAttachment to " + parent + " for plugin " + plugin.getDescription().getFullName() + ": Scheduler returned -1");
+        if (Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new RemoveAttachmentRunnable(result),
+                ticks) == -1) {
+            Bukkit.getServer().getLogger().log(Level.WARNING, "Could not add PermissionAttachment to " + parent
+                    + " for plugin " + plugin.getDescription().getFullName() + ": Scheduler returned -1");
             result.remove();
             return null;
         } else {

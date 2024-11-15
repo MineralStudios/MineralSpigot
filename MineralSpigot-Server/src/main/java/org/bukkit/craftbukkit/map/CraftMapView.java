@@ -2,11 +2,8 @@ package org.bukkit.craftbukkit.map;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import net.minecraft.server.WorldMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -15,11 +12,14 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.server.WorldMap;
+
 public final class CraftMapView implements MapView {
 
-    private final Map<CraftPlayer, RenderData> renderCache = new HashMap<CraftPlayer, RenderData>();
+    private final Map<CraftPlayer, RenderData> renderCache = new Object2ObjectOpenHashMap<CraftPlayer, RenderData>();
     private final List<MapRenderer> renderers = new ArrayList<MapRenderer>();
-    private final Map<MapRenderer, Map<CraftPlayer, CraftMapCanvas>> canvases = new HashMap<MapRenderer, Map<CraftPlayer, CraftMapCanvas>>();
+    private final Map<MapRenderer, Map<CraftPlayer, CraftMapCanvas>> canvases = new Object2ObjectOpenHashMap<MapRenderer, Map<CraftPlayer, CraftMapCanvas>>();
     protected final WorldMap worldMap;
 
     public CraftMapView(WorldMap worldMap) {
@@ -32,8 +32,7 @@ public final class CraftMapView implements MapView {
         if (text.startsWith("map_")) {
             try {
                 return Short.parseShort(text.substring("map_".length()));
-            }
-            catch (NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 throw new IllegalStateException("Map has non-numeric ID");
             }
         } else {
@@ -90,7 +89,7 @@ public final class CraftMapView implements MapView {
     public void addRenderer(MapRenderer renderer) {
         if (!renderers.contains(renderer)) {
             renderers.add(renderer);
-            canvases.put(renderer, new HashMap<CraftPlayer, CraftMapCanvas>());
+            canvases.put(renderer, new Object2ObjectOpenHashMap<CraftPlayer, CraftMapCanvas>());
             renderer.initialize(this);
         }
     }
@@ -114,7 +113,8 @@ public final class CraftMapView implements MapView {
 
     private boolean isContextual() {
         for (MapRenderer renderer : renderers) {
-            if (renderer.isContextual()) return true;
+            if (renderer.isContextual())
+                return true;
         }
         return false;
     }
@@ -149,7 +149,8 @@ public final class CraftMapView implements MapView {
             for (int i = 0; i < buf.length; ++i) {
                 byte color = buf[i];
                 // There are 143 valid color id's, 0 -> 127 and -128 -> -113
-                if (color >= 0 || color <= -113) render.buffer[i] = color;
+                if (color >= 0 || color <= -113)
+                    render.buffer[i] = color;
             }
 
             for (int i = 0; i < canvas.getCursors().size(); ++i) {

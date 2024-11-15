@@ -1,10 +1,12 @@
 package org.bukkit.enchantments;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.command.defaults.EnchantCommand;
 import org.bukkit.inventory.ItemStack;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 /**
  * The various type of enchantments that may be added to armour or weapons
@@ -136,8 +138,8 @@ public abstract class Enchantment {
      */
     public static final Enchantment LURE = new EnchantmentWrapper(62);
 
-    private static final Map<Integer, Enchantment> byId = new HashMap<Integer, Enchantment>();
-    private static final Map<String, Enchantment> byName = new HashMap<String, Enchantment>();
+    private static final Int2ObjectOpenHashMap<Enchantment> byId = new Int2ObjectOpenHashMap<>();
+    private static final Map<String, Enchantment> byName = new Object2ObjectOpenHashMap<String, Enchantment>();
     private static boolean acceptingNew = true;
     private final int id;
 
@@ -240,7 +242,8 @@ public abstract class Enchantment {
         if (byId.containsKey(enchantment.id) || byName.containsKey(enchantment.getName())) {
             throw new IllegalArgumentException("Cannot set already-set enchantment");
         } else if (!isAcceptingRegistrations()) {
-            throw new IllegalStateException("No longer accepting new enchantments (can only be done by the server implementation)");
+            throw new IllegalStateException(
+                    "No longer accepting new enchantments (can only be done by the server implementation)");
         }
 
         byId.put(enchantment.id, enchantment);

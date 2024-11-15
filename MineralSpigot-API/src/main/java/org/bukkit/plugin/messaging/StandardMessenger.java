@@ -2,7 +2,9 @@ package org.bukkit.plugin.messaging;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
-import java.util.HashMap;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -15,10 +17,10 @@ import org.github.paperspigot.exception.ServerPluginMessageException;
  * Standard implementation to {@link Messenger}
  */
 public class StandardMessenger implements Messenger {
-    private final Map<String, Set<PluginMessageListenerRegistration>> incomingByChannel = new HashMap<String, Set<PluginMessageListenerRegistration>>();
-    private final Map<Plugin, Set<PluginMessageListenerRegistration>> incomingByPlugin = new HashMap<Plugin, Set<PluginMessageListenerRegistration>>();
-    private final Map<String, Set<Plugin>> outgoingByChannel = new HashMap<String, Set<Plugin>>();
-    private final Map<Plugin, Set<String>> outgoingByPlugin = new HashMap<Plugin, Set<String>>();
+    private final Map<String, Set<PluginMessageListenerRegistration>> incomingByChannel = new Object2ObjectOpenHashMap<String, Set<PluginMessageListenerRegistration>>();
+    private final Map<Plugin, Set<PluginMessageListenerRegistration>> incomingByPlugin = new Object2ObjectOpenHashMap<Plugin, Set<PluginMessageListenerRegistration>>();
+    private final Map<String, Set<Plugin>> outgoingByChannel = new Object2ObjectOpenHashMap<String, Set<Plugin>>();
+    private final Map<Plugin, Set<String>> outgoingByPlugin = new Object2ObjectOpenHashMap<Plugin, Set<String>>();
     private final Object incomingLock = new Object();
     private final Object outgoingLock = new Object();
 
@@ -140,7 +142,8 @@ public class StandardMessenger implements Messenger {
             Set<PluginMessageListenerRegistration> registrations = incomingByPlugin.get(plugin);
 
             if (registrations != null) {
-                PluginMessageListenerRegistration[] toRemove = registrations.toArray(new PluginMessageListenerRegistration[0]);
+                PluginMessageListenerRegistration[] toRemove = registrations
+                        .toArray(new PluginMessageListenerRegistration[0]);
 
                 for (PluginMessageListenerRegistration registration : toRemove) {
                     if (registration.getChannel().equals(channel)) {
@@ -156,7 +159,8 @@ public class StandardMessenger implements Messenger {
             Set<PluginMessageListenerRegistration> registrations = incomingByPlugin.get(plugin);
 
             if (registrations != null) {
-                PluginMessageListenerRegistration[] toRemove = registrations.toArray(new PluginMessageListenerRegistration[0]);
+                PluginMessageListenerRegistration[] toRemove = registrations
+                        .toArray(new PluginMessageListenerRegistration[0]);
 
                 incomingByPlugin.remove(plugin);
 
@@ -202,7 +206,8 @@ public class StandardMessenger implements Messenger {
         removeFromOutgoing(plugin);
     }
 
-    public PluginMessageListenerRegistration registerIncomingPluginChannel(Plugin plugin, String channel, PluginMessageListener listener) {
+    public PluginMessageListenerRegistration registerIncomingPluginChannel(Plugin plugin, String channel,
+            PluginMessageListener listener) {
         if (plugin == null) {
             throw new IllegalArgumentException("Plugin cannot be null");
         }
@@ -214,7 +219,8 @@ public class StandardMessenger implements Messenger {
             throw new IllegalArgumentException("Listener cannot be null");
         }
 
-        PluginMessageListenerRegistration result = new PluginMessageListenerRegistration(this, plugin, channel, listener);
+        PluginMessageListenerRegistration result = new PluginMessageListenerRegistration(this, plugin, channel,
+                listener);
 
         addToIncoming(result);
 
@@ -424,17 +430,14 @@ public class StandardMessenger implements Messenger {
 
         for (PluginMessageListenerRegistration registration : registrations) {
             // Spigot Start
-            try
-            {
-                registration.getListener().onPluginMessageReceived( channel, source, message );
-            } catch ( Throwable t )
-            {
+            try {
+                registration.getListener().onPluginMessageReceived(channel, source, message);
+            } catch (Throwable t) {
                 // Paper start
                 String msg = "Could not pass incoming plugin message to " + registration.getPlugin();
-                org.bukkit.Bukkit.getLogger().log( java.util.logging.Level.WARNING, msg, t );
+                org.bukkit.Bukkit.getLogger().log(java.util.logging.Level.WARNING, msg, t);
                 source.getServer().getPluginManager().callEvent(new ServerExceptionEvent(
-                        new ServerPluginMessageException(msg, t, registration.getPlugin(), source, channel, message)
-                ));
+                        new ServerPluginMessageException(msg, t, registration.getPlugin(), source, channel, message)));
                 // Paper end
             }
             // Spigot End
@@ -460,18 +463,18 @@ public class StandardMessenger implements Messenger {
      * valid.
      *
      * @param messenger Messenger to use for validation.
-     * @param source Source plugin of the Message.
-     * @param channel Plugin Channel to send the message by.
-     * @param message Raw message payload to send.
-     * @throws IllegalArgumentException Thrown if the source plugin is
-     *     disabled.
-     * @throws IllegalArgumentException Thrown if source, channel or message
-     *     is null.
-     * @throws MessageTooLargeException Thrown if the message is too big.
-     * @throws ChannelNameTooLongException Thrown if the channel name is too
-     *     long.
+     * @param source    Source plugin of the Message.
+     * @param channel   Plugin Channel to send the message by.
+     * @param message   Raw message payload to send.
+     * @throws IllegalArgumentException      Thrown if the source plugin is
+     *                                       disabled.
+     * @throws IllegalArgumentException      Thrown if source, channel or message
+     *                                       is null.
+     * @throws MessageTooLargeException      Thrown if the message is too big.
+     * @throws ChannelNameTooLongException   Thrown if the channel name is too
+     *                                       long.
      * @throws ChannelNotRegisteredException Thrown if the channel is not
-     *     registered for this plugin.
+     *                                       registered for this plugin.
      */
     public static void validatePluginMessage(Messenger messenger, Plugin source, String channel, byte[] message) {
         if (messenger == null) {

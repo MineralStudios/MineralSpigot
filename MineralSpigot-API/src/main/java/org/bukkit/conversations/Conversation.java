@@ -1,11 +1,12 @@
 package org.bukkit.conversations;
 
-import org.bukkit.plugin.Plugin;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.bukkit.plugin.Plugin;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 /**
  * The Conversation class is responsible for tracking the current state of a
@@ -47,24 +48,25 @@ public class Conversation {
     /**
      * Initializes a new Conversation.
      *
-     * @param plugin The plugin that owns this conversation.
-     * @param forWhom The entity for whom this conversation is mediating.
+     * @param plugin      The plugin that owns this conversation.
+     * @param forWhom     The entity for whom this conversation is mediating.
      * @param firstPrompt The first prompt in the conversation graph.
      */
     public Conversation(Plugin plugin, Conversable forWhom, Prompt firstPrompt) {
-        this(plugin, forWhom, firstPrompt, new HashMap<Object, Object>());
+        this(plugin, forWhom, firstPrompt, new Object2ObjectOpenHashMap<Object, Object>());
     }
 
     /**
      * Initializes a new Conversation.
      *
-     * @param plugin The plugin that owns this conversation.
-     * @param forWhom The entity for whom this conversation is mediating.
-     * @param firstPrompt The first prompt in the conversation graph.
+     * @param plugin             The plugin that owns this conversation.
+     * @param forWhom            The entity for whom this conversation is mediating.
+     * @param firstPrompt        The first prompt in the conversation graph.
      * @param initialSessionData Any initial values to put in the conversation
-     *     context sessionData map.
+     *                           context sessionData map.
      */
-    public Conversation(Plugin plugin, Conversable forWhom, Prompt firstPrompt, Map<Object, Object> initialSessionData) {
+    public Conversation(Plugin plugin, Conversable forWhom, Prompt firstPrompt,
+            Map<Object, Object> initialSessionData) {
         this.firstPrompt = firstPrompt;
         this.context = new ConversationContext(plugin, forWhom, initialSessionData);
         this.modal = true;
@@ -95,7 +97,7 @@ public class Conversation {
     }
 
     /**
-     * Sets the modality of this conversation.  If a conversation is modal,
+     * Sets the modality of this conversation. If a conversation is modal,
      * all messages directed to the player are suppressed for the duration of
      * the conversation.
      *
@@ -210,29 +212,28 @@ public class Conversation {
      */
     public void acceptInput(String input) {
         try { // Spigot
-        if (currentPrompt != null) {
+            if (currentPrompt != null) {
 
-            // Echo the user's input
-            if (localEchoEnabled) {
-                context.getForWhom().sendRawMessage(prefix.getPrefix(context) + input);
-            }
-
-            // Test for conversation abandonment based on input
-            for(ConversationCanceller canceller : cancellers) {
-                if (canceller.cancelBasedOnInput(context, input)) {
-                    abandon(new ConversationAbandonedEvent(this, canceller));
-                    return;
+                // Echo the user's input
+                if (localEchoEnabled) {
+                    context.getForWhom().sendRawMessage(prefix.getPrefix(context) + input);
                 }
-            }
 
-            // Not abandoned, output the next prompt
-            currentPrompt = currentPrompt.acceptInput(context, input);
-            outputNextPrompt();
-        }
-        // Spigot Start
-        } catch ( Throwable t )
-        {
-            org.bukkit.Bukkit.getLogger().log( java.util.logging.Level.SEVERE, "Error handling conversation prompt", t );
+                // Test for conversation abandonment based on input
+                for (ConversationCanceller canceller : cancellers) {
+                    if (canceller.cancelBasedOnInput(context, input)) {
+                        abandon(new ConversationAbandonedEvent(this, canceller));
+                        return;
+                    }
+                }
+
+                // Not abandoned, output the next prompt
+                currentPrompt = currentPrompt.acceptInput(context, input);
+                outputNextPrompt();
+            }
+            // Spigot Start
+        } catch (Throwable t) {
+            org.bukkit.Bukkit.getLogger().log(java.util.logging.Level.SEVERE, "Error handling conversation prompt", t);
         }
         // Spigot End
     }

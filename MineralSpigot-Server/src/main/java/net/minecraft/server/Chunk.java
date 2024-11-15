@@ -1,11 +1,5 @@
 package net.minecraft.server;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
-
-import gg.mineral.server.config.GlobalConfig;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -19,12 +13,16 @@ import java.util.concurrent.atomic.AtomicInteger; // PaperSpigot
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.google.common.collect.Lists; // CraftBukkit
 import org.bukkit.Bukkit; // CraftBukkit
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
-import org.github.paperspigot.event.ServerExceptionEvent;
 import org.github.paperspigot.exception.ServerInternalException;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Lists; // CraftBukkit
+import com.google.common.collect.Queues;
+
+import gg.mineral.server.config.GlobalConfig;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class Chunk {
 
@@ -142,7 +140,7 @@ public class Chunk {
         this.e = new byte[256];
         this.f = new int[256];
         this.g = new boolean[256];
-        this.tileEntities = Maps.newHashMap();
+        this.tileEntities = new Object2ObjectOpenHashMap<>();
         this.v = 4096;
         this.w = Queues.newConcurrentLinkedQueue();
         this.entitySlices = (List[]) (new List[16]); // Spigot

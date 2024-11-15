@@ -1,8 +1,6 @@
 package org.bukkit.craftbukkit.help;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +28,7 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 /**
  * Standard implementation of {@link HelpMap} for CraftBukkit servers.
@@ -123,7 +122,7 @@ public class SimpleHelpMap implements HelpMap {
      */
     public synchronized void initializeCommands() {
         // ** Load topics from highest to lowest priority order **
-        Set<String> ignoredPlugins = new HashSet<String>(yaml.getIgnoredPlugins());
+        Set<String> ignoredPlugins = new ObjectOpenHashSet<String>(yaml.getIgnoredPlugins());
 
         // Don't load any automatic help topics if All is ignored
         if (ignoredPlugins.contains("All")) {

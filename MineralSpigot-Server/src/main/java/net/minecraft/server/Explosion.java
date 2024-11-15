@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import gg.mineral.server.config.GlobalConfig;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,7 +32,7 @@ public class Explosion {
     public final Entity source;
     private final float size;
     private final List<BlockPosition> blocks = Lists.newArrayList();
-    private final Map<EntityHuman, Vec3D> k = Maps.newHashMap();
+    private final Map<EntityHuman, Vec3D> k = new Object2ObjectOpenHashMap<>();
     public boolean wasCanceled = false; // CraftBukkit - add field
 
     public Explosion(World world, Entity entity, double d0, double d1, double d2, float f, boolean flag,

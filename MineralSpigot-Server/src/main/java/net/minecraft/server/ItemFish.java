@@ -1,7 +1,6 @@
 package net.minecraft.server;
 
-import com.google.common.collect.Maps;
-import java.util.Map;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 public class ItemFish extends ItemFood {
 
@@ -43,14 +42,16 @@ public class ItemFish extends ItemFood {
     public String e_(ItemStack itemstack) {
         ItemFish.EnumFish itemfish_enumfish = ItemFish.EnumFish.a(itemstack);
 
-        return this.getName() + "." + itemfish_enumfish.b() + "." + (this.b && itemfish_enumfish.g() ? "cooked" : "raw");
+        return this.getName() + "." + itemfish_enumfish.b() + "."
+                + (this.b && itemfish_enumfish.g() ? "cooked" : "raw");
     }
 
     public static enum EnumFish {
 
-        COD(0, "cod", 2, 0.1F, 5, 0.6F), SALMON(1, "salmon", 2, 0.1F, 6, 0.8F), CLOWNFISH(2, "clownfish", 1, 0.1F), PUFFERFISH(3, "pufferfish", 1, 0.1F);
+        COD(0, "cod", 2, 0.1F, 5, 0.6F), SALMON(1, "salmon", 2, 0.1F, 6, 0.8F), CLOWNFISH(2, "clownfish", 1, 0.1F),
+        PUFFERFISH(3, "pufferfish", 1, 0.1F);
 
-        private static final Map<Integer, ItemFish.EnumFish> e = Maps.newHashMap();
+        private static final Int2ObjectOpenHashMap<ItemFish.EnumFish> e = new Int2ObjectOpenHashMap<>();
         private final int f;
         private final String g;
         private final int h;
@@ -108,7 +109,7 @@ public class ItemFish extends ItemFood {
         }
 
         public static ItemFish.EnumFish a(int i) {
-            ItemFish.EnumFish itemfish_enumfish = (ItemFish.EnumFish) ItemFish.EnumFish.e.get(Integer.valueOf(i));
+            ItemFish.EnumFish itemfish_enumfish = (ItemFish.EnumFish) ItemFish.EnumFish.e.get(i);
 
             return itemfish_enumfish == null ? ItemFish.EnumFish.COD : itemfish_enumfish;
         }
@@ -124,7 +125,7 @@ public class ItemFish extends ItemFood {
             for (int j = 0; j < i; ++j) {
                 ItemFish.EnumFish itemfish_enumfish = aitemfish_enumfish[j];
 
-                ItemFish.EnumFish.e.put(Integer.valueOf(itemfish_enumfish.a()), itemfish_enumfish);
+                ItemFish.EnumFish.e.put(itemfish_enumfish.a(), itemfish_enumfish);
             }
 
         }

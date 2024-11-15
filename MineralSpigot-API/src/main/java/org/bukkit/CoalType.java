@@ -1,8 +1,6 @@
 package org.bukkit;
 
-import java.util.Map;
-
-import com.google.common.collect.Maps;
+import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 
 /**
  * Represents the two types of coal
@@ -12,7 +10,7 @@ public enum CoalType {
     CHARCOAL(0x1);
 
     private final byte data;
-    private final static Map<Byte, CoalType> BY_DATA = Maps.newHashMap();
+    private final static Byte2ObjectOpenHashMap<CoalType> BY_DATA = new Byte2ObjectOpenHashMap<>();
 
     private CoalType(final int data) {
         this.data = (byte) data;
@@ -34,7 +32,7 @@ public enum CoalType {
      *
      * @param data Data value to fetch
      * @return The {@link CoalType} representing the given value, or null if
-     *     it doesn't exist
+     *         it doesn't exist
      * @deprecated Magic value
      */
     @Deprecated

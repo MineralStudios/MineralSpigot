@@ -1,11 +1,12 @@
 package net.minecraft.server;
 
-import com.google.common.collect.Maps;
 import java.util.Map;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class ItemRecord extends Item {
 
-    private static final Map<String, ItemRecord> b = Maps.newHashMap();
+    private static final Map<String, ItemRecord> b = new Object2ObjectOpenHashMap<>();
     public final String a;
 
     protected ItemRecord(String s) {
@@ -15,20 +16,23 @@ public class ItemRecord extends Item {
         ItemRecord.b.put("records." + s, this);
     }
 
-    public boolean interactWith(ItemStack itemstack, EntityHuman entityhuman, World world, BlockPosition blockposition, EnumDirection enumdirection, float f, float f1, float f2) {
+    public boolean interactWith(ItemStack itemstack, EntityHuman entityhuman, World world, BlockPosition blockposition,
+            EnumDirection enumdirection, float f, float f1, float f2) {
         IBlockData iblockdata = world.getType(blockposition);
 
-        if (iblockdata.getBlock() == Blocks.JUKEBOX && !((Boolean) iblockdata.get(BlockJukeBox.HAS_RECORD)).booleanValue()) {
+        if (iblockdata.getBlock() == Blocks.JUKEBOX
+                && !((Boolean) iblockdata.get(BlockJukeBox.HAS_RECORD)).booleanValue()) {
             if (world.isClientSide) {
                 return true;
             } else {
                 // CraftBukkit Start
                 /*
-                ((BlockJukeBox) Blocks.JUKEBOX).a(world, blockposition, iblockdata, itemstack);
-                world.a((EntityHuman) null, 1005, blockposition, Item.getId(this));
-                --itemstack.count;
-                entityhuman.b(StatisticList.X);
-                */
+                 * ((BlockJukeBox) Blocks.JUKEBOX).a(world, blockposition, iblockdata,
+                 * itemstack);
+                 * world.a((EntityHuman) null, 1005, blockposition, Item.getId(this));
+                 * --itemstack.count;
+                 * entityhuman.b(StatisticList.X);
+                 */
                 // CraftBukkit End
                 return true;
             }

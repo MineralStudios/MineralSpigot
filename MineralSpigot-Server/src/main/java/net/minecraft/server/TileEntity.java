@@ -1,19 +1,20 @@
 package net.minecraft.server;
 
-import com.google.common.collect.Maps;
 import java.util.Map;
 import java.util.concurrent.Callable;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import org.bukkit.inventory.InventoryHolder; // CraftBukkit
 import org.github.paperspigot.exception.ServerInternalException;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public abstract class TileEntity {
 
     private static final Logger a = LogManager.getLogger();
-    private static Map<String, Class<? extends TileEntity>> f = Maps.newHashMap();
-    private static Map<Class<? extends TileEntity>, String> g = Maps.newHashMap();
+    private static Map<String, Class<? extends TileEntity>> f = new Object2ObjectOpenHashMap<>();
+    private static Map<Class<? extends TileEntity>, String> g = new Object2ObjectOpenHashMap<>();
     protected World world;
     protected BlockPosition position;
     protected boolean d;

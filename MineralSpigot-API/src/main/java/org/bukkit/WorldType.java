@@ -1,7 +1,8 @@
 package org.bukkit;
 
-import com.google.common.collect.Maps;
 import java.util.Map;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 /**
  * Represents various types of worlds that may exist
@@ -14,7 +15,7 @@ public enum WorldType {
     AMPLIFIED("AMPLIFIED"),
     CUSTOMIZED("CUSTOMIZED");
 
-    private final static Map<String, WorldType> BY_NAME = Maps.newHashMap();
+    private final static Map<String, WorldType> BY_NAME = new Object2ObjectOpenHashMap<>();
     private final String name;
 
     private WorldType(String name) {

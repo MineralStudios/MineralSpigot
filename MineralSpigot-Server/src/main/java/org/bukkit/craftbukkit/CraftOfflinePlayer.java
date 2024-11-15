@@ -1,13 +1,14 @@
 package org.bukkit.craftbukkit;
 
 import com.mojang.authlib.GameProfile;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+
 import java.io.File;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.WorldNBTStorage;
 
@@ -122,7 +123,7 @@ public class CraftOfflinePlayer implements OfflinePlayer, ConfigurationSerializa
     }
 
     public Map<String, Object> serialize() {
-        Map<String, Object> result = new LinkedHashMap<String, Object>();
+        Map<String, Object> result = new Object2ObjectLinkedOpenHashMap<String, Object>();
 
         result.put("UUID", profile.getId().toString());
 
@@ -191,7 +192,8 @@ public class CraftOfflinePlayer implements OfflinePlayer, ConfigurationSerializa
 
     public long getFirstPlayed() {
         Player player = getPlayer();
-        if (player != null) return player.getFirstPlayed();
+        if (player != null)
+            return player.getFirstPlayed();
 
         NBTTagCompound data = getBukkitData();
 
@@ -209,7 +211,8 @@ public class CraftOfflinePlayer implements OfflinePlayer, ConfigurationSerializa
 
     public long getLastPlayed() {
         Player player = getPlayer();
-        if (player != null) return player.getLastPlayed();
+        if (player != null)
+            return player.getLastPlayed();
 
         NBTTagCompound data = getBukkitData();
 
@@ -231,14 +234,16 @@ public class CraftOfflinePlayer implements OfflinePlayer, ConfigurationSerializa
 
     public Location getBedSpawnLocation() {
         NBTTagCompound data = getData();
-        if (data == null) return null;
+        if (data == null)
+            return null;
 
         if (data.hasKey("SpawnX") && data.hasKey("SpawnY") && data.hasKey("SpawnZ")) {
             String spawnWorld = data.getString("SpawnWorld");
             if (spawnWorld.equals("")) {
                 spawnWorld = server.getWorlds().get(0).getName();
             }
-            return new Location(server.getWorld(spawnWorld), data.getInt("SpawnX"), data.getInt("SpawnY"), data.getInt("SpawnZ"));
+            return new Location(server.getWorld(spawnWorld), data.getInt("SpawnX"), data.getInt("SpawnY"),
+                    data.getInt("SpawnZ"));
         }
         return null;
     }

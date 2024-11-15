@@ -1,11 +1,13 @@
 package org.bukkit.craftbukkit;
 
 import com.google.common.base.Preconditions;
+
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Random;
@@ -1303,7 +1305,7 @@ public class CraftWorld implements World {
     }
 
     public Set<String> getListeningPluginChannels() {
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new ObjectOpenHashSet<String>();
 
         for (Player player : getPlayers()) {
             result.addAll(player.getListeningPluginChannels());

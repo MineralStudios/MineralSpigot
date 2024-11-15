@@ -1,11 +1,5 @@
 package net.minecraft.server;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import org.bukkit.Bukkit;
-import org.github.paperspigot.event.ServerExceptionEvent;
-import org.github.paperspigot.exception.ServerInternalException;
-
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
@@ -18,12 +12,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.github.paperspigot.exception.ServerInternalException;
+
+import com.google.common.collect.Lists;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
+
 public class PersistentCollection {
 
     private IDataManager b;
-    protected Map<String, PersistentBase> a = Maps.newHashMap();
+    protected Map<String, PersistentBase> a = new Object2ObjectOpenHashMap<>();
     public List<PersistentBase> c = Lists.newArrayList(); // Spigot
-    private Map<String, Short> d = Maps.newHashMap();
+    private Object2ShortOpenHashMap<String> d = new Object2ShortOpenHashMap<>() {
+        {
+            defaultReturnValue((short) -1);
+        }
+    };
 
     public PersistentCollection(IDataManager idatamanager) {
         this.b = idatamanager;
@@ -42,7 +47,8 @@ public class PersistentCollection {
 
                     if (file != null && file.exists()) {
                         try {
-                            persistentbase = (PersistentBase) oclass.getConstructor(new Class[] { String.class}).newInstance(new Object[] { s});
+                            persistentbase = (PersistentBase) oclass.getConstructor(new Class[] { String.class })
+                                    .newInstance(new Object[] { s });
                         } catch (Exception exception) {
                             throw new RuntimeException("Failed to instantiate " + oclass.toString(), exception);
                         }
@@ -137,7 +143,7 @@ public class PersistentCollection {
                         NBTTagShort nbttagshort = (NBTTagShort) nbtbase;
                         short short0 = nbttagshort.e();
 
-                        this.d.put(s, Short.valueOf(short0));
+                        this.d.put(s, short0);
                     }
                 }
             }
@@ -148,17 +154,11 @@ public class PersistentCollection {
     }
 
     public int a(String s) {
-        Short oshort = (Short) this.d.get(s);
-
-        if (oshort == null) {
-            oshort = Short.valueOf((short) 0);
-        } else {
-            oshort = Short.valueOf((short) (oshort.shortValue() + 1));
-        }
+        short oshort = (short) (this.d.getShort(s) + 1);
 
         this.d.put(s, oshort);
         if (this.b == null) {
-            return oshort.shortValue();
+            return oshort;
         } else {
             try {
                 File file = this.b.getDataFile("idcounts");
@@ -169,7 +169,7 @@ public class PersistentCollection {
 
                     while (iterator.hasNext()) {
                         String s1 = (String) iterator.next();
-                        short short0 = ((Short) this.d.get(s1)).shortValue();
+                        short short0 = this.d.getShort(s1);
 
                         nbttagcompound.setShort(s1, short0);
                     }
@@ -184,7 +184,7 @@ public class PersistentCollection {
                 ServerInternalException.reportInternalException(exception); // Paper
             }
 
-            return oshort.shortValue();
+            return oshort;
         }
     }
 }

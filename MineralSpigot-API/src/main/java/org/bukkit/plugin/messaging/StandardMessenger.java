@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.bukkit.entity.Player;
@@ -30,12 +30,12 @@ public class StandardMessenger implements Messenger {
             Set<String> channels = outgoingByPlugin.get(plugin);
 
             if (plugins == null) {
-                plugins = new HashSet<Plugin>();
+                plugins = new ObjectOpenHashSet<Plugin>();
                 outgoingByChannel.put(channel, plugins);
             }
 
             if (channels == null) {
-                channels = new HashSet<String>();
+                channels = new ObjectOpenHashSet<String>();
                 outgoingByPlugin.put(plugin, channels);
             }
 
@@ -88,7 +88,7 @@ public class StandardMessenger implements Messenger {
             Set<PluginMessageListenerRegistration> registrations = incomingByChannel.get(registration.getChannel());
 
             if (registrations == null) {
-                registrations = new HashSet<PluginMessageListenerRegistration>();
+                registrations = new ObjectOpenHashSet<PluginMessageListenerRegistration>();
                 incomingByChannel.put(registration.getChannel(), registrations);
             } else {
                 if (registrations.contains(registration)) {
@@ -101,7 +101,7 @@ public class StandardMessenger implements Messenger {
             registrations = incomingByPlugin.get(registration.getPlugin());
 
             if (registrations == null) {
-                registrations = new HashSet<PluginMessageListenerRegistration>();
+                registrations = new ObjectOpenHashSet<PluginMessageListenerRegistration>();
                 incomingByPlugin.put(registration.getPlugin(), registrations);
             } else {
                 if (registrations.contains(registration)) {

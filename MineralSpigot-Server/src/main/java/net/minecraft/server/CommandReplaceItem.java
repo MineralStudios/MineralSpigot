@@ -1,15 +1,15 @@
 package net.minecraft.server;
 
-import com.google.common.collect.Maps;
-import java.util.Collection;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+
 import java.util.List;
-import java.util.Map;
 
 public class CommandReplaceItem extends CommandAbstract {
 
-    private static final Map<String, Integer> a = Maps.newHashMap();
+    private static final Object2IntOpenHashMap<String> a = new Object2IntOpenHashMap<>();
 
-    public CommandReplaceItem() {}
+    public CommandReplaceItem() {
+    }
 
     public String getCommand() {
         return "replaceitem";
@@ -81,7 +81,8 @@ public class CommandReplaceItem extends CommandAbstract {
                 try {
                     itemstack.setTag(MojangsonParser.parse(s));
                 } catch (MojangsonParseException mojangsonparseexception) {
-                    throw new CommandException("commands.replaceitem.tagError", new Object[] { mojangsonparseexception.getMessage()});
+                    throw new CommandException("commands.replaceitem.tagError",
+                            new Object[] { mojangsonparseexception.getMessage() });
                 }
             }
 
@@ -96,7 +97,9 @@ public class CommandReplaceItem extends CommandAbstract {
                 TileEntity tileentity = world.getTileEntity(blockposition);
 
                 if (tileentity == null || !(tileentity instanceof IInventory)) {
-                    throw new CommandException("commands.replaceitem.noContainer", new Object[] { Integer.valueOf(blockposition.getX()), Integer.valueOf(blockposition.getY()), Integer.valueOf(blockposition.getZ())});
+                    throw new CommandException("commands.replaceitem.noContainer",
+                            new Object[] { Integer.valueOf(blockposition.getX()), Integer.valueOf(blockposition.getY()),
+                                    Integer.valueOf(blockposition.getZ()) });
                 }
 
                 IInventory iinventory = (IInventory) tileentity;
@@ -113,7 +116,8 @@ public class CommandReplaceItem extends CommandAbstract {
                 }
 
                 if (!entity.d(j, itemstack)) {
-                    throw new CommandException("commands.replaceitem.failed", new Object[] { Integer.valueOf(j), Integer.valueOf(k), itemstack == null ? "Air" : itemstack.C()});
+                    throw new CommandException("commands.replaceitem.failed", new Object[] { Integer.valueOf(j),
+                            Integer.valueOf(k), itemstack == null ? "Air" : itemstack.C() });
                 }
 
                 if (entity instanceof EntityHuman) {
@@ -122,20 +126,30 @@ public class CommandReplaceItem extends CommandAbstract {
             }
 
             icommandlistener.a(CommandObjectiveExecutor.EnumCommandResult.AFFECTED_ITEMS, k);
-            a(icommandlistener, this, "commands.replaceitem.success", new Object[] { Integer.valueOf(j), Integer.valueOf(k), itemstack == null ? "Air" : itemstack.C()});
+            a(icommandlistener, this, "commands.replaceitem.success",
+                    new Object[] { Integer.valueOf(j), Integer.valueOf(k), itemstack == null ? "Air" : itemstack.C() });
         }
     }
 
     private int e(String s) throws CommandException {
         if (!CommandReplaceItem.a.containsKey(s)) {
-            throw new CommandException("commands.generic.parameter.invalid", new Object[] { s});
+            throw new CommandException("commands.generic.parameter.invalid", new Object[] { s });
         } else {
-            return ((Integer) CommandReplaceItem.a.get(s)).intValue();
+            return CommandReplaceItem.a.getInt(s);
         }
     }
 
     public List<String> tabComplete(ICommandListener icommandlistener, String[] astring, BlockPosition blockposition) {
-        return astring.length == 1 ? a(astring, new String[] { "entity", "block"}) : (astring.length == 2 && astring[0].equals("entity") ? a(astring, this.d()) : (astring.length >= 2 && astring.length <= 4 && astring[0].equals("block") ? a(astring, 1, blockposition) : ((astring.length != 3 || !astring[0].equals("entity")) && (astring.length != 5 || !astring[0].equals("block")) ? ((astring.length != 4 || !astring[0].equals("entity")) && (astring.length != 6 || !astring[0].equals("block")) ? null : a(astring, (Collection) Item.REGISTRY.keySet())) : a(astring, (Collection) CommandReplaceItem.a.keySet()))));
+        return astring.length == 1 ? a(astring, new String[] { "entity", "block" })
+                : (astring.length == 2 && astring[0].equals("entity") ? a(astring, this.d())
+                        : (astring.length >= 2 && astring.length <= 4 && astring[0].equals("block")
+                                ? a(astring, 1, blockposition)
+                                : ((astring.length != 3 || !astring[0].equals("entity"))
+                                        && (astring.length != 5 || !astring[0].equals("block"))
+                                                ? ((astring.length != 4 || !astring[0].equals("entity"))
+                                                        && (astring.length != 6 || !astring[0].equals("block")) ? null
+                                                                : a(astring, Item.REGISTRY.keySet()))
+                                                : a(astring, CommandReplaceItem.a.keySet()))));
     }
 
     protected String[] d() {
@@ -150,36 +164,36 @@ public class CommandReplaceItem extends CommandAbstract {
         int i;
 
         for (i = 0; i < 54; ++i) {
-            CommandReplaceItem.a.put("slot.container." + i, Integer.valueOf(i));
+            CommandReplaceItem.a.put("slot.container." + i, i);
         }
 
         for (i = 0; i < 9; ++i) {
-            CommandReplaceItem.a.put("slot.hotbar." + i, Integer.valueOf(i));
+            CommandReplaceItem.a.put("slot.hotbar." + i, i);
         }
 
         for (i = 0; i < 27; ++i) {
-            CommandReplaceItem.a.put("slot.inventory." + i, Integer.valueOf(9 + i));
+            CommandReplaceItem.a.put("slot.inventory." + i, 9 + i);
         }
 
         for (i = 0; i < 27; ++i) {
-            CommandReplaceItem.a.put("slot.enderchest." + i, Integer.valueOf(200 + i));
+            CommandReplaceItem.a.put("slot.enderchest." + i, 200 + i);
         }
 
         for (i = 0; i < 8; ++i) {
-            CommandReplaceItem.a.put("slot.villager." + i, Integer.valueOf(300 + i));
+            CommandReplaceItem.a.put("slot.villager." + i, 300 + i);
         }
 
         for (i = 0; i < 15; ++i) {
-            CommandReplaceItem.a.put("slot.horse." + i, Integer.valueOf(500 + i));
+            CommandReplaceItem.a.put("slot.horse." + i, 500 + i);
         }
 
-        CommandReplaceItem.a.put("slot.weapon", Integer.valueOf(99));
-        CommandReplaceItem.a.put("slot.armor.head", Integer.valueOf(103));
-        CommandReplaceItem.a.put("slot.armor.chest", Integer.valueOf(102));
-        CommandReplaceItem.a.put("slot.armor.legs", Integer.valueOf(101));
-        CommandReplaceItem.a.put("slot.armor.feet", Integer.valueOf(100));
-        CommandReplaceItem.a.put("slot.horse.saddle", Integer.valueOf(400));
-        CommandReplaceItem.a.put("slot.horse.armor", Integer.valueOf(401));
-        CommandReplaceItem.a.put("slot.horse.chest", Integer.valueOf(499));
+        CommandReplaceItem.a.put("slot.weapon", 99);
+        CommandReplaceItem.a.put("slot.armor.head", 103);
+        CommandReplaceItem.a.put("slot.armor.chest", 102);
+        CommandReplaceItem.a.put("slot.armor.legs", 101);
+        CommandReplaceItem.a.put("slot.armor.feet", 100);
+        CommandReplaceItem.a.put("slot.horse.saddle", 400);
+        CommandReplaceItem.a.put("slot.horse.armor", 401);
+        CommandReplaceItem.a.put("slot.horse.chest", 499);
     }
 }

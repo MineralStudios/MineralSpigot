@@ -10,25 +10,28 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import gg.mineral.server.config.GlobalConfig;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.val;
 
 public class EntityTypes {
 
     private static final Logger b = LogManager.getLogger();
-    private static final Map<String, Class<? extends Entity>> c = Maps.newHashMap();
-    private static final Map<Class<? extends Entity>, String> d = Maps.newHashMap();
-    private static final Map<Integer, Class<? extends Entity>> e = Maps.newHashMap();
-    private static final Map<Class<? extends Entity>, Integer> f = Maps.newHashMap();
-    private static final Map<String, Integer> g = Maps.newHashMap();
-    public static final Map<Integer, EntityTypes.MonsterEggInfo> eggInfo = Maps.newLinkedHashMap();
+    private static final Map<String, Class<? extends Entity>> c = new Object2ObjectOpenHashMap<>();
+    private static final Map<Class<? extends Entity>, String> d = new Object2ObjectOpenHashMap<>();
+    private static final Int2ObjectOpenHashMap<Class<? extends Entity>> e = new Int2ObjectOpenHashMap<>();
+    private static final Object2IntOpenHashMap<Class<? extends Entity>> f = new Object2IntOpenHashMap<>();
+    private static final Object2IntOpenHashMap<String> g = new Object2IntOpenHashMap<>();
+    public static final Int2ObjectLinkedOpenHashMap<EntityTypes.MonsterEggInfo> eggInfo = new Int2ObjectLinkedOpenHashMap<>();
 
     private static void a(Class<? extends Entity> oclass, String s, int i) {
         if (EntityTypes.c.containsKey(s)) {
             throw new IllegalArgumentException("ID is already registered: " + s);
-        } else if (EntityTypes.e.containsKey(Integer.valueOf(i))) {
+        } else if (EntityTypes.e.containsKey(i)) {
             throw new IllegalArgumentException("ID is already registered: " + i);
         } else if (i == 0) {
             throw new IllegalArgumentException("Cannot register to reserved id: " + i);
@@ -37,15 +40,15 @@ public class EntityTypes {
         } else {
             EntityTypes.c.put(s, oclass);
             EntityTypes.d.put(oclass, s);
-            EntityTypes.e.put(Integer.valueOf(i), oclass);
-            EntityTypes.f.put(oclass, Integer.valueOf(i));
-            EntityTypes.g.put(s, Integer.valueOf(i));
+            EntityTypes.e.put(i, oclass);
+            EntityTypes.f.put(oclass, i);
+            EntityTypes.g.put(s, i);
         }
     }
 
     private static void a(Class<? extends Entity> oclass, String s, int i, int j, int k) {
         a(oclass, s, i);
-        EntityTypes.eggInfo.put(Integer.valueOf(i), new EntityTypes.MonsterEggInfo(i, j, k));
+        EntityTypes.eggInfo.put(i, new EntityTypes.MonsterEggInfo(i, j, k));
     }
 
     public static Entity createEntityByName(String s, World world) {
@@ -126,13 +129,13 @@ public class EntityTypes {
     }
 
     public static int a(Entity entity) {
-        Integer integer = (Integer) EntityTypes.f.get(entity.getClass());
+        int integer = EntityTypes.f.getInt(entity.getClass());
 
-        return integer == null ? 0 : integer.intValue();
+        return integer;
     }
 
     public static Class<? extends Entity> a(int i) {
-        return (Class) EntityTypes.e.get(Integer.valueOf(i));
+        return EntityTypes.e.get(i);
     }
 
     public static String b(Entity entity) {

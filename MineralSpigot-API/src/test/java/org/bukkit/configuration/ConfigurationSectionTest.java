@@ -2,13 +2,13 @@ package org.bukkit.configuration;
 
 import org.bukkit.Material;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.junit.Test;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import static org.junit.Assert.*;
@@ -203,7 +203,7 @@ public abstract class ConfigurationSectionTest {
     @Test
     public void testSectionMap() {
         ConfigurationSection config = getConfigurationSection();
-        Map<String, Object> testMap = new LinkedHashMap<String, Object>();
+        Map<String, Object> testMap = new Object2ObjectLinkedOpenHashMap<String, Object>();
 
         testMap.put("string", "Hello World");
         testMap.put("integer", 15);

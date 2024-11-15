@@ -1,6 +1,5 @@
 package org.bukkit.permissions;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 /**
  * Base Permissible for use in any Permissible object via proxy or extension
@@ -234,7 +234,7 @@ public class PermissibleBase implements Permissible {
     }
 
     public Set<PermissionAttachmentInfo> getEffectivePermissions() {
-        return new HashSet<PermissionAttachmentInfo>(permissions.values());
+        return new ObjectOpenHashSet<PermissionAttachmentInfo>(permissions.values());
     }
 
     private class RemoveAttachmentRunnable implements Runnable {

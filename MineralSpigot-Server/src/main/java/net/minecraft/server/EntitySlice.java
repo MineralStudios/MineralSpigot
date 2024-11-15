@@ -1,19 +1,21 @@
 package net.minecraft.server;
 
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 public class EntitySlice<T> extends AbstractSet<T> {
 
     private static final Set<Class<?>> a = Sets.newConcurrentHashSet(); // CraftBukkit
-    private final Map<Class<?>, List<T>> b = Maps.newHashMap();
+    private final Map<Class<?>, List<T>> b = new Object2ObjectOpenHashMap<>();
     private final Set<Class<?>> c = Sets.newIdentityHashSet();
     private final Class<T> d;
     private final List<T> e = Lists.newArrayList();

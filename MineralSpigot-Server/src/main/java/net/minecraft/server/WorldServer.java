@@ -22,11 +22,11 @@ import org.bukkit.event.weather.LightningStrikeEvent;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import gg.mineral.server.config.GlobalConfig;
 import it.unimi.dsi.fastutil.longs.Long2ShortMap.Entry;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 import java.util.concurrent.Callable;
@@ -42,7 +42,7 @@ public class WorldServer extends World implements IAsyncTaskHandler, Callable<Wo
     private final HashTreeSet<NextTickListEntry> M = new HashTreeSet<NextTickListEntry>(); // CraftBukkit - HashTreeSet
                                                                                            // // PAIL: Rename
                                                                                            // nextTickList
-    private final Map<UUID, Entity> entitiesByUUID = Maps.newHashMap();
+    private final Map<UUID, Entity> entitiesByUUID = new Object2ObjectOpenHashMap<>();
     public ChunkProviderServer chunkProviderServer;
     public boolean savingDisabled;
     private boolean O;

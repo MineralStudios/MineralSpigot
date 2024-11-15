@@ -1,18 +1,5 @@
 package net.minecraft.server;
 
-import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.io.Files;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,20 +12,36 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class JsonList<K, V extends JsonListEntry<K>> {
 
     protected static final Logger a = LogManager.getLogger();
     protected final Gson b;
     private final File c;
-    private final Map<String, V> d = Maps.newHashMap();
+    private final Map<String, V> d = new Object2ObjectOpenHashMap<>();
     private boolean e = true;
     private static final ParameterizedType f = new ParameterizedType() {
         public Type[] getActualTypeArguments() {
-            return new Type[] { JsonListEntry.class};
+            return new Type[] { JsonListEntry.class };
         }
 
         public Type getRawType() {
@@ -170,17 +173,17 @@ public class JsonList<K, V extends JsonListEntry<K>> {
         try {
             bufferedreader = Files.newReader(this.c, Charsets.UTF_8);
             collection = (Collection) this.b.fromJson(bufferedreader, JsonList.f);
-        // Spigot Start
-        } catch ( java.io.FileNotFoundException ex )
-        {
-            org.bukkit.Bukkit.getLogger().log( java.util.logging.Level.INFO, "Unable to find file {0}, creating it.", this.c );
-        } catch ( com.google.gson.JsonSyntaxException ex )
-        {
-            org.bukkit.Bukkit.getLogger().log( java.util.logging.Level.WARNING, "Unable to read file {0}, backing it up to {0}.backup and creating new copy.", this.c );
-            File backup = new File( this.c + ".backup" );
-            this.c.renameTo( backup );
+            // Spigot Start
+        } catch (java.io.FileNotFoundException ex) {
+            org.bukkit.Bukkit.getLogger().log(java.util.logging.Level.INFO, "Unable to find file {0}, creating it.",
+                    this.c);
+        } catch (com.google.gson.JsonSyntaxException ex) {
+            org.bukkit.Bukkit.getLogger().log(java.util.logging.Level.WARNING,
+                    "Unable to read file {0}, backing it up to {0}.backup and creating new copy.", this.c);
+            File backup = new File(this.c + ".backup");
+            this.c.renameTo(backup);
             this.c.delete();
-        // Spigot End
+            // Spigot End
         } finally {
             IOUtils.closeQuietly(bufferedreader);
         }
@@ -193,7 +196,8 @@ public class JsonList<K, V extends JsonListEntry<K>> {
                 JsonListEntry jsonlistentry = (JsonListEntry) iterator.next();
 
                 if (jsonlistentry.getKey() != null) {
-                    this.d.put(this.a((K) jsonlistentry.getKey()), (V) jsonlistentry); // CraftBukkit - fix decompile error
+                    this.d.put(this.a((K) jsonlistentry.getKey()), (V) jsonlistentry); // CraftBukkit - fix decompile
+                                                                                       // error
                 }
             }
         }
@@ -202,16 +206,19 @@ public class JsonList<K, V extends JsonListEntry<K>> {
 
     class JsonListEntrySerializer implements JsonDeserializer<JsonListEntry<K>>, JsonSerializer<JsonListEntry<K>> {
 
-        private JsonListEntrySerializer() {}
+        private JsonListEntrySerializer() {
+        }
 
-        public JsonElement a(JsonListEntry<K> jsonlistentry, Type type, JsonSerializationContext jsonserializationcontext) {
+        public JsonElement a(JsonListEntry<K> jsonlistentry, Type type,
+                JsonSerializationContext jsonserializationcontext) {
             JsonObject jsonobject = new JsonObject();
 
             jsonlistentry.a(jsonobject);
             return jsonobject;
         }
 
-        public JsonListEntry<K> a(JsonElement jsonelement, Type type, JsonDeserializationContext jsondeserializationcontext) throws JsonParseException {
+        public JsonListEntry<K> a(JsonElement jsonelement, Type type,
+                JsonDeserializationContext jsondeserializationcontext) throws JsonParseException {
             if (jsonelement.isJsonObject()) {
                 JsonObject jsonobject = jsonelement.getAsJsonObject();
                 JsonListEntry jsonlistentry = JsonList.this.a(jsonobject);
@@ -222,11 +229,14 @@ public class JsonList<K, V extends JsonListEntry<K>> {
             }
         }
 
-        public JsonElement serialize(JsonListEntry<K> object, Type type, JsonSerializationContext jsonserializationcontext) { // CraftBukkit - fix decompile error
+        public JsonElement serialize(JsonListEntry<K> object, Type type,
+                JsonSerializationContext jsonserializationcontext) { // CraftBukkit - fix decompile error
             return this.a((JsonListEntry) object, type, jsonserializationcontext);
         }
 
-        public JsonListEntry<K> deserialize(JsonElement jsonelement, Type type, JsonDeserializationContext jsondeserializationcontext) throws JsonParseException { // CraftBukkit - fix decompile error
+        public JsonListEntry<K> deserialize(JsonElement jsonelement, Type type,
+                JsonDeserializationContext jsondeserializationcontext) throws JsonParseException { // CraftBukkit - fix
+                                                                                                   // decompile error
             return this.a(jsonelement, type, jsondeserializationcontext);
         }
 

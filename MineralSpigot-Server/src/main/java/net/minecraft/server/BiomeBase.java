@@ -1,10 +1,10 @@
 package net.minecraft.server;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import gg.mineral.server.config.GlobalConfig;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +32,7 @@ public abstract class BiomeBase {
     protected static final BiomeTemperature m = new BiomeTemperature(-0.2F, 0.1F);
     private static final BiomeBase[] biomes = new BiomeBase[256];
     public static final Set<BiomeBase> n = Sets.newHashSet();
-    public static final Map<String, BiomeBase> o = Maps.newHashMap();
+    public static final Map<String, BiomeBase> o = new Object2ObjectOpenHashMap<>();
     public static final BiomeBase OCEAN = (new BiomeOcean(0)).b(112).a("Ocean").a(BiomeBase.c);
     public static final BiomeBase PLAINS = (new BiomePlains(1)).b(9286496).a("Plains");
     public static final BiomeBase DESERT = (new BiomeDesert(2)).b(16421912).a("Desert").b().a(2.0F, 0.0F)

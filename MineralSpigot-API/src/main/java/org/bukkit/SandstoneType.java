@@ -1,8 +1,6 @@
 package org.bukkit;
 
-import java.util.Map;
-
-import com.google.common.collect.Maps;
+import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 
 /**
  * Represents the three different types of Sandstone
@@ -13,7 +11,7 @@ public enum SandstoneType {
     SMOOTH(0x2);
 
     private final byte data;
-    private final static Map<Byte, SandstoneType> BY_DATA = Maps.newHashMap();
+    private final static Byte2ObjectOpenHashMap<SandstoneType> BY_DATA = new Byte2ObjectOpenHashMap<>();
 
     private SandstoneType(final int data) {
         this.data = (byte) data;
@@ -35,7 +33,7 @@ public enum SandstoneType {
      *
      * @param data Data value to fetch
      * @return The {@link SandstoneType} representing the given value, or null
-     *     if it doesn't exist
+     *         if it doesn't exist
      * @deprecated Magic value
      */
     @Deprecated

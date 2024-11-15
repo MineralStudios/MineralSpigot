@@ -1,13 +1,13 @@
 package org.bukkit.util;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
-import static org.bukkit.util.NumberConversions.checkFinite;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 
 /**
  * Represents a mutable vector. Because the components of Vectors are mutable,
@@ -176,7 +176,8 @@ public class Vector implements Cloneable, ConfigurationSerializable {
      * @return the distance
      */
     public double distance(Vector o) {
-        return Math.sqrt(NumberConversions.square(x - o.x) + NumberConversions.square(y - o.y) + NumberConversions.square(z - o.z));
+        return Math.sqrt(NumberConversions.square(x - o.x) + NumberConversions.square(y - o.y)
+                + NumberConversions.square(z - o.z));
     }
 
     /**
@@ -186,7 +187,8 @@ public class Vector implements Cloneable, ConfigurationSerializable {
      * @return the distance
      */
     public double distanceSquared(Vector o) {
-        return NumberConversions.square(x - o.x) + NumberConversions.square(y - o.y) + NumberConversions.square(z - o.z);
+        return NumberConversions.square(x - o.x) + NumberConversions.square(y - o.y)
+                + NumberConversions.square(z - o.z);
     }
 
     /**
@@ -371,7 +373,8 @@ public class Vector implements Cloneable, ConfigurationSerializable {
      * @return whether this vector is in the sphere
      */
     public boolean isInSphere(Vector origin, double radius) {
-        return (NumberConversions.square(origin.x - x) + NumberConversions.square(origin.y - y) + NumberConversions.square(origin.z - z)) <= NumberConversions.square(radius);
+        return (NumberConversions.square(origin.x - x) + NumberConversions.square(origin.y - y)
+                + NumberConversions.square(origin.z - z)) <= NumberConversions.square(radius);
     }
 
     /**
@@ -545,7 +548,8 @@ public class Vector implements Cloneable, ConfigurationSerializable {
 
         Vector other = (Vector) obj;
 
-        return Math.abs(x - other.x) < epsilon && Math.abs(y - other.y) < epsilon && Math.abs(z - other.z) < epsilon && (this.getClass().equals(obj.getClass()));
+        return Math.abs(x - other.x) < epsilon && Math.abs(y - other.y) < epsilon && Math.abs(z - other.z) < epsilon
+                && (this.getClass().equals(obj.getClass()));
     }
 
     /**
@@ -599,7 +603,7 @@ public class Vector implements Cloneable, ConfigurationSerializable {
      * Gets a Location version of this vector.
      *
      * @param world The world to link the location to.
-     * @param yaw The desired yaw.
+     * @param yaw   The desired yaw.
      * @param pitch The desired pitch.
      * @return the location
      */
@@ -658,7 +662,7 @@ public class Vector implements Cloneable, ConfigurationSerializable {
     }
 
     public Map<String, Object> serialize() {
-        Map<String, Object> result = new LinkedHashMap<String, Object>();
+        Map<String, Object> result = new Object2ObjectLinkedOpenHashMap<String, Object>();
 
         result.put("x", getX());
         result.put("y", getY());

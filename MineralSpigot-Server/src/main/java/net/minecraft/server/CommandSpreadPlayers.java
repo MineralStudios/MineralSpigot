@@ -1,18 +1,21 @@
 package net.minecraft.server;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class CommandSpreadPlayers extends CommandAbstract {
 
-    public CommandSpreadPlayers() {}
+    public CommandSpreadPlayers() {
+    }
 
     public String getCommand() {
         return "spreadplayers";
@@ -67,25 +70,37 @@ public class CommandSpreadPlayers extends CommandAbstract {
             if (arraylist.isEmpty()) {
                 throw new ExceptionEntityNotFound();
             } else {
-                icommandlistener.sendMessage(new ChatMessage("commands.spreadplayers.spreading." + (flag ? "teams" : "players"), new Object[] { Integer.valueOf(arraylist.size()), Double.valueOf(d4), Double.valueOf(d1), Double.valueOf(d2), Double.valueOf(d3)}));
-                this.a(icommandlistener, arraylist, new CommandSpreadPlayers.Location2D(d1, d2), d3, d4, ((Entity) arraylist.get(0)).world, flag);
+                icommandlistener
+                        .sendMessage(new ChatMessage("commands.spreadplayers.spreading." + (flag ? "teams" : "players"),
+                                new Object[] { Integer.valueOf(arraylist.size()), Double.valueOf(d4),
+                                        Double.valueOf(d1), Double.valueOf(d2), Double.valueOf(d3) }));
+                this.a(icommandlistener, arraylist, new CommandSpreadPlayers.Location2D(d1, d2), d3, d4,
+                        ((Entity) arraylist.get(0)).world, flag);
             }
         }
     }
 
-    private void a(ICommandListener icommandlistener, List<Entity> list, CommandSpreadPlayers.Location2D commandspreadplayers_location2d, double d0, double d1, World world, boolean flag) throws CommandException {
+    private void a(ICommandListener icommandlistener, List<Entity> list,
+            CommandSpreadPlayers.Location2D commandspreadplayers_location2d, double d0, double d1, World world,
+            boolean flag) throws CommandException {
         Random random = new Random();
         double d2 = commandspreadplayers_location2d.a - d1;
         double d3 = commandspreadplayers_location2d.b - d1;
         double d4 = commandspreadplayers_location2d.a + d1;
         double d5 = commandspreadplayers_location2d.b + d1;
-        CommandSpreadPlayers.Location2D[] acommandspreadplayers_location2d = this.a(random, flag ? this.b(list) : list.size(), d2, d3, d4, d5);
-        int i = this.a(commandspreadplayers_location2d, d0, world, random, d2, d3, d4, d5, acommandspreadplayers_location2d, flag);
+        CommandSpreadPlayers.Location2D[] acommandspreadplayers_location2d = this.a(random,
+                flag ? this.b(list) : list.size(), d2, d3, d4, d5);
+        int i = this.a(commandspreadplayers_location2d, d0, world, random, d2, d3, d4, d5,
+                acommandspreadplayers_location2d, flag);
         double d6 = this.a(list, world, acommandspreadplayers_location2d, flag);
 
-        a(icommandlistener, this, "commands.spreadplayers.success." + (flag ? "teams" : "players"), new Object[] { Integer.valueOf(acommandspreadplayers_location2d.length), Double.valueOf(commandspreadplayers_location2d.a), Double.valueOf(commandspreadplayers_location2d.b)});
+        a(icommandlistener, this, "commands.spreadplayers.success." + (flag ? "teams" : "players"),
+                new Object[] { Integer.valueOf(acommandspreadplayers_location2d.length),
+                        Double.valueOf(commandspreadplayers_location2d.a),
+                        Double.valueOf(commandspreadplayers_location2d.b) });
         if (acommandspreadplayers_location2d.length > 1) {
-            icommandlistener.sendMessage(new ChatMessage("commands.spreadplayers.info." + (flag ? "teams" : "players"), new Object[] { String.format("%.2f", new Object[] { Double.valueOf(d6)}), Integer.valueOf(i)}));
+            icommandlistener.sendMessage(new ChatMessage("commands.spreadplayers.info." + (flag ? "teams" : "players"),
+                    new Object[] { String.format("%.2f", new Object[] { Double.valueOf(d6) }), Integer.valueOf(i) }));
         }
 
     }
@@ -107,7 +122,9 @@ public class CommandSpreadPlayers extends CommandAbstract {
         return hashset.size();
     }
 
-    private int a(CommandSpreadPlayers.Location2D commandspreadplayers_location2d, double d0, World world, Random random, double d1, double d2, double d3, double d4, CommandSpreadPlayers.Location2D[] acommandspreadplayers_location2d, boolean flag) throws CommandException {
+    private int a(CommandSpreadPlayers.Location2D commandspreadplayers_location2d, double d0, World world,
+            Random random, double d1, double d2, double d3, double d4,
+            CommandSpreadPlayers.Location2D[] acommandspreadplayers_location2d, boolean flag) throws CommandException {
         boolean flag1 = true;
         double d5 = 3.4028234663852886E38D;
 
@@ -134,8 +151,10 @@ public class CommandSpreadPlayers extends CommandAbstract {
                         d5 = Math.min(d6, d5);
                         if (d6 < d0) {
                             ++j;
-                            commandspreadplayers_location2d1.a += commandspreadplayers_location2d3.a - commandspreadplayers_location2d2.a;
-                            commandspreadplayers_location2d1.b += commandspreadplayers_location2d3.b - commandspreadplayers_location2d2.b;
+                            commandspreadplayers_location2d1.a += commandspreadplayers_location2d3.a
+                                    - commandspreadplayers_location2d2.a;
+                            commandspreadplayers_location2d1.b += commandspreadplayers_location2d3.b
+                                    - commandspreadplayers_location2d2.b;
                         }
                     }
                 }
@@ -175,23 +194,30 @@ public class CommandSpreadPlayers extends CommandAbstract {
         }
 
         if (i >= 10000) {
-            throw new CommandException("commands.spreadplayers.failure." + (flag ? "teams" : "players"), new Object[] { Integer.valueOf(acommandspreadplayers_location2d.length), Double.valueOf(commandspreadplayers_location2d.a), Double.valueOf(commandspreadplayers_location2d.b), String.format("%.2f", new Object[] { Double.valueOf(d5)})});
+            throw new CommandException("commands.spreadplayers.failure." + (flag ? "teams" : "players"),
+                    new Object[] { Integer.valueOf(acommandspreadplayers_location2d.length),
+                            Double.valueOf(commandspreadplayers_location2d.a),
+                            Double.valueOf(commandspreadplayers_location2d.b),
+                            String.format("%.2f", new Object[] { Double.valueOf(d5) }) });
         } else {
             return i;
         }
     }
 
-    private double a(List<Entity> list, World world, CommandSpreadPlayers.Location2D[] acommandspreadplayers_location2d, boolean flag) {
+    private double a(List<Entity> list, World world, CommandSpreadPlayers.Location2D[] acommandspreadplayers_location2d,
+            boolean flag) {
         double d0 = 0.0D;
         int i = 0;
-        HashMap hashmap = Maps.newHashMap();
+        Map<ScoreboardTeamBase, Location2D> hashmap = new Object2ObjectOpenHashMap<>();
 
         for (int j = 0; j < list.size(); ++j) {
             Entity entity = (Entity) list.get(j);
             CommandSpreadPlayers.Location2D commandspreadplayers_location2d;
 
             if (flag) {
-                ScoreboardTeamBase scoreboardteambase = entity instanceof EntityHuman ? ((EntityHuman) entity).getScoreboardTeam() : null;
+                ScoreboardTeamBase scoreboardteambase = entity instanceof EntityHuman
+                        ? ((EntityHuman) entity).getScoreboardTeam()
+                        : null;
 
                 if (!hashmap.containsKey(scoreboardteambase)) {
                     hashmap.put(scoreboardteambase, acommandspreadplayers_location2d[i++]);
@@ -202,7 +228,9 @@ public class CommandSpreadPlayers extends CommandAbstract {
                 commandspreadplayers_location2d = acommandspreadplayers_location2d[i++];
             }
 
-            entity.enderTeleportTo((double) ((float) MathHelper.floor(commandspreadplayers_location2d.a) + 0.5F), (double) commandspreadplayers_location2d.a(world), (double) MathHelper.floor(commandspreadplayers_location2d.b) + 0.5D);
+            entity.enderTeleportTo((double) ((float) MathHelper.floor(commandspreadplayers_location2d.a) + 0.5F),
+                    (double) commandspreadplayers_location2d.a(world),
+                    (double) MathHelper.floor(commandspreadplayers_location2d.b) + 0.5D);
             double d1 = Double.MAX_VALUE;
 
             for (int k = 0; k < acommandspreadplayers_location2d.length; ++k) {
@@ -249,7 +277,8 @@ public class CommandSpreadPlayers extends CommandAbstract {
         double a;
         double b;
 
-        Location2D() {}
+        Location2D() {
+        }
 
         Location2D(double d0, double d1) {
             this.a = d0;

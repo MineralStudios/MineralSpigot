@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -44,6 +43,7 @@ import com.google.common.collect.Sets;
 
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.server.GenericAttributes;
@@ -848,7 +848,7 @@ class CraftMetaItem implements ItemMeta, Repairable {
         }
         // Spigot end
 
-        Set<String> hideFlags = new HashSet<String>();
+        Set<String> hideFlags = new ObjectOpenHashSet<String>();
         for (ItemFlag hideFlagEnum : getItemFlags()) {
             hideFlags.add(hideFlagEnum.name());
         }

@@ -3,7 +3,6 @@ package org.bukkit.command.defaults;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,16 +25,22 @@ import org.bukkit.util.StringUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+
 @Deprecated
 public class ScoreboardCommand extends VanillaCommand {
 
     private static final List<String> MAIN_CHOICES = ImmutableList.of("objectives", "players", "teams");
     private static final List<String> OBJECTIVES_CHOICES = ImmutableList.of("list", "add", "remove", "setdisplay");
-    private static final List<String> OBJECTIVES_CRITERIA = ImmutableList.of("health", "playerKillCount", "totalKillCount", "deathCount", "dummy");
+    private static final List<String> OBJECTIVES_CRITERIA = ImmutableList.of("health", "playerKillCount",
+            "totalKillCount", "deathCount", "dummy");
     private static final List<String> PLAYERS_CHOICES = ImmutableList.of("set", "add", "remove", "reset", "list");
-    private static final List<String> TEAMS_CHOICES = ImmutableList.of("add", "remove", "join", "leave", "empty", "list", "option");
-    private static final List<String> TEAMS_OPTION_CHOICES = ImmutableList.of("color", "friendlyfire", "seeFriendlyInvisibles");
-    private static final Map<String, DisplaySlot> OBJECTIVES_DISPLAYSLOT = ImmutableMap.of("belowName", DisplaySlot.BELOW_NAME, "list", DisplaySlot.PLAYER_LIST, "sidebar", DisplaySlot.SIDEBAR);
+    private static final List<String> TEAMS_CHOICES = ImmutableList.of("add", "remove", "join", "leave", "empty",
+            "list", "option");
+    private static final List<String> TEAMS_OPTION_CHOICES = ImmutableList.of("color", "friendlyfire",
+            "seeFriendlyInvisibles");
+    private static final Map<String, DisplaySlot> OBJECTIVES_DISPLAYSLOT = ImmutableMap.of("belowName",
+            DisplaySlot.BELOW_NAME, "list", DisplaySlot.PLAYER_LIST, "sidebar", DisplaySlot.SIDEBAR);
     private static final Map<String, ChatColor> TEAMS_OPTION_COLOR = ImmutableMap.<String, ChatColor>builder()
             .put("aqua", ChatColor.AQUA)
             .put("black", ChatColor.BLACK)
@@ -43,7 +48,7 @@ public class ScoreboardCommand extends VanillaCommand {
             .put("bold", ChatColor.BOLD)
             .put("dark_aqua", ChatColor.DARK_AQUA)
             .put("dark_blue", ChatColor.DARK_BLUE)
-            .put("dark_gray",  ChatColor.DARK_GRAY)
+            .put("dark_gray", ChatColor.DARK_GRAY)
             .put("dark_green", ChatColor.DARK_GREEN)
             .put("dark_purple", ChatColor.DARK_PURPLE)
             .put("dark_red", ChatColor.DARK_RED)
@@ -91,22 +96,27 @@ public class ScoreboardCommand extends VanillaCommand {
                     sender.sendMessage(ChatColor.RED + "There are no objectives on the scoreboard");
                     return false;
                 }
-                sender.sendMessage(ChatColor.DARK_GREEN + "Showing " + objectives.size() + " objective(s) on scoreboard");
+                sender.sendMessage(
+                        ChatColor.DARK_GREEN + "Showing " + objectives.size() + " objective(s) on scoreboard");
                 for (Objective objective : objectives) {
-                    sender.sendMessage("- " + objective.getName() + ": displays as '" + objective.getDisplayName() + "' and is type '" + objective.getCriteria() + "'");
+                    sender.sendMessage("- " + objective.getName() + ": displays as '" + objective.getDisplayName()
+                            + "' and is type '" + objective.getCriteria() + "'");
                 }
             } else if (args[1].equalsIgnoreCase("add")) {
                 if (args.length < 4) {
-                    sender.sendMessage(ChatColor.RED + "/scoreboard objectives add <name> <criteriaType> [display name ...]");
+                    sender.sendMessage(
+                            ChatColor.RED + "/scoreboard objectives add <name> <criteriaType> [display name ...]");
                     return false;
                 }
                 String name = args[2];
                 String criteria = args[3];
 
                 if (criteria == null) {
-                    sender.sendMessage(ChatColor.RED + "Invalid objective criteria type. Valid types are: " + stringCollectionToString(OBJECTIVES_CRITERIA));
+                    sender.sendMessage(ChatColor.RED + "Invalid objective criteria type. Valid types are: "
+                            + stringCollectionToString(OBJECTIVES_CRITERIA));
                 } else if (name.length() > 16) {
-                    sender.sendMessage(ChatColor.RED + "The name '" + name + "' is too long for an objective, it can be at most 16 characters long");
+                    sender.sendMessage(ChatColor.RED + "The name '" + name
+                            + "' is too long for an objective, it can be at most 16 characters long");
                 } else if (mainScoreboard.getObjective(name) != null) {
                     sender.sendMessage(ChatColor.RED + "An objective with the name '" + name + "' already exists");
                 } else {
@@ -114,7 +124,8 @@ public class ScoreboardCommand extends VanillaCommand {
                     if (args.length > 4) {
                         displayName = StringUtils.join(ArrayUtils.subarray(args, 4, args.length), ' ');
                         if (displayName.length() > 32) {
-                            sender.sendMessage(ChatColor.RED + "The name '" + displayName + "' is too long for an objective, it can be at most 32 characters long");
+                            sender.sendMessage(ChatColor.RED + "The name '" + displayName
+                                    + "' is too long for an objective, it can be at most 32 characters long");
                             return false;
                         }
                     }
@@ -151,12 +162,14 @@ public class ScoreboardCommand extends VanillaCommand {
                         String objectiveName = args[3];
                         Objective objective = mainScoreboard.getObjective(objectiveName);
                         if (objective == null) {
-                            sender.sendMessage(ChatColor.RED + "No objective was found by the name '" + objectiveName + "'");
+                            sender.sendMessage(
+                                    ChatColor.RED + "No objective was found by the name '" + objectiveName + "'");
                             return false;
                         }
 
                         objective.setDisplaySlot(slot);
-                        sender.sendMessage("Set the display objective in slot '" + slotName + "' to '" + objective.getName() + "'");
+                        sender.sendMessage("Set the display objective in slot '" + slotName + "' to '"
+                                + objective.getName() + "'");
                     } else {
                         Objective objective = mainScoreboard.getObjective(slot);
                         if (objective != null) {
@@ -171,7 +184,8 @@ public class ScoreboardCommand extends VanillaCommand {
                 sender.sendMessage(ChatColor.RED + "/scoreboard players <set|add|remove|reset|list>");
                 return false;
             }
-            if (args[1].equalsIgnoreCase("set") || args[1].equalsIgnoreCase("add") || args[1].equalsIgnoreCase("remove")) {
+            if (args[1].equalsIgnoreCase("set") || args[1].equalsIgnoreCase("add")
+                    || args[1].equalsIgnoreCase("remove")) {
                 if (args.length != 5) {
                     if (args[1].equalsIgnoreCase("set")) {
                         sender.sendMessage(ChatColor.RED + "/scoreboard players set <player> <objective> <score>");
@@ -188,7 +202,8 @@ public class ScoreboardCommand extends VanillaCommand {
                     sender.sendMessage(ChatColor.RED + "No objective was found by the name '" + objectiveName + "'");
                     return false;
                 } else if (!objective.isModifiable()) {
-                    sender.sendMessage(ChatColor.RED + "The objective '" + objectiveName + "' is read-only and cannot be set");
+                    sender.sendMessage(
+                            ChatColor.RED + "The objective '" + objectiveName + "' is read-only and cannot be set");
                     return false;
                 }
 
@@ -201,7 +216,8 @@ public class ScoreboardCommand extends VanillaCommand {
                     return false;
                 }
                 if (value < 1 && !args[1].equalsIgnoreCase("set")) {
-                    sender.sendMessage(ChatColor.RED + "The number you have entered (" + value + ") is too small, it must be at least 1");
+                    sender.sendMessage(ChatColor.RED + "The number you have entered (" + value
+                            + ") is too small, it must be at least 1");
                     return false;
                 }
 
@@ -243,7 +259,8 @@ public class ScoreboardCommand extends VanillaCommand {
                     if (entries.isEmpty()) {
                         sender.sendMessage(ChatColor.RED + "There are no tracked players on the scoreboard");
                     } else {
-                        sender.sendMessage(ChatColor.DARK_GREEN + "Showing " + entries.size() + " tracked players on the scoreboard");
+                        sender.sendMessage(ChatColor.DARK_GREEN + "Showing " + entries.size()
+                                + " tracked players on the scoreboard");
                         sender.sendMessage(stringCollectionToString(entries));
                     }
                 } else {
@@ -256,9 +273,11 @@ public class ScoreboardCommand extends VanillaCommand {
                     if (scores.isEmpty()) {
                         sender.sendMessage(ChatColor.RED + "Player " + playerName + " has no scores recorded");
                     } else {
-                        sender.sendMessage(ChatColor.DARK_GREEN + "Showing " + scores.size() + " tracked objective(s) for " + playerName);
+                        sender.sendMessage(ChatColor.DARK_GREEN + "Showing " + scores.size()
+                                + " tracked objective(s) for " + playerName);
                         for (Score score : scores) {
-                            sender.sendMessage("- " + score.getObjective().getDisplayName() + ": " + score.getScore() + " (" + score.getObjective().getName() + ")");
+                            sender.sendMessage("- " + score.getObjective().getDisplayName() + ": " + score.getScore()
+                                    + " (" + score.getObjective().getName() + ")");
                         }
                     }
                 }
@@ -274,9 +293,11 @@ public class ScoreboardCommand extends VanillaCommand {
                     if (teams.isEmpty()) {
                         sender.sendMessage(ChatColor.RED + "There are no teams registered on the scoreboard");
                     } else {
-                        sender.sendMessage(ChatColor.DARK_GREEN + "Showing " + teams.size() + " teams on the scoreboard");
+                        sender.sendMessage(
+                                ChatColor.DARK_GREEN + "Showing " + teams.size() + " teams on the scoreboard");
                         for (Team team : teams) {
-                            sender.sendMessage("- " + team.getName() + ": '" + team.getDisplayName() + "' has " + team.getSize() + " players");
+                            sender.sendMessage("- " + team.getName() + ": '" + team.getDisplayName() + "' has "
+                                    + team.getSize() + " players");
                         }
                     }
                 } else if (args.length == 3) {
@@ -289,7 +310,8 @@ public class ScoreboardCommand extends VanillaCommand {
                         if (players.isEmpty()) {
                             sender.sendMessage(ChatColor.RED + "Team " + team.getName() + " has no players");
                         } else {
-                            sender.sendMessage(ChatColor.DARK_GREEN + "Showing " + players.size() + " player(s) in team " + team.getName());
+                            sender.sendMessage(ChatColor.DARK_GREEN + "Showing " + players.size()
+                                    + " player(s) in team " + team.getName());
                             sender.sendMessage(offlinePlayerSetToString(players));
                         }
                     }
@@ -304,7 +326,8 @@ public class ScoreboardCommand extends VanillaCommand {
                 }
                 String name = args[2];
                 if (name.length() > 16) {
-                    sender.sendMessage(ChatColor.RED + "The name '" + name + "' is too long for a team, it can be at most 16 characters long");
+                    sender.sendMessage(ChatColor.RED + "The name '" + name
+                            + "' is too long for a team, it can be at most 16 characters long");
                 } else if (mainScoreboard.getTeam(name) != null) {
                     sender.sendMessage(ChatColor.RED + "A team with the name '" + name + "' already exists");
                 } else {
@@ -312,7 +335,8 @@ public class ScoreboardCommand extends VanillaCommand {
                     if (args.length > 3) {
                         displayName = StringUtils.join(ArrayUtils.subarray(args, 3, args.length), ' ');
                         if (displayName.length() > 32) {
-                            sender.sendMessage(ChatColor.RED + "The display name '" + displayName + "' is too long for a team, it can be at most 32 characters long");
+                            sender.sendMessage(ChatColor.RED + "The display name '" + displayName
+                                    + "' is too long for a team, it can be at most 32 characters long");
                             return false;
                         }
                     }
@@ -347,7 +371,8 @@ public class ScoreboardCommand extends VanillaCommand {
                 } else {
                     Set<OfflinePlayer> players = team.getPlayers();
                     if (players.isEmpty()) {
-                        sender.sendMessage(ChatColor.RED + "Team " + team.getName() + " is already empty, cannot remove nonexistant players");
+                        sender.sendMessage(ChatColor.RED + "Team " + team.getName()
+                                + " is already empty, cannot remove nonexistant players");
                     } else {
                         for (OfflinePlayer player : players) {
                             team.removePlayer(player);
@@ -365,7 +390,7 @@ public class ScoreboardCommand extends VanillaCommand {
                 if (team == null) {
                     sender.sendMessage(ChatColor.RED + "No team was found by the name '" + teamName + "'");
                 } else {
-                    Set<String> addedPlayers = new HashSet<String>();
+                    Set<String> addedPlayers = new ObjectOpenHashSet<String>();
                     if ((sender instanceof Player) && args.length == 3) {
                         team.addPlayer((Player) sender);
                         addedPlayers.add(sender.getName());
@@ -383,15 +408,16 @@ public class ScoreboardCommand extends VanillaCommand {
                             addedPlayers.add(offlinePlayer.getName());
                         }
                     }
-                    sender.sendMessage("Added " + addedPlayers.size() + " player(s) to team " + team.getName() + ": " + stringCollectionToString(addedPlayers));
+                    sender.sendMessage("Added " + addedPlayers.size() + " player(s) to team " + team.getName() + ": "
+                            + stringCollectionToString(addedPlayers));
                 }
             } else if (args[1].equalsIgnoreCase("leave")) {
                 if (!(sender instanceof Player) && args.length < 3) {
                     sender.sendMessage(ChatColor.RED + "/scoreboard teams leave [player...]");
                     return false;
                 }
-                Set<String> left = new HashSet<String>();
-                Set<String> noTeam = new HashSet<String>();
+                Set<String> left = new ObjectOpenHashSet<String>();
+                Set<String> noTeam = new ObjectOpenHashSet<String>();
                 if ((sender instanceof Player) && args.length == 2) {
                     Team team = mainScoreboard.getPlayerTeam((Player) sender);
                     if (team != null) {
@@ -420,14 +446,17 @@ public class ScoreboardCommand extends VanillaCommand {
                     }
                 }
                 if (!left.isEmpty()) {
-                    sender.sendMessage("Removed " + left.size() + " player(s) from their teams: " + stringCollectionToString(left));
+                    sender.sendMessage("Removed " + left.size() + " player(s) from their teams: "
+                            + stringCollectionToString(left));
                 }
                 if (!noTeam.isEmpty()) {
-                    sender.sendMessage("Could not remove " + noTeam.size() + " player(s) from their teams: " + stringCollectionToString(noTeam));
+                    sender.sendMessage("Could not remove " + noTeam.size() + " player(s) from their teams: "
+                            + stringCollectionToString(noTeam));
                 }
             } else if (args[1].equalsIgnoreCase("option")) {
                 if (args.length != 4 && args.length != 5) {
-                    sender.sendMessage(ChatColor.RED + "/scoreboard teams option <team> <friendlyfire|color|seefriendlyinvisibles> <value>");
+                    sender.sendMessage(ChatColor.RED
+                            + "/scoreboard teams option <team> <friendlyfire|color|seefriendlyinvisibles> <value>");
                     return false;
                 }
                 String teamName = args[2];
@@ -437,29 +466,35 @@ public class ScoreboardCommand extends VanillaCommand {
                     return false;
                 }
                 String option = args[3].toLowerCase();
-                if (!option.equals("friendlyfire") && !option.equals("color") && !option.equals("seefriendlyinvisibles")) {
-                    sender.sendMessage(ChatColor.RED + "/scoreboard teams option <team> <friendlyfire|color|seefriendlyinvisibles> <value>");
+                if (!option.equals("friendlyfire") && !option.equals("color")
+                        && !option.equals("seefriendlyinvisibles")) {
+                    sender.sendMessage(ChatColor.RED
+                            + "/scoreboard teams option <team> <friendlyfire|color|seefriendlyinvisibles> <value>");
                     return false;
                 }
                 if (args.length == 4) {
                     if (option.equals("color")) {
-                        sender.sendMessage(ChatColor.RED + "Valid values for option color are: " + stringCollectionToString(TEAMS_OPTION_COLOR.keySet()));
+                        sender.sendMessage(ChatColor.RED + "Valid values for option color are: "
+                                + stringCollectionToString(TEAMS_OPTION_COLOR.keySet()));
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Valid values for option " + option + " are: true and false");
+                        sender.sendMessage(
+                                ChatColor.RED + "Valid values for option " + option + " are: true and false");
                     }
                 } else {
                     String value = args[4].toLowerCase();
                     if (option.equals("color")) {
                         ChatColor color = TEAMS_OPTION_COLOR.get(value);
                         if (color == null) {
-                            sender.sendMessage(ChatColor.RED + "Valid values for option color are: " + stringCollectionToString(TEAMS_OPTION_COLOR.keySet()));
+                            sender.sendMessage(ChatColor.RED + "Valid values for option color are: "
+                                    + stringCollectionToString(TEAMS_OPTION_COLOR.keySet()));
                             return false;
                         }
                         team.setPrefix(color.toString());
                         team.setSuffix(ChatColor.RESET.toString());
                     } else {
                         if (!value.equals("true") && !value.equals("false")) {
-                            sender.sendMessage(ChatColor.RED + "Valid values for option " + option + " are: true and false");
+                            sender.sendMessage(
+                                    ChatColor.RED + "Valid values for option " + option + " are: true and false");
                             return false;
                         }
                         if (option.equals("friendlyfire")) {
@@ -498,30 +533,36 @@ public class ScoreboardCommand extends VanillaCommand {
                     }
                 } else if (args[1].equalsIgnoreCase("remove")) {
                     if (args.length == 3) {
-                        return StringUtil.copyPartialMatches(args[2], this.getCurrentObjectives(), new ArrayList<String>());
+                        return StringUtil.copyPartialMatches(args[2], this.getCurrentObjectives(),
+                                new ArrayList<String>());
                     }
                 } else if (args[1].equalsIgnoreCase("setdisplay")) {
                     if (args.length == 3) {
-                        return StringUtil.copyPartialMatches(args[2], OBJECTIVES_DISPLAYSLOT.keySet(), new ArrayList<String>());
+                        return StringUtil.copyPartialMatches(args[2], OBJECTIVES_DISPLAYSLOT.keySet(),
+                                new ArrayList<String>());
                     }
                     if (args.length == 4) {
-                        return StringUtil.copyPartialMatches(args[3], this.getCurrentObjectives(), new ArrayList<String>());
+                        return StringUtil.copyPartialMatches(args[3], this.getCurrentObjectives(),
+                                new ArrayList<String>());
                     }
                 }
             } else if (args[0].equalsIgnoreCase("players")) {
                 if (args.length == 2) {
                     return StringUtil.copyPartialMatches(args[1], PLAYERS_CHOICES, new ArrayList<String>());
                 }
-                if (args[1].equalsIgnoreCase("set") || args[1].equalsIgnoreCase("add") || args[1].equalsIgnoreCase("remove")) {
+                if (args[1].equalsIgnoreCase("set") || args[1].equalsIgnoreCase("add")
+                        || args[1].equalsIgnoreCase("remove")) {
                     if (args.length == 3) {
                         return super.tabComplete(sender, alias, args);
                     }
                     if (args.length == 4) {
-                        return StringUtil.copyPartialMatches(args[3], this.getCurrentObjectives(), new ArrayList<String>());
+                        return StringUtil.copyPartialMatches(args[3], this.getCurrentObjectives(),
+                                new ArrayList<String>());
                     }
                 } else {
                     if (args.length == 3) {
-                        return StringUtil.copyPartialMatches(args[2], this.getCurrentEntries(), new ArrayList<String>());
+                        return StringUtil.copyPartialMatches(args[2], this.getCurrentEntries(),
+                                new ArrayList<String>());
                     }
                 }
             } else if (args[0].equalsIgnoreCase("teams")) {
@@ -546,7 +587,8 @@ public class ScoreboardCommand extends VanillaCommand {
                     }
                     if (args.length == 5) {
                         if (args[3].equalsIgnoreCase("color")) {
-                            return StringUtil.copyPartialMatches(args[4], TEAMS_OPTION_COLOR.keySet(), new ArrayList<String>());
+                            return StringUtil.copyPartialMatches(args[4], TEAMS_OPTION_COLOR.keySet(),
+                                    new ArrayList<String>());
                         } else {
                             return StringUtil.copyPartialMatches(args[4], BOOLEAN, new ArrayList<String>());
                         }

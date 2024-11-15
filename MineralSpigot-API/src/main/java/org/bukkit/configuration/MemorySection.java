@@ -1,10 +1,12 @@
 package org.bukkit.configuration;
 
-import static org.bukkit.util.NumberConversions.*;
+import static org.bukkit.util.NumberConversions.toDouble;
+import static org.bukkit.util.NumberConversions.toFloat;
+import static org.bukkit.util.NumberConversions.toInt;
+import static org.bukkit.util.NumberConversions.toLong;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,11 +17,14 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+
 /**
  * A type of {@link ConfigurationSection} that is stored in memory.
  */
 public class MemorySection implements ConfigurationSection {
-    protected final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    protected final Map<String, Object> map = new Object2ObjectLinkedOpenHashMap<String, Object>();
     private final Configuration root;
     private final ConfigurationSection parent;
     private final String path;
@@ -33,7 +38,7 @@ public class MemorySection implements ConfigurationSection {
      * will throw an exception!
      *
      * @throws IllegalStateException Thrown if this is not a {@link
-     *     Configuration} root.
+     *                               Configuration} root.
      */
     protected MemorySection() {
         if (!(this instanceof Configuration)) {
@@ -50,10 +55,10 @@ public class MemorySection implements ConfigurationSection {
      * Creates an empty MemorySection with the specified parent and path.
      *
      * @param parent Parent section that contains this own section.
-     * @param path Path that you may access this section from via the root
-     *     {@link Configuration}.
+     * @param path   Path that you may access this section from via the root
+     *               {@link Configuration}.
      * @throws IllegalArgumentException Thrown is parent or path is null, or
-     *     if parent contains no root Configuration.
+     *                                  if parent contains no root Configuration.
      */
     protected MemorySection(ConfigurationSection parent, String path) {
         Validate.notNull(parent, "Parent cannot be null");
@@ -69,7 +74,7 @@ public class MemorySection implements ConfigurationSection {
     }
 
     public Set<String> getKeys(boolean deep) {
-        Set<String> result = new LinkedHashSet<String>();
+        Set<String> result = new ObjectLinkedOpenHashSet<String>();
 
         Configuration root = getRoot();
         if (root != null && root.options().copyDefaults()) {
@@ -86,7 +91,7 @@ public class MemorySection implements ConfigurationSection {
     }
 
     public Map<String, Object> getValues(boolean deep) {
-        Map<String, Object> result = new LinkedHashMap<String, Object>();
+        Map<String, Object> result = new Object2ObjectLinkedOpenHashMap<String, Object>();
 
         Configuration root = getRoot();
         if (root != null && root.options().copyDefaults()) {
@@ -773,7 +778,7 @@ public class MemorySection implements ConfigurationSection {
      * only {@link MemorySection}.
      *
      * @param section Section to create a path for.
-     * @param key Name of the specified section.
+     * @param key     Name of the specified section.
      * @return Full path of the section from its root.
      */
     public static String createPath(ConfigurationSection section, String key) {
@@ -787,8 +792,8 @@ public class MemorySection implements ConfigurationSection {
      * You may use this method for any given {@link ConfigurationSection}, not
      * only {@link MemorySection}.
      *
-     * @param section Section to create a path for.
-     * @param key Name of the specified section.
+     * @param section    Section to create a path for.
+     * @param key        Name of the specified section.
      * @param relativeTo Section to create the path relative to.
      * @return Full path of the section from its root.
      */
@@ -802,7 +807,8 @@ public class MemorySection implements ConfigurationSection {
 
         StringBuilder builder = new StringBuilder();
         if (section != null) {
-            for (ConfigurationSection parent = section; (parent != null) && (parent != relativeTo); parent = parent.getParent()) {
+            for (ConfigurationSection parent = section; (parent != null)
+                    && (parent != relativeTo); parent = parent.getParent()) {
                 if (builder.length() > 0) {
                     builder.insert(0, separator);
                 }
@@ -826,12 +832,12 @@ public class MemorySection implements ConfigurationSection {
     public String toString() {
         Configuration root = getRoot();
         return new StringBuilder()
-            .append(getClass().getSimpleName())
-            .append("[path='")
-            .append(getCurrentPath())
-            .append("', root='")
-            .append(root == null ? null : root.getClass().getSimpleName())
-            .append("']")
-            .toString();
+                .append(getClass().getSimpleName())
+                .append("[path='")
+                .append(getCurrentPath())
+                .append("', root='")
+                .append(root == null ? null : root.getClass().getSimpleName())
+                .append("']")
+                .toString();
     }
 }

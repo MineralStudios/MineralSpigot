@@ -2,10 +2,10 @@ package org.bukkit.craftbukkit.scoreboard;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -15,6 +15,7 @@ import org.bukkit.scoreboard.ScoreboardManager;
 
 import gg.mineral.server.config.GlobalConfig;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.IScoreboardCriteria;
 import net.minecraft.server.MinecraftServer;
@@ -90,7 +91,7 @@ public final class CraftScoreboardManager implements ScoreboardManager {
         }
 
         // Old objective tracking
-        HashSet<ScoreboardObjective> removed = new HashSet<ScoreboardObjective>();
+        Set<ScoreboardObjective> removed = new ObjectOpenHashSet<ScoreboardObjective>();
         for (int i = 0; i < 3; ++i) {
             ScoreboardObjective scoreboardobjective = oldboard.getObjectiveForSlot(i);
             if (scoreboardobjective != null && !removed.contains(scoreboardobjective)) {

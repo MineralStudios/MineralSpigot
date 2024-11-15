@@ -1,24 +1,28 @@
 package net.minecraft.server;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class CommandHandler implements ICommandHandler {
 
     private static final Logger a = LogManager.getLogger();
-    private final Map<String, ICommand> b = Maps.newHashMap();
+    private final Map<String, ICommand> b = new Object2ObjectOpenHashMap<>();
     private final Set<ICommand> c = Sets.newHashSet();
 
-    public CommandHandler() {}
+    public CommandHandler() {
+    }
 
     public int a(ICommandListener icommandlistener, String s) {
         s = s.trim();
@@ -80,7 +84,8 @@ public class CommandHandler implements ICommandHandler {
             icommand.execute(icommandlistener, astring);
             return true;
         } catch (ExceptionUsage exceptionusage) {
-            chatmessage = new ChatMessage("commands.generic.usage", new Object[] { new ChatMessage(exceptionusage.getMessage(), exceptionusage.getArgs())});
+            chatmessage = new ChatMessage("commands.generic.usage",
+                    new Object[] { new ChatMessage(exceptionusage.getMessage(), exceptionusage.getArgs()) });
             chatmessage.getChatModifier().setColor(EnumChatFormat.RED);
             icommandlistener.sendMessage(chatmessage);
         } catch (CommandException commandexception) {
@@ -132,7 +137,8 @@ public class CommandHandler implements ICommandHandler {
             while (iterator.hasNext()) {
                 Entry entry = (Entry) iterator.next();
 
-                if (CommandAbstract.a(s1, (String) entry.getKey()) && ((ICommand) entry.getValue()).canUse(icommandlistener)) {
+                if (CommandAbstract.a(s1, (String) entry.getKey())
+                        && ((ICommand) entry.getValue()).canUse(icommandlistener)) {
                     arraylist.add(entry.getKey());
                 }
             }

@@ -1,19 +1,17 @@
 package net.minecraft.server;
 
-import com.google.common.collect.Maps;
-
 import gg.mineral.server.config.GlobalConfig;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Callable;
 
 public abstract class StructureGenerator extends WorldGenBase {
 
     private PersistentStructure d;
-    protected Map<Long, StructureStart> e = Maps.newHashMap();
+    protected Long2ObjectOpenHashMap<StructureStart> e = new Long2ObjectOpenHashMap<>();
 
     public StructureGenerator() {
     }
@@ -22,14 +20,14 @@ public abstract class StructureGenerator extends WorldGenBase {
 
     protected final void a(World world, final int i, final int j, int k, int l, ChunkSnapshot chunksnapshot) {
         this.a(world);
-        if (!this.e.containsKey(Long.valueOf(ChunkCoordIntPair.a(i, j)))) {
+        if (!this.e.containsKey(ChunkCoordIntPair.a(i, j))) {
             this.b.nextInt();
 
             try {
                 if (this.a(i, j)) {
                     StructureStart structurestart = this.b(i, j);
 
-                    this.e.put(Long.valueOf(ChunkCoordIntPair.a(i, j)), structurestart);
+                    this.e.put(ChunkCoordIntPair.a(i, j), structurestart);
                     this.a(i, j, structurestart);
                 }
 
@@ -232,7 +230,7 @@ public abstract class StructureGenerator extends WorldGenBase {
                             StructureStart structurestart = WorldGenFactory.a(nbttagcompound1, world);
 
                             if (structurestart != null) {
-                                this.e.put(Long.valueOf(ChunkCoordIntPair.a(i, j)), structurestart);
+                                this.e.put(ChunkCoordIntPair.a(i, j), structurestart);
                             }
                         }
                     }

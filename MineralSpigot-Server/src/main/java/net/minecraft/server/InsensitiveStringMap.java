@@ -1,17 +1,18 @@
 package net.minecraft.server;
 
-import com.google.common.collect.Maps;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 public class InsensitiveStringMap<V> implements Map<String, V> {
 
-    private final Map<String, V> a = Maps.newLinkedHashMap();
+    private final Map<String, V> a = new Object2ObjectLinkedOpenHashMap<>();
 
-    public InsensitiveStringMap() {}
+    public InsensitiveStringMap() {
+    }
 
     public int size() {
         return this.a.size();

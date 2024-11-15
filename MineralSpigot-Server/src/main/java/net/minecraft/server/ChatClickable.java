@@ -1,6 +1,9 @@
 package net.minecraft.server;
 
 import com.google.common.collect.Maps;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 import java.util.Map;
 
 public class ChatClickable {
@@ -58,9 +61,11 @@ public class ChatClickable {
 
     public static enum EnumClickAction {
 
-        OPEN_URL("open_url", true), OPEN_FILE("open_file", false), RUN_COMMAND("run_command", true), TWITCH_USER_INFO("twitch_user_info", false), SUGGEST_COMMAND("suggest_command", true), CHANGE_PAGE("change_page", true);
+        OPEN_URL("open_url", true), OPEN_FILE("open_file", false), RUN_COMMAND("run_command", true),
+        TWITCH_USER_INFO("twitch_user_info", false), SUGGEST_COMMAND("suggest_command", true),
+        CHANGE_PAGE("change_page", true);
 
-        private static final Map<String, ChatClickable.EnumClickAction> g = Maps.newHashMap();
+        private static final Map<String, ChatClickable.EnumClickAction> g = new Object2ObjectOpenHashMap<>();
         private final boolean h;
         private final String i;
 

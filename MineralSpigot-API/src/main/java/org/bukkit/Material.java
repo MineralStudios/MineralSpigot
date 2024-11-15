@@ -56,7 +56,8 @@ import org.bukkit.material.Wool;
 import org.bukkit.potion.Potion;
 import org.bukkit.util.Java15Compat;
 
-import com.google.common.collect.Maps;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 import org.bukkit.material.Banner;
 
 /**
@@ -460,7 +461,7 @@ public enum Material {
     private final int id;
     private final Constructor<? extends MaterialData> ctor;
     private static Material[] byId = new Material[383];
-    private final static Map<String, Material> BY_NAME = Maps.newHashMap();
+    private final static Map<String, Material> BY_NAME = new Object2ObjectOpenHashMap<>();
     private int maxStack; // PandaSpigot - Make non-final
     private final short durability;
 
@@ -517,7 +518,7 @@ public enum Material {
     public int getMaxStackSize() {
         return maxStack;
     }
-    
+
     // PandaSpigot start - Add setMaxStackSize()
     /**
      * Sets the maximum amount of this material that can be held in a stack.
@@ -674,7 +675,8 @@ public enum Material {
 
         try {
             result = getMaterial(Integer.parseInt(name));
-        } catch (NumberFormatException ex) {}
+        } catch (NumberFormatException ex) {
+        }
 
         if (result == null) {
             String filtered = name.toUpperCase();

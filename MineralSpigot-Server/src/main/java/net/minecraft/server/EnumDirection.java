@@ -1,15 +1,29 @@
 package net.minecraft.server;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Maps;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Maps;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 public enum EnumDirection implements INamable {
 
-    DOWN(0, 1, -1, "down", EnumDirection.EnumAxisDirection.NEGATIVE, EnumDirection.EnumAxis.Y, new BaseBlockPosition(0, -1, 0)), UP(1, 0, -1, "up", EnumDirection.EnumAxisDirection.POSITIVE, EnumDirection.EnumAxis.Y, new BaseBlockPosition(0, 1, 0)), NORTH(2, 3, 2, "north", EnumDirection.EnumAxisDirection.NEGATIVE, EnumDirection.EnumAxis.Z, new BaseBlockPosition(0, 0, -1)), SOUTH(3, 2, 0, "south", EnumDirection.EnumAxisDirection.POSITIVE, EnumDirection.EnumAxis.Z, new BaseBlockPosition(0, 0, 1)), WEST(4, 5, 1, "west", EnumDirection.EnumAxisDirection.NEGATIVE, EnumDirection.EnumAxis.X, new BaseBlockPosition(-1, 0, 0)), EAST(5, 4, 3, "east", EnumDirection.EnumAxisDirection.POSITIVE, EnumDirection.EnumAxis.X, new BaseBlockPosition(1, 0, 0));
+    DOWN(0, 1, -1, "down", EnumDirection.EnumAxisDirection.NEGATIVE, EnumDirection.EnumAxis.Y,
+            new BaseBlockPosition(0, -1, 0)),
+    UP(1, 0, -1, "up", EnumDirection.EnumAxisDirection.POSITIVE, EnumDirection.EnumAxis.Y,
+            new BaseBlockPosition(0, 1, 0)),
+    NORTH(2, 3, 2, "north", EnumDirection.EnumAxisDirection.NEGATIVE, EnumDirection.EnumAxis.Z,
+            new BaseBlockPosition(0, 0, -1)),
+    SOUTH(3, 2, 0, "south", EnumDirection.EnumAxisDirection.POSITIVE, EnumDirection.EnumAxis.Z,
+            new BaseBlockPosition(0, 0, 1)),
+    WEST(4, 5, 1, "west", EnumDirection.EnumAxisDirection.NEGATIVE, EnumDirection.EnumAxis.X,
+            new BaseBlockPosition(-1, 0, 0)),
+    EAST(5, 4, 3, "east", EnumDirection.EnumAxisDirection.POSITIVE, EnumDirection.EnumAxis.X,
+            new BaseBlockPosition(1, 0, 0));
 
     private final int g;
     private final int h;
@@ -20,9 +34,11 @@ public enum EnumDirection implements INamable {
     private final BaseBlockPosition m;
     private static final EnumDirection[] n = new EnumDirection[6];
     private static final EnumDirection[] o = new EnumDirection[4];
-    private static final Map<String, EnumDirection> p = Maps.newHashMap();
+    private static final Map<String, EnumDirection> p = new Object2ObjectOpenHashMap<>();
 
-    private EnumDirection(int i, int j, int k, String s, EnumDirection.EnumAxisDirection enumdirection_enumaxisdirection, EnumDirection.EnumAxis enumdirection_enumaxis, BaseBlockPosition baseblockposition) {
+    private EnumDirection(int i, int j, int k, String s,
+            EnumDirection.EnumAxisDirection enumdirection_enumaxisdirection,
+            EnumDirection.EnumAxis enumdirection_enumaxis, BaseBlockPosition baseblockposition) {
         this.g = i;
         this.i = k;
         this.h = j;
@@ -50,39 +66,39 @@ public enum EnumDirection implements INamable {
 
     public EnumDirection e() {
         switch (EnumDirection.SyntheticClass_1.b[this.ordinal()]) {
-        case 1:
-            return EnumDirection.EAST;
+            case 1:
+                return EnumDirection.EAST;
 
-        case 2:
-            return EnumDirection.SOUTH;
+            case 2:
+                return EnumDirection.SOUTH;
 
-        case 3:
-            return EnumDirection.WEST;
+            case 3:
+                return EnumDirection.WEST;
 
-        case 4:
-            return EnumDirection.NORTH;
+            case 4:
+                return EnumDirection.NORTH;
 
-        default:
-            throw new IllegalStateException("Unable to get Y-rotated facing of " + this);
+            default:
+                throw new IllegalStateException("Unable to get Y-rotated facing of " + this);
         }
     }
 
     public EnumDirection f() {
         switch (EnumDirection.SyntheticClass_1.b[this.ordinal()]) {
-        case 1:
-            return EnumDirection.WEST;
+            case 1:
+                return EnumDirection.WEST;
 
-        case 2:
-            return EnumDirection.NORTH;
+            case 2:
+                return EnumDirection.NORTH;
 
-        case 3:
-            return EnumDirection.EAST;
+            case 3:
+                return EnumDirection.EAST;
 
-        case 4:
-            return EnumDirection.SOUTH;
+            case 4:
+                return EnumDirection.SOUTH;
 
-        default:
-            throw new IllegalStateException("Unable to get CCW facing of " + this);
+            default:
+                throw new IllegalStateException("Unable to get CCW facing of " + this);
         }
     }
 
@@ -130,7 +146,8 @@ public enum EnumDirection implements INamable {
         return this.j;
     }
 
-    public static EnumDirection a(EnumDirection.EnumAxisDirection enumdirection_enumaxisdirection, EnumDirection.EnumAxis enumdirection_enumaxis) {
+    public static EnumDirection a(EnumDirection.EnumAxisDirection enumdirection_enumaxisdirection,
+            EnumDirection.EnumAxis enumdirection_enumaxis) {
         EnumDirection[] aenumdirection = values();
         int i = aenumdirection.length;
 
@@ -142,7 +159,8 @@ public enum EnumDirection implements INamable {
             }
         }
 
-        throw new IllegalArgumentException("No such direction: " + enumdirection_enumaxisdirection + " " + enumdirection_enumaxis);
+        throw new IllegalArgumentException(
+                "No such direction: " + enumdirection_enumaxisdirection + " " + enumdirection_enumaxis);
     }
 
     static {
@@ -246,18 +264,20 @@ public enum EnumDirection implements INamable {
 
         HORIZONTAL, VERTICAL;
 
-        private EnumDirectionLimit() {}
+        private EnumDirectionLimit() {
+        }
 
         public EnumDirection[] a() {
             switch (EnumDirection.SyntheticClass_1.c[this.ordinal()]) {
-            case 1:
-                return new EnumDirection[] { EnumDirection.NORTH, EnumDirection.EAST, EnumDirection.SOUTH, EnumDirection.WEST};
+                case 1:
+                    return new EnumDirection[] { EnumDirection.NORTH, EnumDirection.EAST, EnumDirection.SOUTH,
+                            EnumDirection.WEST };
 
-            case 2:
-                return new EnumDirection[] { EnumDirection.UP, EnumDirection.DOWN};
+                case 2:
+                    return new EnumDirection[] { EnumDirection.UP, EnumDirection.DOWN };
 
-            default:
-                throw new Error("Someone\'s been tampering with the universe!");
+                default:
+                    throw new Error("Someone\'s been tampering with the universe!");
             }
         }
 
@@ -303,9 +323,10 @@ public enum EnumDirection implements INamable {
 
     public static enum EnumAxis implements Predicate<EnumDirection>, INamable {
 
-        X("x", EnumDirection.EnumDirectionLimit.HORIZONTAL), Y("y", EnumDirection.EnumDirectionLimit.VERTICAL), Z("z", EnumDirection.EnumDirectionLimit.HORIZONTAL);
+        X("x", EnumDirection.EnumDirectionLimit.HORIZONTAL), Y("y", EnumDirection.EnumDirectionLimit.VERTICAL),
+        Z("z", EnumDirection.EnumDirectionLimit.HORIZONTAL);
 
-        private static final Map<String, EnumDirection.EnumAxis> d = Maps.newHashMap();
+        private static final Map<String, EnumDirection.EnumAxis> d = new Object2ObjectOpenHashMap<>();
         private final String e;
         private final EnumDirection.EnumDirectionLimit f;
 

@@ -1,16 +1,14 @@
 package net.minecraft.server;
 
+import com.google.common.collect.Maps;
 import java.util.Map;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class ChatHoverable {
 
     private final ChatHoverable.EnumHoverAction a;
     private final IChatBaseComponent b;
 
-    public ChatHoverable(ChatHoverable.EnumHoverAction chathoverable_enumhoveraction,
-            IChatBaseComponent ichatbasecomponent) {
+    public ChatHoverable(ChatHoverable.EnumHoverAction chathoverable_enumhoveraction, IChatBaseComponent ichatbasecomponent) {
         this.a = chathoverable_enumhoveraction;
         this.b = ichatbasecomponent;
     }
@@ -60,10 +58,9 @@ public class ChatHoverable {
 
     public static enum EnumHoverAction {
 
-        SHOW_TEXT("show_text", true), SHOW_ACHIEVEMENT("show_achievement", true), SHOW_ITEM("show_item", true),
-        SHOW_ENTITY("show_entity", true);
+        SHOW_TEXT("show_text", true), SHOW_ACHIEVEMENT("show_achievement", true), SHOW_ITEM("show_item", true), SHOW_ENTITY("show_entity", true);
 
-        private static final Map<String, ChatHoverable.EnumHoverAction> e = new Object2ObjectOpenHashMap<>();
+        private static final Map<String, ChatHoverable.EnumHoverAction> e = Maps.newHashMap();
         private final boolean f;
         private final String g;
 

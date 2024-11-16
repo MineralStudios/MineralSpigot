@@ -1,22 +1,29 @@
 package net.minecraft.server;
 
+import com.google.common.collect.Lists;
+
 import gg.mineral.server.config.GlobalConfig;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 // CraftBukkit start
 import java.util.Random;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.craftbukkit.chunkio.ChunkIOExecutor;
 import org.bukkit.craftbukkit.util.LongHash;
 import org.bukkit.craftbukkit.util.LongHashSet;
+import org.bukkit.craftbukkit.util.LongObjectHashMap;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.github.paperspigot.event.ServerExceptionEvent;
 import org.github.paperspigot.exception.ServerInternalException;
@@ -30,7 +37,7 @@ public class ChunkProviderServer implements IChunkProvider {
     public IChunkProvider chunkProvider;
     public IChunkLoader chunkLoader;
     public boolean forceChunkLoad = false; // CraftBukkit - true -> false
-    public Long2ObjectOpenHashMap<Chunk> chunks = new Long2ObjectOpenHashMap<Chunk>();
+    public LongObjectHashMap<Chunk> chunks = new LongObjectHashMap<Chunk>();
     public WorldServer world;
 
     public ChunkProviderServer(WorldServer worldserver, IChunkLoader ichunkloader, IChunkProvider ichunkprovider) {

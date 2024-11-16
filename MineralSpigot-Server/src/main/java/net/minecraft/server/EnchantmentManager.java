@@ -2,9 +2,6 @@ package net.minecraft.server;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,14 +13,10 @@ import java.util.Random;
 public class EnchantmentManager {
 
     private static final Random a = new Random();
-    private static final EnchantmentManager.EnchantmentModifierProtection b = new EnchantmentManager.EnchantmentModifierProtection(
-            (EnchantmentManager.SyntheticClass_1) null);
-    private static final EnchantmentManager.EnchantmentModifierDamage c = new EnchantmentManager.EnchantmentModifierDamage(
-            (EnchantmentManager.SyntheticClass_1) null);
-    private static final EnchantmentManager.EnchantmentModifierThorns d = new EnchantmentManager.EnchantmentModifierThorns(
-            (EnchantmentManager.SyntheticClass_1) null);
-    private static final EnchantmentManager.EnchantmentModifierArthropods e = new EnchantmentManager.EnchantmentModifierArthropods(
-            (EnchantmentManager.SyntheticClass_1) null);
+    private static final EnchantmentManager.EnchantmentModifierProtection b = new EnchantmentManager.EnchantmentModifierProtection((EnchantmentManager.SyntheticClass_1) null);
+    private static final EnchantmentManager.EnchantmentModifierDamage c = new EnchantmentManager.EnchantmentModifierDamage((EnchantmentManager.SyntheticClass_1) null);
+    private static final EnchantmentManager.EnchantmentModifierThorns d = new EnchantmentManager.EnchantmentModifierThorns((EnchantmentManager.SyntheticClass_1) null);
+    private static final EnchantmentManager.EnchantmentModifierArthropods e = new EnchantmentManager.EnchantmentModifierArthropods((EnchantmentManager.SyntheticClass_1) null);
 
     public static int getEnchantmentLevel(int i, ItemStack itemstack) {
         if (itemstack == null) {
@@ -50,8 +43,7 @@ public class EnchantmentManager {
 
     public static Map<Integer, Integer> a(ItemStack itemstack) {
         LinkedHashMap linkedhashmap = Maps.newLinkedHashMap();
-        NBTTagList nbttaglist = itemstack.getItem() == Items.ENCHANTED_BOOK ? Items.ENCHANTED_BOOK.h(itemstack)
-                : itemstack.getEnchantments();
+        NBTTagList nbttaglist = itemstack.getItem() == Items.ENCHANTED_BOOK ? Items.ENCHANTED_BOOK.h(itemstack) : itemstack.getEnchantments();
 
         if (nbttaglist != null) {
             for (int i = 0; i < nbttaglist.size(); ++i) {
@@ -80,8 +72,7 @@ public class EnchantmentManager {
                 nbttagcompound.setShort("lvl", (short) ((Integer) map.get(Integer.valueOf(i))).intValue());
                 nbttaglist.add(nbttagcompound);
                 if (itemstack.getItem() == Items.ENCHANTED_BOOK) {
-                    Items.ENCHANTED_BOOK.a(itemstack,
-                            new WeightedRandomEnchant(enchantment, ((Integer) map.get(Integer.valueOf(i))).intValue()));
+                    Items.ENCHANTED_BOOK.a(itemstack, new WeightedRandomEnchant(enchantment, ((Integer) map.get(Integer.valueOf(i))).intValue()));
                 }
             }
         }
@@ -117,8 +108,7 @@ public class EnchantmentManager {
         }
     }
 
-    private static void a(EnchantmentManager.EnchantmentModifier enchantmentmanager_enchantmentmodifier,
-            ItemStack itemstack) {
+    private static void a(EnchantmentManager.EnchantmentModifier enchantmentmanager_enchantmentmodifier, ItemStack itemstack) {
         if (itemstack != null) {
             NBTTagList nbttaglist = itemstack.getEnchantments();
 
@@ -136,8 +126,7 @@ public class EnchantmentManager {
         }
     }
 
-    private static void a(EnchantmentManager.EnchantmentModifier enchantmentmanager_enchantmentmodifier,
-            ItemStack[] aitemstack) {
+    private static void a(EnchantmentManager.EnchantmentModifier enchantmentmanager_enchantmentmodifier, ItemStack[] aitemstack) {
         ItemStack[] aitemstack1 = aitemstack;
         int i = aitemstack.length;
 
@@ -314,11 +303,10 @@ public class EnchantmentManager {
             }
 
             ArrayList arraylist = null;
-            Int2ObjectOpenHashMap<WeightedRandomEnchant> map = b(l, itemstack);
+            Map map = b(l, itemstack);
 
             if (map != null && !map.isEmpty()) {
-                WeightedRandomEnchant weightedrandomenchant = (WeightedRandomEnchant) WeightedRandom.a(random,
-                        map.values());
+                WeightedRandomEnchant weightedrandomenchant = (WeightedRandomEnchant) WeightedRandom.a(random, map.values());
 
                 if (weightedrandomenchant != null) {
                     arraylist = Lists.newArrayList();
@@ -334,8 +322,7 @@ public class EnchantmentManager {
 
                             while (true) {
                                 if (iterator1.hasNext()) {
-                                    WeightedRandomEnchant weightedrandomenchant1 = (WeightedRandomEnchant) iterator1
-                                            .next();
+                                    WeightedRandomEnchant weightedrandomenchant1 = (WeightedRandomEnchant) iterator1.next();
 
                                     if (weightedrandomenchant1.enchantment.a(Enchantment.getById(integer.intValue()))) {
                                         continue;
@@ -352,8 +339,7 @@ public class EnchantmentManager {
                         }
 
                         if (!map.isEmpty()) {
-                            WeightedRandomEnchant weightedrandomenchant2 = (WeightedRandomEnchant) WeightedRandom
-                                    .a(random, map.values());
+                            WeightedRandomEnchant weightedrandomenchant2 = (WeightedRandomEnchant) WeightedRandom.a(random, map.values());
 
                             arraylist.add(weightedrandomenchant2);
                         }
@@ -365,9 +351,9 @@ public class EnchantmentManager {
         }
     }
 
-    public static Int2ObjectOpenHashMap<WeightedRandomEnchant> b(int i, ItemStack itemstack) {
+    public static Map<Integer, WeightedRandomEnchant> b(int i, ItemStack itemstack) {
         Item item = itemstack.getItem();
-        Int2ObjectOpenHashMap<WeightedRandomEnchant> hashmap = null;
+        HashMap hashmap = null;
         boolean flag = itemstack.getItem() == Items.BOOK;
         Enchantment[] aenchantment = Enchantment.b;
         int j = aenchantment.length;
@@ -379,10 +365,10 @@ public class EnchantmentManager {
                 for (int l = enchantment.getStartLevel(); l <= enchantment.getMaxLevel(); ++l) {
                     if (i >= enchantment.a(l) && i <= enchantment.b(l)) {
                         if (hashmap == null) {
-                            hashmap = new Int2ObjectOpenHashMap<>();
+                            hashmap = Maps.newHashMap();
                         }
 
-                        hashmap.put(enchantment.id, new WeightedRandomEnchant(enchantment, l));
+                        hashmap.put(Integer.valueOf(enchantment.id), new WeightedRandomEnchant(enchantment, l));
                     }
                 }
             }
@@ -391,16 +377,14 @@ public class EnchantmentManager {
         return hashmap;
     }
 
-    static class SyntheticClass_1 {
-    }
+    static class SyntheticClass_1 {    }
 
     static final class EnchantmentModifierArthropods implements EnchantmentManager.EnchantmentModifier {
 
         public EntityLiving a;
         public Entity b;
 
-        private EnchantmentModifierArthropods() {
-        }
+        private EnchantmentModifierArthropods() {}
 
         public void a(Enchantment enchantment, int i) {
             enchantment.a(this.a, this.b, i);
@@ -416,8 +400,7 @@ public class EnchantmentManager {
         public EntityLiving a;
         public Entity b;
 
-        private EnchantmentModifierThorns() {
-        }
+        private EnchantmentModifierThorns() {}
 
         public void a(Enchantment enchantment, int i) {
             enchantment.b(this.a, this.b, i);
@@ -433,8 +416,7 @@ public class EnchantmentManager {
         public float a;
         public EnumMonsterType b;
 
-        private EnchantmentModifierDamage() {
-        }
+        private EnchantmentModifierDamage() {}
 
         public void a(Enchantment enchantment, int i) {
             this.a += enchantment.a(i, this.b);
@@ -450,8 +432,7 @@ public class EnchantmentManager {
         public int a;
         public DamageSource b;
 
-        private EnchantmentModifierProtection() {
-        }
+        private EnchantmentModifierProtection() {}
 
         public void a(Enchantment enchantment, int i) {
             this.a += enchantment.a(i, this.b);

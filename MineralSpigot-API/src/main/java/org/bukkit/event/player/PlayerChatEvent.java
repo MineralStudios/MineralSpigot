@@ -1,5 +1,6 @@
 package org.bukkit.event.player;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang.Validate;
@@ -8,22 +9,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-
 /**
  * Holds information for player chat and commands
  *
  * @deprecated This event will fire from the main thread and allows the use of
- *             all of the Bukkit API, unlike the {@link AsyncPlayerChatEvent}.
- *             <p>
- *             Listening to this event forces chat to wait for the main thread
- *             which
- *             causes delays for chat. {@link AsyncPlayerChatEvent} is the
- *             encouraged
- *             alternative for thread safe implementations.
+ *     all of the Bukkit API, unlike the {@link AsyncPlayerChatEvent}.
+ *     <p>
+ *     Listening to this event forces chat to wait for the main thread which
+ *     causes delays for chat. {@link AsyncPlayerChatEvent} is the encouraged
+ *     alternative for thread safe implementations.
  */
 @Deprecated
-@Warning(reason = "Listening to this event forces chat to wait for the main thread, delaying chat messages.")
+@Warning(reason="Listening to this event forces chat to wait for the main thread, delaying chat messages.")
 public class PlayerChatEvent extends PlayerEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private boolean cancel = false;
@@ -35,11 +32,10 @@ public class PlayerChatEvent extends PlayerEvent implements Cancellable {
         super(player);
         this.message = message;
         this.format = "<%1$s> %2$s";
-        this.recipients = new ObjectOpenHashSet<Player>(player.getServer().getOnlinePlayers());
+        this.recipients = new HashSet<Player>(player.getServer().getOnlinePlayers());
     }
 
-    public PlayerChatEvent(final Player player, final String message, final String format,
-            final Set<Player> recipients) {
+    public PlayerChatEvent(final Player player, final String message, final String format, final Set<Player> recipients) {
         super(player);
         this.message = message;
         this.format = format;

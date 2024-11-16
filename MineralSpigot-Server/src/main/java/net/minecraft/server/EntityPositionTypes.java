@@ -1,12 +1,11 @@
 package net.minecraft.server;
 
-import java.util.Map;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import com.google.common.collect.Maps;
+import java.util.HashMap;
 
 public class EntityPositionTypes {
 
-    private static final Map<Class, EntityInsentient.EnumEntityPositionType> a = new Object2ObjectOpenHashMap<>();
+    private static final HashMap<Class, EntityInsentient.EnumEntityPositionType> a = Maps.newHashMap();
 
     public static EntityInsentient.EnumEntityPositionType a(Class oclass) {
         return (EntityInsentient.EnumEntityPositionType) EntityPositionTypes.a.get(oclass);

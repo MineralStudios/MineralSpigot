@@ -1,23 +1,20 @@
 package net.minecraft.server;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
 public abstract class AttributeMapBase {
 
-    protected final Map<IAttribute, AttributeInstance> a = new Object2ObjectOpenHashMap<>();
-    protected final Map<String, AttributeInstance> b = new InsensitiveStringMap<>();
+    protected final Map<IAttribute, AttributeInstance> a = Maps.newHashMap();
+    protected final Map<String, AttributeInstance> b = new InsensitiveStringMap();
     protected final Multimap<IAttribute, IAttribute> c = HashMultimap.create();
 
-    public AttributeMapBase() {
-    }
+    public AttributeMapBase() {}
 
     public AttributeInstance a(IAttribute iattribute) {
         return (AttributeInstance) this.a.get(iattribute);
@@ -50,8 +47,7 @@ public abstract class AttributeMapBase {
         return this.b.values();
     }
 
-    public void a(AttributeInstance attributeinstance) {
-    }
+    public void a(AttributeInstance attributeinstance) {}
 
     public void a(Multimap<String, AttributeModifier> multimap) {
         Iterator iterator = multimap.entries().iterator();

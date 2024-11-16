@@ -1,9 +1,6 @@
 package net.minecraft.server;
 
-import java.io.IOException;
-import java.util.Locale;
-import java.util.Map;
-
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
@@ -11,13 +8,13 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Locale;
 
 public class ChatTypeAdapterFactory implements TypeAdapterFactory {
 
-    public ChatTypeAdapterFactory() {
-    }
+    public ChatTypeAdapterFactory() {}
 
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typetoken) {
         Class<? super T> oclass = typetoken.getRawType();
@@ -25,7 +22,7 @@ public class ChatTypeAdapterFactory implements TypeAdapterFactory {
         if (!oclass.isEnum()) {
             return null;
         } else {
-            final Map<String, T> hashmap = new Object2ObjectOpenHashMap<>();
+            final HashMap<String, T> hashmap = Maps.newHashMap();
             Object[] aobject = oclass.getEnumConstants();
             int i = aobject.length;
 
@@ -58,7 +55,6 @@ public class ChatTypeAdapterFactory implements TypeAdapterFactory {
     }
 
     private String a(Object object) {
-        return object instanceof Enum ? ((Enum) object).name().toLowerCase(Locale.US)
-                : object.toString().toLowerCase(Locale.US);
+        return object instanceof Enum ? ((Enum) object).name().toLowerCase(Locale.US) : object.toString().toLowerCase(Locale.US);
     }
 }

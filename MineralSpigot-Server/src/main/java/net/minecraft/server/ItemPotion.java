@@ -2,9 +2,6 @@ package net.minecraft.server;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -12,7 +9,7 @@ import java.util.Map;
 
 public class ItemPotion extends Item {
 
-    private Int2ObjectOpenHashMap<List<MobEffect>> a = new Int2ObjectOpenHashMap<>();
+    private Map<Integer, List<MobEffect>> a = Maps.newHashMap();
     private static final Map<List<MobEffect>, Integer> b = Maps.newLinkedHashMap();
 
     public ItemPotion() {
@@ -38,11 +35,11 @@ public class ItemPotion extends Item {
 
             return arraylist;
         } else {
-            List list = (List) this.a.get(itemstack.getData());
+            List list = (List) this.a.get(Integer.valueOf(itemstack.getData()));
 
             if (list == null) {
                 list = PotionBrewer.getEffects(itemstack.getData(), false);
-                this.a.put(itemstack.getData(), list);
+                this.a.put(Integer.valueOf(itemstack.getData()), list);
             }
 
             return list;
@@ -50,11 +47,11 @@ public class ItemPotion extends Item {
     }
 
     public List<MobEffect> e(int i) {
-        List list = (List) this.a.get(i);
+        List list = (List) this.a.get(Integer.valueOf(i));
 
         if (list == null) {
             list = PotionBrewer.getEffects(i, false);
-            this.a.put(i, list);
+            this.a.put(Integer.valueOf(i), list);
         }
 
         return list;

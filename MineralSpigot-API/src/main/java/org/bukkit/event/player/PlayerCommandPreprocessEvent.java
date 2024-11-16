@@ -1,13 +1,12 @@
 package org.bukkit.event.player;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
-
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 /**
  * This event is called whenever a player runs a command (by placing a slash
@@ -22,17 +21,17 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
  * <ul>
  * <li>Logging executed commands to a separate file
  * <li>Variable substitution. For example, replacing
- * <code>${nearbyPlayer}</code> with the name of the nearest other
- * player, or simulating the <code>@a</code> and <code>@p</code>
- * decorators used by Command Blocks in plugins that do not handle it.
+ *     <code>${nearbyPlayer}</code> with the name of the nearest other
+ *     player, or simulating the <code>@a</code> and <code>@p</code>
+ *     decorators used by Command Blocks in plugins that do not handle it.
  * <li>Conditionally blocking commands belonging to other plugins. For
- * example, blocking the use of the <code>/home</code> command in a
- * combat arena.
+ *     example, blocking the use of the <code>/home</code> command in a
+ *     combat arena.
  * <li>Per-sender command aliases. For example, after a player runs the
- * command <code>/calias cr gamemode creative</code>, the next time they
- * run <code>/cr</code>, it gets replaced into
- * <code>/gamemode creative</code>. (Global command aliases should be
- * done by registering the alias.)
+ *     command <code>/calias cr gamemode creative</code>, the next time they
+ *     run <code>/cr</code>, it gets replaced into
+ *     <code>/gamemode creative</code>. (Global command aliases should be
+ *     done by registering the alias.)
  * </ul>
  * <p>
  * Examples of incorrect uses are:
@@ -55,7 +54,7 @@ public class PlayerCommandPreprocessEvent extends PlayerEvent implements Cancell
 
     public PlayerCommandPreprocessEvent(final Player player, final String message) {
         super(player);
-        this.recipients = new ObjectOpenHashSet<Player>(player.getServer().getOnlinePlayers());
+        this.recipients = new HashSet<Player>(player.getServer().getOnlinePlayers());
         this.message = message;
     }
 
@@ -115,7 +114,7 @@ public class PlayerCommandPreprocessEvent extends PlayerEvent implements Cancell
      * Gets the format to use to display this chat message
      *
      * @deprecated This method is provided for backward compatibility with no
-     *             guarantee to the use of the format.
+     *     guarantee to the use of the format.
      * @return String.Format compatible format string
      */
     @Deprecated
@@ -127,7 +126,7 @@ public class PlayerCommandPreprocessEvent extends PlayerEvent implements Cancell
      * Sets the format to use to display this chat message
      *
      * @deprecated This method is provided for backward compatibility with no
-     *             guarantee to the effect of modifying the format.
+     *     guarantee to the effect of modifying the format.
      * @param format String.Format compatible format string
      */
     @Deprecated
@@ -154,7 +153,7 @@ public class PlayerCommandPreprocessEvent extends PlayerEvent implements Cancell
      * unmodifiable set.
      *
      * @deprecated This method is provided for backward compatibility with no
-     *             guarantee to the effect of viewing or modifying the set.
+     *     guarantee to the effect of viewing or modifying the set.
      * @return All Players who will see this chat message
      */
     @Deprecated

@@ -3,6 +3,7 @@ package org.bukkit.plugin;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +27,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 /**
  * This type is the runtime-container for the information in the plugin.yml.
@@ -1228,7 +1228,7 @@ public final class PluginDescriptionFile {
         }
 
         if (map.get("awareness") instanceof Iterable) {
-            Set<PluginAwareness> awareness = new ObjectOpenHashSet<PluginAwareness>();
+            Set<PluginAwareness> awareness = new HashSet<PluginAwareness>();
             try {
                 for (Object o : (Iterable<?>) map.get("awareness")) {
                     awareness.add((PluginAwareness) o);

@@ -1,8 +1,8 @@
 package org.bukkit.permissions;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.bukkit.plugin.Plugin;
-
-import it.unimi.dsi.fastutil.objects.Object2BooleanLinkedOpenHashMap;
 
 /**
  * Holds information about a permission attachment on a {@link Permissible}
@@ -10,7 +10,7 @@ import it.unimi.dsi.fastutil.objects.Object2BooleanLinkedOpenHashMap;
  */
 public class PermissionAttachment {
     private PermissionRemovedExecutor removed;
-    private final Object2BooleanLinkedOpenHashMap<String> permissions = new Object2BooleanLinkedOpenHashMap<>();
+    private final Map<String, Boolean> permissions = new LinkedHashMap<String, Boolean>();
     private final Permissible permissible;
     private final Plugin plugin;
 
@@ -72,14 +72,14 @@ public class PermissionAttachment {
      *
      * @return Copy of all permissions and values expressed by this attachment
      */
-    public Object2BooleanLinkedOpenHashMap<String> getPermissions() {
-        return new Object2BooleanLinkedOpenHashMap<>(permissions);
+    public Map<String, Boolean> getPermissions() {
+        return new LinkedHashMap<String, Boolean>(permissions);
     }
 
     /**
      * Sets a permission to the given value, by its fully qualified name
      *
-     * @param name  Name of the permission
+     * @param name Name of the permission
      * @param value New value of the permission
      */
     public void setPermission(String name, boolean value) {
@@ -90,7 +90,7 @@ public class PermissionAttachment {
     /**
      * Sets a permission to the given value
      *
-     * @param perm  Permission to set
+     * @param perm Permission to set
      * @param value New value of the permission
      */
     public void setPermission(Permission perm, boolean value) {
@@ -106,7 +106,7 @@ public class PermissionAttachment {
      * @param name Name of the permission to remove
      */
     public void unsetPermission(String name) {
-        permissions.removeBoolean(name.toLowerCase());
+        permissions.remove(name.toLowerCase());
         permissible.recalculatePermissions();
     }
 
@@ -126,7 +126,7 @@ public class PermissionAttachment {
      * Removes this attachment from its registered {@link Permissible}
      *
      * @return true if the permissible was removed successfully, false if it
-     *         did not exist
+     *     did not exist
      */
     public boolean remove() {
         try {

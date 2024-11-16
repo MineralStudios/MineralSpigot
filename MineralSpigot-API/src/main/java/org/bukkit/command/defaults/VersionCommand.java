@@ -18,6 +18,7 @@ import com.google.common.io.Resources;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -26,9 +27,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 // PandaSpigot end
@@ -45,8 +43,7 @@ public class VersionCommand extends BukkitCommand {
 
     @Override
     public boolean execute(CommandSender sender, String currentAlias, String[] args) {
-        if (!testPermission(sender))
-            return true;
+        if (!testPermission(sender)) return true;
 
         if (args.length == 0) {
             sender.sendMessage(Bukkit.getVersionMessage()); // PandaSpigot - Use Bukkit.getVersionMessage
@@ -88,8 +85,7 @@ public class VersionCommand extends BukkitCommand {
 
     private void describeToSender(Plugin plugin, CommandSender sender) {
         PluginDescriptionFile desc = plugin.getDescription();
-        sender.sendMessage(
-                ChatColor.GREEN + desc.getName() + ChatColor.WHITE + " version " + ChatColor.GREEN + desc.getVersion());
+        sender.sendMessage(ChatColor.GREEN + desc.getName() + ChatColor.WHITE + " version " + ChatColor.GREEN + desc.getVersion());
 
         if (desc.getDescription() != null) {
             sender.sendMessage(desc.getDescription());
@@ -152,7 +148,7 @@ public class VersionCommand extends BukkitCommand {
     private final ReentrantLock versionLock = new ReentrantLock();
     private boolean hasVersion = false;
     private String versionMessage = null;
-    private final Set<CommandSender> versionWaiters = new ObjectOpenHashSet<CommandSender>();
+    private final Set<CommandSender> versionWaiters = new HashSet<CommandSender>();
     private boolean versionTaskStarted = false;
     private long lastCheck = 0;
 
@@ -191,8 +187,7 @@ public class VersionCommand extends BukkitCommand {
 
     private void obtainVersion() {
         String version = Bukkit.getVersion();
-        if (version == null)
-            version = "Custom";
+        if (version == null) version = "Custom";
         // PandaSpigot start
         if (version.startsWith("git-PandaSpigot-")) {
             String[] parts = version.substring("git-PandaSpigot-".length()).split("[-\\s]");
@@ -214,14 +209,12 @@ public class VersionCommand extends BukkitCommand {
                     this.setVersionMessage(ChatColor.YELLOW + "Unknown version");
                     break;
                 default:
-                    this.setVersionMessage(ChatColor.RED + "You are " + distance + " version(s) behind!\n"
-                            + ChatColor.RED + "Download the new version at " + ChatColor.GOLD
-                            + "https://github.com/hpfxd/PandaSpigot");
+                    this.setVersionMessage(ChatColor.RED + "You are " + distance + " version(s) behind!\n" + ChatColor.RED + "Download the new version at " + ChatColor.GOLD + "https://github.com/hpfxd/PandaSpigot");
                     break;
             }
-            // PaperSpigot start
+        // PaperSpigot start
         } else if (version.startsWith("git-PaperSpigot-")) {
-            // PandaSpigot end
+        // PandaSpigot end
             String[] parts = version.substring("git-PaperSpigot-".length()).split("[-\\s]");
             int paperSpigotVersions = getDistance("paperspigot", parts[0]);
             if (paperSpigotVersions == -1) {
@@ -234,7 +227,7 @@ public class VersionCommand extends BukkitCommand {
                 }
             }
         } else if (version.startsWith("git-Spigot-")) {
-            // PaperSpigot end
+        // PaperSpigot end
             String[] parts = version.substring("git-Spigot-".length()).split("-");
             int cbVersions = getDistance("craftbukkit", parts[1].substring(0, parts[1].indexOf(' ')));
             int spigotVersions = getDistance("spigot", parts[0]);
@@ -284,20 +277,15 @@ public class VersionCommand extends BukkitCommand {
     // PandaSpigot start
     private static int fetchActionsDistance(String repo, String workflowId, int runNumber) {
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(
-                    "https://api.github.com/repos/" + repo + "/actions/workflows/" + workflowId + "/runs")
-                    .openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URL("https://api.github.com/repos/" + repo + "/actions/workflows/" + workflowId + "/runs").openConnection();
             connection.setRequestProperty("Accept", "application/vnd.github.v3+json");
             connection.setRequestProperty("User-Agent", "PandaSpigot/" + Bukkit.getVersion());
             connection.connect();
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
-                return -2;
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream(), Charsets.UTF_8))) {
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) return -2;
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8))) {
                 JsonObject obj = new Gson().fromJson(reader, JsonObject.class);
                 JsonArray arr = obj.getAsJsonArray("workflow_runs");
-                if (arr.size() == 0)
-                    return -1;
+                if (arr.size() == 0) return -1;
                 JsonObject firstElement = arr.iterator().next().getAsJsonObject();
                 int latestRunNumber = firstElement.get("run_number").getAsInt();
                 return latestRunNumber - runNumber;
@@ -310,19 +298,15 @@ public class VersionCommand extends BukkitCommand {
             return -1;
         }
     }
-
     private static int fetchGitDistance(String repo, String branch, String hash) {
         hash = hash.replace("\"", "");
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(
-                    "https://api.github.com/repos/" + repo + "/compare/" + branch + "..." + hash).openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URL("https://api.github.com/repos/" + repo + "/compare/" + branch + "..." + hash).openConnection();
             connection.setRequestProperty("Accept", "application/vnd.github.v3+json");
             connection.setRequestProperty("User-Agent", "PandaSpigot/" + Bukkit.getVersion());
             connection.connect();
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
-                return -2; // Unknown commit
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream(), Charsets.UTF_8))) {
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) return -2; // Unknown commit
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8))) {
                 JsonObject obj = new Gson().fromJson(reader, JsonObject.class);
                 String status = obj.get("status").getAsString();
                 switch (status) {
@@ -348,14 +332,15 @@ public class VersionCommand extends BukkitCommand {
         try {
             BufferedReader reader = Resources.asCharSource(
                     new URL("https://ci.destroystokyo.com/job/PaperSpigot/lastSuccessfulBuild/buildNumber"), // PaperSpigot
-                    Charsets.UTF_8).openBufferedStream();
+                    Charsets.UTF_8
+            ).openBufferedStream();
             try {
                 // PaperSpigot start
                 int newVer = Integer.decode(reader.readLine());
                 int currentVer = Integer.decode(currentVerInt);
                 return newVer - currentVer;
             } catch (NumberFormatException ex) {
-                // ex.printStackTrace();
+                //ex.printStackTrace();
                 // PaperSpigot end
                 return -1;
             } finally {

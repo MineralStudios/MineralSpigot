@@ -1,14 +1,12 @@
 package net.minecraft.server;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-import com.google.common.collect.Lists;
-
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import java.util.Map;
 
 public class PotionBrewer {
 
@@ -26,9 +24,9 @@ public class PotionBrewer {
     public static final String l;
     public static final String m;
     public static final String n;
-    private static final Int2ObjectOpenHashMap<String> effectDurations = new Int2ObjectOpenHashMap<>();
-    private static final Int2ObjectOpenHashMap<String> effectAmplifiers = new Int2ObjectOpenHashMap<>();
-    private static final Int2IntOpenHashMap q;
+    private static final Map<Integer, String> effectDurations = Maps.newHashMap();
+    private static final Map<Integer, String> effectAmplifiers = Maps.newHashMap();
+    private static final Map<Integer, Integer> q;
     private static final String[] appearances;
 
     public static boolean a(int i, int j) {
@@ -279,14 +277,14 @@ public class PotionBrewer {
             MobEffectList mobeffectlist = amobeffectlist[k];
 
             if (mobeffectlist != null && (!mobeffectlist.j() || flag)) {
-                String s = (String) PotionBrewer.effectDurations.get(mobeffectlist.getId());
+                String s = (String) PotionBrewer.effectDurations.get(Integer.valueOf(mobeffectlist.getId()));
 
                 if (s != null) {
                     int l = a(s, 0, s.length(), i);
 
                     if (l > 0) {
                         int i1 = 0;
-                        String s1 = (String) PotionBrewer.effectAmplifiers.get(mobeffectlist.getId());
+                        String s1 = (String) PotionBrewer.effectAmplifiers.get(Integer.valueOf(mobeffectlist.getId()));
 
                         if (s1 != null) {
                             i1 = a(s1, 0, s1.length(), i);
@@ -418,54 +416,41 @@ public class PotionBrewer {
     }
 
     static {
-        PotionBrewer.effectDurations.put(MobEffectList.REGENERATION.getId(), "0 & !1 & !2 & !3 & 0+6");
+        PotionBrewer.effectDurations.put(Integer.valueOf(MobEffectList.REGENERATION.getId()), "0 & !1 & !2 & !3 & 0+6");
         b = "-0+1-2-3&4-4+13";
-        PotionBrewer.effectDurations.put(MobEffectList.FASTER_MOVEMENT.getId(),
-                "!0 & 1 & !2 & !3 & 1+6");
+        PotionBrewer.effectDurations.put(Integer.valueOf(MobEffectList.FASTER_MOVEMENT.getId()), "!0 & 1 & !2 & !3 & 1+6");
         h = "+0+1-2-3&4-4+13";
-        PotionBrewer.effectDurations.put(MobEffectList.FIRE_RESISTANCE.getId(),
-                "0 & 1 & !2 & !3 & 0+6");
+        PotionBrewer.effectDurations.put(Integer.valueOf(MobEffectList.FIRE_RESISTANCE.getId()), "0 & 1 & !2 & !3 & 0+6");
         f = "+0-1+2-3&4-4+13";
-        PotionBrewer.effectDurations.put(MobEffectList.HEAL.getId(), "0 & !1 & 2 & !3");
+        PotionBrewer.effectDurations.put(Integer.valueOf(MobEffectList.HEAL.getId()), "0 & !1 & 2 & !3");
         d = "-0-1+2-3&4-4+13";
-        PotionBrewer.effectDurations.put(MobEffectList.POISON.getId(), "!0 & !1 & 2 & !3 & 2+6");
+        PotionBrewer.effectDurations.put(Integer.valueOf(MobEffectList.POISON.getId()), "!0 & !1 & 2 & !3 & 2+6");
         e = "-0+3-4+13";
-        PotionBrewer.effectDurations.put(MobEffectList.WEAKNESS.getId(), "!0 & !1 & !2 & 3 & 3+6");
-        PotionBrewer.effectDurations.put(MobEffectList.HARM.getId(), "!0 & !1 & 2 & 3");
-        PotionBrewer.effectDurations.put(MobEffectList.SLOWER_MOVEMENT.getId(),
-                "!0 & 1 & !2 & 3 & 3+6");
+        PotionBrewer.effectDurations.put(Integer.valueOf(MobEffectList.WEAKNESS.getId()), "!0 & !1 & !2 & 3 & 3+6");
+        PotionBrewer.effectDurations.put(Integer.valueOf(MobEffectList.HARM.getId()), "!0 & !1 & 2 & 3");
+        PotionBrewer.effectDurations.put(Integer.valueOf(MobEffectList.SLOWER_MOVEMENT.getId()), "!0 & 1 & !2 & 3 & 3+6");
         g = "+0-1-2+3&4-4+13";
-        PotionBrewer.effectDurations.put(MobEffectList.INCREASE_DAMAGE.getId(),
-                "0 & !1 & !2 & 3 & 3+6");
+        PotionBrewer.effectDurations.put(Integer.valueOf(MobEffectList.INCREASE_DAMAGE.getId()), "0 & !1 & !2 & 3 & 3+6");
         l = "-0+1+2-3+13&4-4";
-        PotionBrewer.effectDurations.put(MobEffectList.NIGHT_VISION.getId(), "!0 & 1 & 2 & !3 & 2+6");
-        PotionBrewer.effectDurations.put(MobEffectList.INVISIBILITY.getId(), "!0 & 1 & 2 & 3 & 2+6");
+        PotionBrewer.effectDurations.put(Integer.valueOf(MobEffectList.NIGHT_VISION.getId()), "!0 & 1 & 2 & !3 & 2+6");
+        PotionBrewer.effectDurations.put(Integer.valueOf(MobEffectList.INVISIBILITY.getId()), "!0 & 1 & 2 & 3 & 2+6");
         m = "+0-1+2+3+13&4-4";
-        PotionBrewer.effectDurations.put(MobEffectList.WATER_BREATHING.getId(),
-                "0 & !1 & 2 & 3 & 2+6");
+        PotionBrewer.effectDurations.put(Integer.valueOf(MobEffectList.WATER_BREATHING.getId()), "0 & !1 & 2 & 3 & 2+6");
         n = "+0+1-2+3&4-4+13";
-        PotionBrewer.effectDurations.put(MobEffectList.JUMP.getId(), "0 & 1 & !2 & 3 & 3+6");
+        PotionBrewer.effectDurations.put(Integer.valueOf(MobEffectList.JUMP.getId()), "0 & 1 & !2 & 3 & 3+6");
         j = "+5-6-7";
-        PotionBrewer.effectAmplifiers.put(MobEffectList.FASTER_MOVEMENT.getId(), "5");
-        PotionBrewer.effectAmplifiers.put(MobEffectList.FASTER_DIG.getId(), "5");
-        PotionBrewer.effectAmplifiers.put(MobEffectList.INCREASE_DAMAGE.getId(), "5");
-        PotionBrewer.effectAmplifiers.put(MobEffectList.REGENERATION.getId(), "5");
-        PotionBrewer.effectAmplifiers.put(MobEffectList.HARM.getId(), "5");
-        PotionBrewer.effectAmplifiers.put(MobEffectList.HEAL.getId(), "5");
-        PotionBrewer.effectAmplifiers.put(MobEffectList.RESISTANCE.getId(), "5");
-        PotionBrewer.effectAmplifiers.put(MobEffectList.POISON.getId(), "5");
-        PotionBrewer.effectAmplifiers.put(MobEffectList.JUMP.getId(), "5");
+        PotionBrewer.effectAmplifiers.put(Integer.valueOf(MobEffectList.FASTER_MOVEMENT.getId()), "5");
+        PotionBrewer.effectAmplifiers.put(Integer.valueOf(MobEffectList.FASTER_DIG.getId()), "5");
+        PotionBrewer.effectAmplifiers.put(Integer.valueOf(MobEffectList.INCREASE_DAMAGE.getId()), "5");
+        PotionBrewer.effectAmplifiers.put(Integer.valueOf(MobEffectList.REGENERATION.getId()), "5");
+        PotionBrewer.effectAmplifiers.put(Integer.valueOf(MobEffectList.HARM.getId()), "5");
+        PotionBrewer.effectAmplifiers.put(Integer.valueOf(MobEffectList.HEAL.getId()), "5");
+        PotionBrewer.effectAmplifiers.put(Integer.valueOf(MobEffectList.RESISTANCE.getId()), "5");
+        PotionBrewer.effectAmplifiers.put(Integer.valueOf(MobEffectList.POISON.getId()), "5");
+        PotionBrewer.effectAmplifiers.put(Integer.valueOf(MobEffectList.JUMP.getId()), "5");
         i = "-5+6-7";
         k = "+14&13-13";
-        q = new Int2IntOpenHashMap();
-        appearances = new String[] { "potion.prefix.mundane", "potion.prefix.uninteresting", "potion.prefix.bland",
-                "potion.prefix.clear", "potion.prefix.milky", "potion.prefix.diffuse", "potion.prefix.artless",
-                "potion.prefix.thin", "potion.prefix.awkward", "potion.prefix.flat", "potion.prefix.bulky",
-                "potion.prefix.bungling", "potion.prefix.buttered", "potion.prefix.smooth", "potion.prefix.suave",
-                "potion.prefix.debonair", "potion.prefix.thick", "potion.prefix.elegant", "potion.prefix.fancy",
-                "potion.prefix.charming", "potion.prefix.dashing", "potion.prefix.refined", "potion.prefix.cordial",
-                "potion.prefix.sparkling", "potion.prefix.potent", "potion.prefix.foul", "potion.prefix.odorless",
-                "potion.prefix.rank", "potion.prefix.harsh", "potion.prefix.acrid", "potion.prefix.gross",
-                "potion.prefix.stinky" };
+        q = Maps.newHashMap();
+        appearances = new String[] { "potion.prefix.mundane", "potion.prefix.uninteresting", "potion.prefix.bland", "potion.prefix.clear", "potion.prefix.milky", "potion.prefix.diffuse", "potion.prefix.artless", "potion.prefix.thin", "potion.prefix.awkward", "potion.prefix.flat", "potion.prefix.bulky", "potion.prefix.bungling", "potion.prefix.buttered", "potion.prefix.smooth", "potion.prefix.suave", "potion.prefix.debonair", "potion.prefix.thick", "potion.prefix.elegant", "potion.prefix.fancy", "potion.prefix.charming", "potion.prefix.dashing", "potion.prefix.refined", "potion.prefix.cordial", "potion.prefix.sparkling", "potion.prefix.potent", "potion.prefix.foul", "potion.prefix.odorless", "potion.prefix.rank", "potion.prefix.harsh", "potion.prefix.acrid", "potion.prefix.gross", "potion.prefix.stinky"};
     }
 }

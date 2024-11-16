@@ -1,9 +1,7 @@
 package net.minecraft.server;
 
 import com.google.common.collect.Lists;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
+import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
@@ -13,43 +11,32 @@ public abstract class Enchantment {
     // CraftBukkit - update CraftEnchant.getName(i) if this changes
     private static final Enchantment[] byId = new Enchantment[256];
     public static final Enchantment[] b;
-    private static final Map<MinecraftKey, Enchantment> E = new Object2ObjectOpenHashMap<>();
-    public static final Enchantment PROTECTION_ENVIRONMENTAL = new EnchantmentProtection(0,
-            new MinecraftKey("protection"), 10, 0);
-    public static final Enchantment PROTECTION_FIRE = new EnchantmentProtection(1, new MinecraftKey("fire_protection"),
-            5, 1);
-    public static final Enchantment PROTECTION_FALL = new EnchantmentProtection(2, new MinecraftKey("feather_falling"),
-            5, 2);
-    public static final Enchantment PROTECTION_EXPLOSIONS = new EnchantmentProtection(3,
-            new MinecraftKey("blast_protection"), 2, 3);
-    public static final Enchantment PROTECTION_PROJECTILE = new EnchantmentProtection(4,
-            new MinecraftKey("projectile_protection"), 5, 4);
+    private static final Map<MinecraftKey, Enchantment> E = Maps.newHashMap();
+    public static final Enchantment PROTECTION_ENVIRONMENTAL = new EnchantmentProtection(0, new MinecraftKey("protection"), 10, 0);
+    public static final Enchantment PROTECTION_FIRE = new EnchantmentProtection(1, new MinecraftKey("fire_protection"), 5, 1);
+    public static final Enchantment PROTECTION_FALL = new EnchantmentProtection(2, new MinecraftKey("feather_falling"), 5, 2);
+    public static final Enchantment PROTECTION_EXPLOSIONS = new EnchantmentProtection(3, new MinecraftKey("blast_protection"), 2, 3);
+    public static final Enchantment PROTECTION_PROJECTILE = new EnchantmentProtection(4, new MinecraftKey("projectile_protection"), 5, 4);
     public static final Enchantment OXYGEN = new EnchantmentOxygen(5, new MinecraftKey("respiration"), 2);
     public static final Enchantment WATER_WORKER = new EnchantmentWaterWorker(6, new MinecraftKey("aqua_affinity"), 2);
     public static final Enchantment THORNS = new EnchantmentThorns(7, new MinecraftKey("thorns"), 1);
-    public static final Enchantment DEPTH_STRIDER = new EnchantmentDepthStrider(8, new MinecraftKey("depth_strider"),
-            2);
+    public static final Enchantment DEPTH_STRIDER = new EnchantmentDepthStrider(8, new MinecraftKey("depth_strider"), 2);
     public static final Enchantment DAMAGE_ALL = new EnchantmentWeaponDamage(16, new MinecraftKey("sharpness"), 10, 0);
     public static final Enchantment DAMAGE_UNDEAD = new EnchantmentWeaponDamage(17, new MinecraftKey("smite"), 5, 1);
-    public static final Enchantment DAMAGE_ARTHROPODS = new EnchantmentWeaponDamage(18,
-            new MinecraftKey("bane_of_arthropods"), 5, 2);
+    public static final Enchantment DAMAGE_ARTHROPODS = new EnchantmentWeaponDamage(18, new MinecraftKey("bane_of_arthropods"), 5, 2);
     public static final Enchantment KNOCKBACK = new EnchantmentKnockback(19, new MinecraftKey("knockback"), 5);
     public static final Enchantment FIRE_ASPECT = new EnchantmentFire(20, new MinecraftKey("fire_aspect"), 2);
-    public static final Enchantment LOOT_BONUS_MOBS = new EnchantmentLootBonus(21, new MinecraftKey("looting"), 2,
-            EnchantmentSlotType.WEAPON);
+    public static final Enchantment LOOT_BONUS_MOBS = new EnchantmentLootBonus(21, new MinecraftKey("looting"), 2, EnchantmentSlotType.WEAPON);
     public static final Enchantment DIG_SPEED = new EnchantmentDigging(32, new MinecraftKey("efficiency"), 10);
     public static final Enchantment SILK_TOUCH = new EnchantmentSilkTouch(33, new MinecraftKey("silk_touch"), 1);
     public static final Enchantment DURABILITY = new EnchantmentDurability(34, new MinecraftKey("unbreaking"), 5);
-    public static final Enchantment LOOT_BONUS_BLOCKS = new EnchantmentLootBonus(35, new MinecraftKey("fortune"), 2,
-            EnchantmentSlotType.DIGGER);
+    public static final Enchantment LOOT_BONUS_BLOCKS = new EnchantmentLootBonus(35, new MinecraftKey("fortune"), 2, EnchantmentSlotType.DIGGER);
     public static final Enchantment ARROW_DAMAGE = new EnchantmentArrowDamage(48, new MinecraftKey("power"), 10);
     public static final Enchantment ARROW_KNOCKBACK = new EnchantmentArrowKnockback(49, new MinecraftKey("punch"), 2);
     public static final Enchantment ARROW_FIRE = new EnchantmentFlameArrows(50, new MinecraftKey("flame"), 2);
     public static final Enchantment ARROW_INFINITE = new EnchantmentInfiniteArrows(51, new MinecraftKey("infinity"), 1);
-    public static final Enchantment LUCK = new EnchantmentLootBonus(61, new MinecraftKey("luck_of_the_sea"), 2,
-            EnchantmentSlotType.FISHING_ROD);
-    public static final Enchantment LURE = new EnchantmentLure(62, new MinecraftKey("lure"), 2,
-            EnchantmentSlotType.FISHING_ROD);
+    public static final Enchantment LUCK = new EnchantmentLootBonus(61, new MinecraftKey("luck_of_the_sea"), 2, EnchantmentSlotType.FISHING_ROD);
+    public static final Enchantment LURE = new EnchantmentLure(62, new MinecraftKey("lure"), 2, EnchantmentSlotType.FISHING_ROD);
     public final int id;
     private final int weight;
     public EnchantmentSlotType slot;
@@ -70,8 +57,7 @@ public abstract class Enchantment {
             Enchantment.E.put(minecraftkey, this);
         }
 
-        org.bukkit.enchantments.Enchantment
-                .registerEnchantment(new org.bukkit.craftbukkit.enchantments.CraftEnchantment(this)); // CraftBukkit
+        org.bukkit.enchantments.Enchantment.registerEnchantment(new org.bukkit.craftbukkit.enchantments.CraftEnchantment(this)); // CraftBukkit
     }
 
     public static Enchantment getByName(String s) {
@@ -133,11 +119,9 @@ public abstract class Enchantment {
         return this.slot.canEnchant(itemstack.getItem());
     }
 
-    public void a(EntityLiving entityliving, Entity entity, int i) {
-    }
+    public void a(EntityLiving entityliving, Entity entity, int i) {}
 
-    public void b(EntityLiving entityliving, Entity entity, int i) {
-    }
+    public void b(EntityLiving entityliving, Entity entity, int i) {}
 
     static {
         ArrayList arraylist = Lists.newArrayList();

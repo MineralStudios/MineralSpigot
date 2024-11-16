@@ -1,21 +1,19 @@
 package net.minecraft.server;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import com.google.common.collect.Maps;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
 
 public class BlockStateEnum<T extends Enum<T> & INamable> extends BlockState<T> {
 
     private final ImmutableSet<T> a;
-    private final Map<String, T> b = new Object2ObjectOpenHashMap<>();
+    private final Map<String, T> b = Maps.newHashMap();
 
     protected BlockStateEnum(String s, Class<T> oclass, Collection<T> collection) {
         super(s, oclass);
@@ -47,8 +45,7 @@ public class BlockStateEnum<T extends Enum<T> & INamable> extends BlockState<T> 
         return a(s, oclass, Predicates.alwaysTrue());
     }
 
-    public static <T extends Enum<T> & INamable> BlockStateEnum<T> a(String s, Class<T> oclass,
-            Predicate<T> predicate) {
+    public static <T extends Enum<T> & INamable> BlockStateEnum<T> a(String s, Class<T> oclass, Predicate<T> predicate) {
         return a(s, oclass, Collections2.filter(Lists.newArrayList(oclass.getEnumConstants()), predicate));
     }
 
@@ -56,8 +53,7 @@ public class BlockStateEnum<T extends Enum<T> & INamable> extends BlockState<T> 
         return a(s, oclass, (Collection) Lists.newArrayList(at));
     }
 
-    public static <T extends Enum<T> & INamable> BlockStateEnum<T> a(String s, Class<T> oclass,
-            Collection<T> collection) {
+    public static <T extends Enum<T> & INamable> BlockStateEnum<T> a(String s, Class<T> oclass, Collection<T> collection) {
         return new BlockStateEnum(s, oclass, collection);
     }
 }

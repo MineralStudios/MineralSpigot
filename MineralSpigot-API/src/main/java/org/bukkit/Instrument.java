@@ -1,6 +1,8 @@
 package org.bukkit;
 
-import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
+import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 public enum Instrument {
 
@@ -30,7 +32,7 @@ public enum Instrument {
     BASS_GUITAR(0x4);
 
     private final byte type;
-    private final static Byte2ObjectOpenHashMap<Instrument> BY_DATA = new Byte2ObjectOpenHashMap<>();
+    private final static Map<Byte, Instrument> BY_DATA = Maps.newHashMap();
 
     private Instrument(final int type) {
         this.type = (byte) type;

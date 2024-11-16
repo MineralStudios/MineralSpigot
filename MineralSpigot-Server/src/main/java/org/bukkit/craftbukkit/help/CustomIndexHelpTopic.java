@@ -5,8 +5,7 @@ import org.bukkit.help.HelpMap;
 import org.bukkit.help.HelpTopic;
 import org.bukkit.help.IndexHelpTopic;
 
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,9 +15,8 @@ public class CustomIndexHelpTopic extends IndexHelpTopic {
     private List<String> futureTopics;
     private final HelpMap helpMap;
 
-    public CustomIndexHelpTopic(HelpMap helpMap, String name, String shortText, String permission,
-            List<String> futureTopics, String preamble) {
-        super(name, shortText, permission, new ObjectOpenHashSet<HelpTopic>(), preamble);
+    public CustomIndexHelpTopic(HelpMap helpMap, String name, String shortText, String permission, List<String> futureTopics, String preamble) {
+        super(name, shortText, permission, new HashSet<HelpTopic>(), preamble);
         this.helpMap = helpMap;
         this.futureTopics = futureTopics;
     }

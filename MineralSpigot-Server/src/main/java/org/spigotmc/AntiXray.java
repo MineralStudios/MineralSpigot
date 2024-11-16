@@ -10,7 +10,6 @@ import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import gg.mineral.server.config.GlobalConfig;
 import gnu.trove.set.TByteSet;
 import gnu.trove.set.hash.TByteHashSet;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.server.Block;
 import net.minecraft.server.BlockPosition;
 import net.minecraft.server.Blocks;
@@ -24,7 +23,7 @@ public class AntiXray {
     private final byte[] replacementOres;
     // PaperSpigot start
     public boolean queueUpdates = true;
-    public final Set<BlockPosition> pendingUpdates = new ObjectOpenHashSet<BlockPosition>();
+    public final Set<BlockPosition> pendingUpdates = new HashSet<BlockPosition>();
     // PaperSpigot end
 
     public AntiXray(int engineMode, int[] hiddenBlocks, int[] replaceBlocks) {

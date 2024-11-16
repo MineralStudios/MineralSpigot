@@ -1,7 +1,6 @@
 package net.minecraft.server;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
+import com.google.common.collect.Maps;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,10 +8,10 @@ import org.apache.logging.log4j.Logger;
 public class WorldGenFactory {
 
     private static final Logger a = LogManager.getLogger();
-    private static Map<String, Class<? extends StructureStart>> b = new Object2ObjectOpenHashMap<>();
-    private static Map<Class<? extends StructureStart>, String> c = new Object2ObjectOpenHashMap<>();
-    private static Map<String, Class<? extends StructurePiece>> d = new Object2ObjectOpenHashMap<>();
-    private static Map<Class<? extends StructurePiece>, String> e = new Object2ObjectOpenHashMap<>();
+    private static Map<String, Class<? extends StructureStart>> b = Maps.newHashMap();
+    private static Map<Class<? extends StructureStart>, String> c = Maps.newHashMap();
+    private static Map<String, Class<? extends StructurePiece>> d = Maps.newHashMap();
+    private static Map<Class<? extends StructurePiece>, String> e = Maps.newHashMap();
 
     private static void b(Class<? extends StructureStart> oclass, String s) {
         WorldGenFactory.b.put(s, oclass);

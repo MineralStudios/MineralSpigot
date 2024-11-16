@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -27,11 +28,11 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import gg.mineral.server.combat.KnockbackProfile;
 import gg.mineral.server.combat.KnockbackProfileList;
 import gg.mineral.server.config.GlobalConfig;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
@@ -48,7 +49,7 @@ public abstract class EntityLiving extends Entity {
             0.30000001192092896D, 2)).a(false);
     private AttributeMapBase c;
     public CombatTracker combatTracker = new CombatTracker(this);
-    public final Int2ObjectOpenHashMap<MobEffect> effects = new Int2ObjectOpenHashMap<>();
+    public final Map<Integer, MobEffect> effects = Maps.newHashMap();
     private final ItemStack[] h = new ItemStack[5];
     public boolean ar;
     public int as;
@@ -462,7 +463,7 @@ public abstract class EntityLiving extends Entity {
                 MobEffect mobeffect = MobEffect.b(nbttagcompound1);
 
                 if (mobeffect != null) {
-                    this.effects.put(mobeffect.getEffectId(), mobeffect);
+                    this.effects.put(Integer.valueOf(mobeffect.getEffectId()), mobeffect);
                 }
             }
         }
@@ -507,8 +508,8 @@ public abstract class EntityLiving extends Entity {
 
         isTickingEffects = true; // CraftBukkit
         while (iterator.hasNext()) {
-            int integer = (int) iterator.next();
-            MobEffect mobeffect = this.effects.get(integer);
+            Integer integer = (Integer) iterator.next();
+            MobEffect mobeffect = (MobEffect) this.effects.get(integer);
 
             if (!mobeffect.tick(this)) {
                 if (!this.world.isClientSide) {
@@ -591,7 +592,7 @@ public abstract class EntityLiving extends Entity {
         Iterator iterator = this.effects.keySet().iterator();
 
         while (iterator.hasNext()) {
-            int integer = (int) iterator.next();
+            Integer integer = (Integer) iterator.next();
             MobEffect mobeffect = (MobEffect) this.effects.get(integer);
 
             if (!this.world.isClientSide) {
@@ -608,15 +609,15 @@ public abstract class EntityLiving extends Entity {
 
     public boolean hasEffect(int i) {
         // CraftBukkit - Add size check for efficiency
-        return this.effects.size() != 0 && this.effects.containsKey(i);
+        return this.effects.size() != 0 && this.effects.containsKey(Integer.valueOf(i));
     }
 
     public boolean hasEffect(MobEffectList mobeffectlist) {
-        return this.effects.containsKey(mobeffectlist.id);
+        return this.effects.containsKey(Integer.valueOf(mobeffectlist.id));
     }
 
     public MobEffect getEffect(MobEffectList mobeffectlist) {
-        return (MobEffect) this.effects.get(mobeffectlist.id);
+        return (MobEffect) this.effects.get(Integer.valueOf(mobeffectlist.id));
     }
 
     public void addEffect(MobEffect mobeffect) {
@@ -628,11 +629,11 @@ public abstract class EntityLiving extends Entity {
         }
         // CraftBukkit end
         if (this.d(mobeffect)) {
-            if (this.effects.containsKey(mobeffect.getEffectId())) {
-                ((MobEffect) this.effects.get(mobeffect.getEffectId())).a(mobeffect);
-                this.a((MobEffect) this.effects.get(mobeffect.getEffectId()), true);
+            if (this.effects.containsKey(Integer.valueOf(mobeffect.getEffectId()))) {
+                ((MobEffect) this.effects.get(Integer.valueOf(mobeffect.getEffectId()))).a(mobeffect);
+                this.a((MobEffect) this.effects.get(Integer.valueOf(mobeffect.getEffectId())), true);
             } else {
-                this.effects.put(mobeffect.getEffectId(), mobeffect);
+                this.effects.put(Integer.valueOf(mobeffect.getEffectId()), mobeffect);
                 this.a(mobeffect);
             }
 
@@ -662,7 +663,7 @@ public abstract class EntityLiving extends Entity {
             return;
         }
         // CraftBukkit end
-        MobEffect mobeffect = (MobEffect) this.effects.remove(i);
+        MobEffect mobeffect = (MobEffect) this.effects.remove(Integer.valueOf(i));
 
         if (mobeffect != null) {
             this.b(mobeffect);

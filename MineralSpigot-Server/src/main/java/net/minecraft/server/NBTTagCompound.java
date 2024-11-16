@@ -1,22 +1,20 @@
 package net.minecraft.server;
 
+import com.google.common.collect.Maps;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class NBTTagCompound extends NBTBase {
 
-    private Map<String, NBTBase> map = new Object2ObjectOpenHashMap<>();
+    private Map<String, NBTBase> map = Maps.newHashMap();
 
-    public NBTTagCompound() {
-    }
+    public NBTTagCompound() {}
 
     void write(DataOutput dataoutput) throws IOException {
         Iterator iterator = this.map.keySet().iterator();
@@ -243,8 +241,7 @@ public class NBTTagCompound extends NBTBase {
 
         Entry entry;
 
-        for (Iterator iterator = this.map.entrySet().iterator(); iterator.hasNext(); stringbuilder
-                .append((String) entry.getKey()).append(':').append(entry.getValue())) {
+        for (Iterator iterator = this.map.entrySet().iterator(); iterator.hasNext(); stringbuilder.append((String) entry.getKey()).append(':').append(entry.getValue())) {
             entry = (Entry) iterator.next();
             if (stringbuilder.length() != 1) {
                 stringbuilder.append(',');

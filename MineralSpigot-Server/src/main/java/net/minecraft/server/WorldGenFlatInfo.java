@@ -1,10 +1,9 @@
 package net.minecraft.server;
 
 import com.google.common.collect.Lists;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
+import com.google.common.collect.Maps;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +12,10 @@ import java.util.Map.Entry;
 public class WorldGenFlatInfo {
 
     private final List<WorldGenFlatLayerInfo> layers = Lists.newArrayList();
-    private final Map<String, Map<String, String>> structures = new Object2ObjectOpenHashMap<>();
+    private final Map<String, Map<String, String>> structures = Maps.newHashMap();
     private int c;
 
-    public WorldGenFlatInfo() {
-    }
+    public WorldGenFlatInfo() {}
 
     public int a() {
         return this.c;
@@ -229,7 +227,7 @@ public class WorldGenFlatInfo {
                         for (int i1 = 0; i1 < l; ++i1) {
                             String s1 = astring2[i1];
                             String[] astring3 = s1.split("\\(", 2);
-                            Map<String, String> hashmap = new Object2ObjectOpenHashMap<>();
+                            HashMap hashmap = Maps.newHashMap();
 
                             if (astring3[0].length() > 0) {
                                 worldgenflatinfo.b().put(astring3[0], hashmap);
@@ -247,7 +245,7 @@ public class WorldGenFlatInfo {
                             }
                         }
                     } else {
-                        worldgenflatinfo.b().put("village", new Object2ObjectOpenHashMap<>());
+                        worldgenflatinfo.b().put("village", Maps.newHashMap());
                     }
 
                     return worldgenflatinfo;
@@ -268,7 +266,7 @@ public class WorldGenFlatInfo {
         worldgenflatinfo.c().add(new WorldGenFlatLayerInfo(2, Blocks.DIRT));
         worldgenflatinfo.c().add(new WorldGenFlatLayerInfo(1, Blocks.GRASS));
         worldgenflatinfo.d();
-        worldgenflatinfo.b().put("village", new Object2ObjectOpenHashMap<>());
+        worldgenflatinfo.b().put("village", Maps.newHashMap());
         return worldgenflatinfo;
     }
 }

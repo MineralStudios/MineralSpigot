@@ -1,6 +1,8 @@
 package org.bukkit;
 
-import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
+import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 /**
  * Represents the different growth states of crops
@@ -41,7 +43,7 @@ public enum CropState {
     RIPE(0x7);
 
     private final byte data;
-    private final static Byte2ObjectOpenHashMap<CropState> BY_DATA = new Byte2ObjectOpenHashMap<>();
+    private final static Map<Byte, CropState> BY_DATA = Maps.newHashMap();
 
     private CropState(final int data) {
         this.data = (byte) data;
@@ -63,7 +65,7 @@ public enum CropState {
      *
      * @param data Data value to fetch
      * @return The {@link CropState} representing the given value, or null if
-     *         it doesn't exist
+     *     it doesn't exist
      * @deprecated Magic value
      */
     @Deprecated

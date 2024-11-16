@@ -33,11 +33,14 @@ import org.apache.logging.log4j.Logger;
 public class ServerConnection {
 
     private static final Logger e = LogManager.getLogger();
-    public static final LazyInitVar<NioEventLoopGroup> a = new LazyInitVar<>() {
-        @Override
-        protected NioEventLoopGroup init() {
+    public static final LazyInitVar<NioEventLoopGroup> a = new LazyInitVar() {
+        protected NioEventLoopGroup a() {
             return new NioEventLoopGroup(0,
                     (new ThreadFactoryBuilder()).setNameFormat("Netty Server IO #%d").setDaemon(true).build());
+        }
+
+        protected Object init() {
+            return this.a();
         }
     };
     public static final LazyInitVar<EpollEventLoopGroup> b = new LazyInitVar() {

@@ -1,6 +1,8 @@
 package org.bukkit;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 /**
  * Represents the various difficulty levels that are available.
@@ -32,7 +34,7 @@ public enum Difficulty {
     HARD(3);
 
     private final int value;
-    private final static Int2ObjectOpenHashMap<Difficulty> BY_ID = new Int2ObjectOpenHashMap<>();
+    private final static Map<Integer, Difficulty> BY_ID = Maps.newHashMap();
 
     private Difficulty(final int value) {
         this.value = value;
@@ -54,7 +56,7 @@ public enum Difficulty {
      *
      * @param value Value to check
      * @return Associative {@link Difficulty} with the given value, or null if
-     *         it doesn't exist
+     *     it doesn't exist
      * @deprecated Magic value
      */
     @Deprecated

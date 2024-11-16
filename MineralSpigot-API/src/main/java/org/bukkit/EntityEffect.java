@@ -1,6 +1,8 @@
 package org.bukkit;
 
-import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
+import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 /**
  * A list of all Effects that can happen to entities.
@@ -95,7 +97,7 @@ public enum EntityEffect {
     FIREWORK_EXPLODE(17);
 
     private final byte data;
-    private final static Byte2ObjectOpenHashMap<EntityEffect> BY_DATA = new Byte2ObjectOpenHashMap<>();
+    private final static Map<Byte, EntityEffect> BY_DATA = Maps.newHashMap();
 
     EntityEffect(final int data) {
         this.data = (byte) data;
@@ -117,13 +119,14 @@ public enum EntityEffect {
      *
      * @param data Data value to fetch
      * @return The {@link EntityEffect} representing the given value, or null
-     *         if it doesn't exist
+     *     if it doesn't exist
      * @deprecated Magic value
      */
     @Deprecated
     public static EntityEffect getByData(final byte data) {
         return BY_DATA.get(data);
     }
+
 
     static {
         for (EntityEffect entityEffect : values()) {

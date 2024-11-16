@@ -9,7 +9,6 @@ import com.google.gson.JsonParser;
 
 import gg.mineral.server.config.GlobalConfig;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -107,10 +106,10 @@ public class ServerStatisticManager extends StatisticManager {
         JsonElement jsonelement = (new JsonParser()).parse(s);
 
         if (!jsonelement.isJsonObject()) {
-            return new Object2ObjectOpenHashMap<>();
+            return Maps.newHashMap();
         } else {
             JsonObject jsonobject = jsonelement.getAsJsonObject();
-            Map<Statistic, StatisticWrapper> hashmap = new Object2ObjectOpenHashMap<>();
+            HashMap hashmap = Maps.newHashMap();
             Iterator iterator = jsonobject.entrySet().iterator();
 
             while (iterator.hasNext()) {

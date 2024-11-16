@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
@@ -37,9 +39,7 @@ import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.UnknownDependencyException;
 import org.yaml.snakeyaml.error.YAMLException;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 /**
  * Represents a Java plugin loader, allowing plugins in the form of .jar
@@ -48,7 +48,7 @@ public final class JavaPluginLoader implements PluginLoader {
     final Server server;
     private final Pattern[] fileFilters = new Pattern[] { Pattern.compile("\\.jar$"), };
     private final Map<String, Class<?>> classes = new java.util.concurrent.ConcurrentHashMap<String, Class<?>>(); // Spigot
-    private final Map<String, PluginClassLoader> loaders = new Object2ObjectLinkedOpenHashMap<String, PluginClassLoader>();
+    private final Map<String, PluginClassLoader> loaders = new LinkedHashMap<String, PluginClassLoader>();
 
     /**
      * This class was not meant to be constructed explicitly
@@ -236,7 +236,7 @@ public final class JavaPluginLoader implements PluginLoader {
         try {
             Method[] publicMethods = listener.getClass().getMethods();
             Method[] privateMethods = listener.getClass().getDeclaredMethods();
-            methods = new ObjectOpenHashSet<Method>(publicMethods.length + privateMethods.length);
+            methods = new HashSet<Method>(publicMethods.length + privateMethods.length, 1.0f);
             for (Method method : publicMethods) {
                 methods.add(method);
             }
@@ -272,7 +272,7 @@ public final class JavaPluginLoader implements PluginLoader {
             method.setAccessible(true);
             Set<RegisteredListener> eventSet = ret.get(eventClass);
             if (eventSet == null) {
-                eventSet = new ObjectOpenHashSet<RegisteredListener>();
+                eventSet = new HashSet<RegisteredListener>();
                 ret.put(eventClass, eventSet);
             }
 

@@ -1,7 +1,8 @@
 package net.minecraft.server;
 
+import com.google.common.collect.Maps;
+
 import gg.mineral.server.config.GlobalConfig;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -42,7 +43,7 @@ public class RemoteControlListener extends RemoteConnectionThread {
     }
 
     private void f() {
-        this.m = new Object2ObjectOpenHashMap<>();
+        this.m = Maps.newHashMap();
     }
 
     private void g() {

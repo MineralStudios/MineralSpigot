@@ -2,12 +2,11 @@ package org.bukkit;
 
 import java.util.Map;
 
+import com.google.common.collect.Maps;
+
 import org.bukkit.block.BlockFace;
 import org.bukkit.material.MaterialData;
 import org.bukkit.potion.Potion;
-
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 /**
  * A list of effects that the server is able to send to players.
@@ -213,32 +212,29 @@ public enum Effect {
     LARGE_SMOKE("largesmoke", Type.PARTICLE),
     /**
      * The particles generated when a tool breaks.
-     * This particle requires a Material so that the client can select the correct
-     * texture.
+     * This particle requires a Material so that the client can select the correct texture.
      */
     ITEM_BREAK("iconcrack", Type.PARTICLE, Material.class),
     /**
      * The particles generated while breaking a block.
-     * This particle requires a Material and data value so that the client can
-     * select the correct texture.
+     * This particle requires a Material and data value so that the client can select the correct texture.
      */
     TILE_BREAK("blockcrack", Type.PARTICLE, MaterialData.class),
     /**
      * The particles generated while sprinting a block
-     * This particle requires a Material and data value so that the client can
-     * select the correct texture.
+     * This particle requires a Material and data value so that the client can select the correct texture.
      */
     TILE_DUST("blockdust", Type.PARTICLE, MaterialData.class);
 
     private final int id;
     private final Type type;
     private final Class<?> data;
-    private static final Int2ObjectOpenHashMap<Effect> BY_ID = new Int2ObjectOpenHashMap<>();
-    private static final Map<String, Effect> BY_NAME = new Object2ObjectOpenHashMap<>();
+    private static final Map<Integer, Effect> BY_ID = Maps.newHashMap();
+    private static final Map<String, Effect> BY_NAME = Maps.newHashMap();
     private final String particleName;
 
     private Effect(int id, Type type) {
-        this(id, type, null);
+        this(id,type,null);
     }
 
     private Effect(int id, Type type, Class<?> data) {
@@ -290,8 +286,7 @@ public enum Effect {
     }
 
     /**
-     * @return if this Effect isn't of type PARTICLE it returns the class which
-     *         represents data for this effect, or null if none
+     * @return if this Effect isn't of type PARTICLE it returns the class which represents data for this effect, or null if none
      */
     public Class<?> getData() {
         return this.data;
@@ -338,7 +333,5 @@ public enum Effect {
     /**
      * Represents the type of an effect.
      */
-    public enum Type {
-        SOUND, VISUAL, PARTICLE
-    }
+    public enum Type {SOUND, VISUAL, PARTICLE}
 }

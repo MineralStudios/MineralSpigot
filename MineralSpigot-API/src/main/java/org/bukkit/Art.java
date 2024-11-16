@@ -1,8 +1,10 @@
 package org.bukkit;
 
+import java.util.HashMap;
+
 import org.apache.commons.lang.Validate;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import com.google.common.collect.Maps;
 
 /**
  * Represents the art on a painting
@@ -36,8 +38,8 @@ public enum Art {
     DONKEYKONG(25, 4, 3);
 
     private int id, width, height;
-    private static final Object2ObjectOpenHashMap<String, Art> BY_NAME = new Object2ObjectOpenHashMap<>();
-    private static final Object2ObjectOpenHashMap<Integer, Art> BY_ID = new Object2ObjectOpenHashMap<>();
+    private static final HashMap<String, Art> BY_NAME = Maps.newHashMap();
+    private static final HashMap<Integer, Art> BY_ID = Maps.newHashMap();
 
     private Art(int id, int width, int height) {
         this.id = id;

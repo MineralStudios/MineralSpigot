@@ -6,10 +6,12 @@ import com.mojang.authlib.GameProfile;
 
 import gg.mineral.api.knockback.Knockback;
 import gg.mineral.server.combat.KnockbackProfile;
+import gg.mineral.server.combat.KnockbackProfileList;
 import gg.mineral.server.config.GlobalConfig;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,6 +20,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +81,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     private long lastPlayed = 0;
     private boolean hasPlayedBefore = false;
     private final ConversationTracker conversationTracker = new ConversationTracker();
-    private final Set<String> channels = new ObjectOpenHashSet<String>();
+    private final Set<String> channels = new HashSet<String>();
     @Getter
     private final Set<UUID> hiddenPlayers = new ObjectOpenHashSet<UUID>();
     @Getter
@@ -1141,7 +1144,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
                 handle.playerInteractManager.getGameMode()));
         handle.updateAbilities();
         connection.sendPacket(new net.minecraft.server.PacketPlayOutPosition(loc.getX(), loc.getY(), loc.getZ(),
-                loc.getYaw(), loc.getPitch(), new ObjectOpenHashSet<>()));
+                loc.getYaw(), loc.getPitch(), new HashSet<>()));
         net.minecraft.server.MinecraftServer.getServer().getPlayerList().updateClient(handle);
 
         // Resend their XP and effects because the respawn packet resets it
@@ -1225,7 +1228,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public Map<String, Object> serialize() {
-        Map<String, Object> result = new it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap<String, Object>();
+        Map<String, Object> result = new LinkedHashMap<String, Object>();
 
         result.put("name", getName());
 
@@ -1791,7 +1794,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
         @Override
         public Set<Player> getHiddenPlayers() {
-            Set<Player> ret = new ObjectOpenHashSet<Player>();
+            Set<Player> ret = new HashSet<Player>();
             for (UUID u : hiddenPlayers) {
                 ret.add(getServer().getPlayer(u));
             }

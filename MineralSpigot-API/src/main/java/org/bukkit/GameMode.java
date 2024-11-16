@@ -1,8 +1,10 @@
 package org.bukkit;
 
+import java.util.Map;
+
 import org.bukkit.entity.HumanEntity;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import com.google.common.collect.Maps;
 
 /**
  * Represents the various type of game modes that {@link HumanEntity}s may
@@ -26,14 +28,14 @@ public enum GameMode {
     ADVENTURE(2),
 
     /**
-     * Spectator mode cannot interact with the world in anyway and is
-     * invisible to normal players. This grants the player the
+     * Spectator mode cannot interact with the world in anyway and is 
+     * invisible to normal players. This grants the player the 
      * ability to no-clip through the world.
      */
     SPECTATOR(3);
 
     private final int value;
-    private final static Int2ObjectOpenHashMap<GameMode> BY_ID = new Int2ObjectOpenHashMap<>();
+    private final static Map<Integer, GameMode> BY_ID = Maps.newHashMap();
 
     private GameMode(final int value) {
         this.value = value;
@@ -55,7 +57,7 @@ public enum GameMode {
      *
      * @param value Value to check
      * @return Associative {@link GameMode} with the given value, or null if
-     *         it doesn't exist
+     *     it doesn't exist
      * @deprecated Magic value
      */
     @Deprecated

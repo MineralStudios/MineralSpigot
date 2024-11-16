@@ -1,6 +1,7 @@
 package org.bukkit.permissions;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,9 +11,6 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 
-import it.unimi.dsi.fastutil.objects.Object2BooleanLinkedOpenHashMap;
-import lombok.val;
-
 /**
  * Represents a unique permission that may be attached to a {@link
  * Permissible}
@@ -21,7 +19,7 @@ public class Permission {
     public static final PermissionDefault DEFAULT_PERMISSION = PermissionDefault.OP;
 
     private final String name;
-    private final Object2BooleanLinkedOpenHashMap<String> children = new Object2BooleanLinkedOpenHashMap<>();
+    private final Map<String, Boolean> children = new LinkedHashMap<String, Boolean>();
     private PermissionDefault defaultValue = DEFAULT_PERMISSION;
     private String description;
 
@@ -177,7 +175,7 @@ public class Permission {
      * If the parent permission does not exist, it will be created and
      * registered.
      *
-     * @param name  Name of the parent permission
+     * @param name Name of the parent permission
      * @param value The value to set this permission to
      * @return Parent permission it created or loaded
      */
@@ -200,7 +198,7 @@ public class Permission {
     /**
      * Adds this permission to the specified parent permission.
      *
-     * @param perm  Parent permission to register with
+     * @param perm Parent permission to register with
      * @param value The value to set this permission to
      */
     public void addParent(Permission perm, boolean value) {
@@ -217,14 +215,14 @@ public class Permission {
      * <ul>
      * <li>default: Boolean true or false. If not specified, false.
      * <li>children: {@code Map<String, Boolean>} of child permissions. If not
-     * specified, empty list.
+     *     specified, empty list.
      * <li>description: Short string containing a very small description of
-     * this description. If not specified, empty string.
+     *     this description. If not specified, empty string.
      * </ul>
      *
-     * @param data  Map of permissions
+     * @param data Map of permissions
      * @param error An error message to show if a permission is invalid.
-     * @param def   Default permission value to use if missing
+     * @param def Default permission value to use if missing
      * @return Permission object
      */
     public static List<Permission> loadPermissions(Map<?, ?> data, String error, PermissionDefault def) {
@@ -232,8 +230,7 @@ public class Permission {
 
         for (Map.Entry<?, ?> entry : data.entrySet()) {
             try {
-                result.add(Permission.loadPermission(entry.getKey().toString(), (Map<?, ?>) entry.getValue(), def,
-                        result));
+                result.add(Permission.loadPermission(entry.getKey().toString(), (Map<?, ?>) entry.getValue(), def, result));
             } catch (Throwable ex) {
                 Bukkit.getServer().getLogger().log(Level.SEVERE, String.format(error, entry.getKey()), ex);
             }
@@ -250,9 +247,9 @@ public class Permission {
      * <ul>
      * <li>default: Boolean true or false. If not specified, false.
      * <li>children: {@code Map<String, Boolean>} of child permissions. If not
-     * specified, empty list.
+     *     specified, empty list.
      * <li>description: Short string containing a very small description of
-     * this description. If not specified, empty string.
+     *     this description. If not specified, empty string.
      * </ul>
      *
      * @param name Name of the permission
@@ -271,24 +268,23 @@ public class Permission {
      * <ul>
      * <li>default: Boolean true or false. If not specified, false.
      * <li>children: {@code Map<String, Boolean>} of child permissions. If not
-     * specified, empty list.
+     *     specified, empty list.
      * <li>description: Short string containing a very small description of
-     * this description. If not specified, empty string.
+     *     this description. If not specified, empty string.
      * </ul>
      *
-     * @param name   Name of the permission
-     * @param data   Map of keys
-     * @param def    Default permission value to use if not set
+     * @param name Name of the permission
+     * @param data Map of keys
+     * @param def Default permission value to use if not set
      * @param output A list to append any created child-Permissions to, may be null
      * @return Permission object
      */
-    public static Permission loadPermission(String name, Map<?, ?> data, PermissionDefault def,
-            List<Permission> output) {
+    public static Permission loadPermission(String name, Map<?, ?> data, PermissionDefault def, List<Permission> output) {
         Validate.notNull(name, "Name cannot be null");
         Validate.notNull(data, "Data cannot be null");
 
         String desc = null;
-        Object2BooleanLinkedOpenHashMap<String> children = null;
+        Map<String, Boolean> children = null;
 
         if (data.get("default") != null) {
             PermissionDefault value = PermissionDefault.getByName(data.get("default").toString());
@@ -302,14 +298,14 @@ public class Permission {
         if (data.get("children") != null) {
             Object childrenNode = data.get("children");
             if (childrenNode instanceof Iterable) {
-                children = new Object2BooleanLinkedOpenHashMap<String>();
+                children = new LinkedHashMap<String, Boolean>();
                 for (Object child : (Iterable<?>) childrenNode) {
                     if (child != null) {
-                        children.put(child.toString(), true);
+                        children.put(child.toString(), Boolean.TRUE);
                     }
                 }
             } else if (childrenNode instanceof Map) {
-                children = extractChildren((Map<?, ?>) childrenNode, name, def, output);
+                children = extractChildren((Map<?,?>) childrenNode, name, def, output);
             } else {
                 throw new IllegalArgumentException("'children' key is of wrong type");
             }
@@ -322,27 +318,22 @@ public class Permission {
         return new Permission(name, desc, def, children);
     }
 
-    private static Object2BooleanLinkedOpenHashMap<String> extractChildren(Map<?, ?> input, String name,
-            PermissionDefault def,
-            List<Permission> output) {
-        Object2BooleanLinkedOpenHashMap<String> children = new Object2BooleanLinkedOpenHashMap<>();
+    private static Map<String, Boolean> extractChildren(Map<?, ?> input, String name, PermissionDefault def, List<Permission> output) {
+        Map<String, Boolean> children = new LinkedHashMap<String, Boolean>();
 
-        for (val entry : input.entrySet()) {
+        for (Map.Entry<?, ?> entry : input.entrySet()) {
             if ((entry.getValue() instanceof Boolean)) {
-                children.put(entry.getKey().toString(), ((Boolean) entry.getValue()).booleanValue());
+                children.put(entry.getKey().toString(), (Boolean) entry.getValue());
             } else if ((entry.getValue() instanceof Map)) {
                 try {
-                    Permission perm = loadPermission(entry.getKey().toString(), (Map<?, ?>) entry.getValue(), def,
-                            output);
-                    children.put(perm.getName(), true);
+                    Permission perm = loadPermission(entry.getKey().toString(), (Map<?, ?>) entry.getValue(), def, output);
+                    children.put(perm.getName(), Boolean.TRUE);
 
                     if (output != null) {
                         output.add(perm);
                     }
                 } catch (Throwable ex) {
-                    throw new IllegalArgumentException(
-                            "Permission node '" + entry.getKey().toString() + "' in child of " + name + " is invalid",
-                            ex);
+                    throw new IllegalArgumentException("Permission node '" + entry.getKey().toString() + "' in child of " + name + " is invalid", ex);
                 }
             } else {
                 throw new IllegalArgumentException("Child '" + entry.getKey().toString() + "' contains invalid value");

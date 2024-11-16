@@ -1,28 +1,9 @@
 package net.minecraft.server;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
-
-import org.apache.commons.io.IOUtils;
-
 import com.google.common.base.Charsets;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -38,13 +19,32 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.ProfileLookupCallback;
 
 import gg.mineral.server.config.GlobalConfig;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+import org.apache.commons.io.IOUtils;
 
 public class UserCache {
 
     public static final SimpleDateFormat a = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-    private final Map<String, UserCache.UserCacheEntry> c = new Object2ObjectOpenHashMap<>();
-    private final Map<UUID, UserCache.UserCacheEntry> d = new Object2ObjectOpenHashMap<>();
+    private final Map<String, UserCache.UserCacheEntry> c = Maps.newHashMap();
+    private final Map<UUID, UserCache.UserCacheEntry> d = Maps.newHashMap();
     private final java.util.Deque<GameProfile> e = new java.util.concurrent.LinkedBlockingDeque<GameProfile>(); // CraftBukkit
     private final MinecraftServer f;
     protected final Gson b;

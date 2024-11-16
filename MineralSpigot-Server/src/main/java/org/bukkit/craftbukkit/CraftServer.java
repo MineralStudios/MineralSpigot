@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -1273,7 +1274,7 @@ public final class CraftServer implements Server {
     @Override
     @SuppressWarnings("unchecked")
     public Set<String> getIPBans() {
-        return new ObjectOpenHashSet<String>(Arrays.asList(playerList.getIPBans().getEntries()));
+        return new HashSet<String>(Arrays.asList(playerList.getIPBans().getEntries()));
     }
 
     @Override
@@ -1292,7 +1293,7 @@ public final class CraftServer implements Server {
 
     @Override
     public Set<OfflinePlayer> getBannedPlayers() {
-        Set<OfflinePlayer> result = new ObjectOpenHashSet<OfflinePlayer>();
+        Set<OfflinePlayer> result = new HashSet<OfflinePlayer>();
 
         for (JsonListEntry entry : playerList.getProfileBans().getValues()) {
             result.add(getOfflinePlayer((GameProfile) entry.getKey()));
@@ -1332,7 +1333,7 @@ public final class CraftServer implements Server {
 
     @Override
     public Set<OfflinePlayer> getOperators() {
-        Set<OfflinePlayer> result = new ObjectOpenHashSet<OfflinePlayer>();
+        Set<OfflinePlayer> result = new HashSet<OfflinePlayer>();
 
         for (JsonListEntry entry : playerList.getOPs().getValues()) {
             result.add(getOfflinePlayer((GameProfile) entry.getKey()));
@@ -1392,7 +1393,7 @@ public final class CraftServer implements Server {
     public OfflinePlayer[] getOfflinePlayers() {
         WorldNBTStorage storage = (WorldNBTStorage) console.worlds.get(0).getDataManager();
         String[] files = storage.getPlayerDir().list(new DatFileFilter());
-        Set<OfflinePlayer> players = new ObjectOpenHashSet<OfflinePlayer>();
+        Set<OfflinePlayer> players = new HashSet<OfflinePlayer>();
 
         for (String file : files) {
             try {

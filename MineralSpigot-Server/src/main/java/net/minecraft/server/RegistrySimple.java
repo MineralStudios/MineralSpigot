@@ -1,7 +1,6 @@
 package net.minecraft.server;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
+import com.google.common.collect.Maps;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -15,11 +14,10 @@ public class RegistrySimple<K, V> implements IRegistry<K, V> {
     private static final Logger a = LogManager.getLogger();
     protected final Map<K, V> c = this.b();
 
-    public RegistrySimple() {
-    }
+    public RegistrySimple() {}
 
     protected Map<K, V> b() {
-        return new Object2ObjectOpenHashMap<>();
+        return Maps.newHashMap();
     }
 
     public V get(K k0) {

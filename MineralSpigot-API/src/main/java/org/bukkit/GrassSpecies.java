@@ -1,6 +1,8 @@
 package org.bukkit;
 
-import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
+import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 /**
  * Represents the different types of grass.
@@ -21,7 +23,7 @@ public enum GrassSpecies {
     FERN_LIKE(0x2);
 
     private final byte data;
-    private final static Byte2ObjectOpenHashMap<GrassSpecies> BY_DATA = new Byte2ObjectOpenHashMap<>();
+    private final static Map<Byte, GrassSpecies> BY_DATA = Maps.newHashMap();
 
     private GrassSpecies(final int data) {
         this.data = (byte) data;
@@ -43,7 +45,7 @@ public enum GrassSpecies {
      *
      * @param data Data value to fetch
      * @return The {@link GrassSpecies} representing the given value, or null
-     *         if it doesn't exist
+     *     if it doesn't exist
      * @deprecated Magic value
      */
     @Deprecated

@@ -10,8 +10,6 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.representer.Representer;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-
 public class YamlRepresenter extends Representer {
 
     public YamlRepresenter() {
@@ -30,9 +28,8 @@ public class YamlRepresenter extends Representer {
         @Override
         public Node representData(Object data) {
             ConfigurationSerializable serializable = (ConfigurationSerializable) data;
-            Map<String, Object> values = new Object2ObjectLinkedOpenHashMap<String, Object>();
-            values.put(ConfigurationSerialization.SERIALIZED_TYPE_KEY,
-                    ConfigurationSerialization.getAlias(serializable.getClass()));
+            Map<String, Object> values = new LinkedHashMap<String, Object>();
+            values.put(ConfigurationSerialization.SERIALIZED_TYPE_KEY, ConfigurationSerialization.getAlias(serializable.getClass()));
             values.putAll(serializable.serialize());
 
             return super.representData(values);

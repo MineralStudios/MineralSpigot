@@ -1,6 +1,8 @@
 package org.bukkit;
 
-import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
+import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 /**
  * Represents the different species of trees regardless of size.
@@ -34,7 +36,7 @@ public enum TreeSpecies {
     ;
 
     private final byte data;
-    private final static Byte2ObjectOpenHashMap<TreeSpecies> BY_DATA = new Byte2ObjectOpenHashMap<>();
+    private final static Map<Byte, TreeSpecies> BY_DATA = Maps.newHashMap();
 
     private TreeSpecies(final int data) {
         this.data = (byte) data;
@@ -56,7 +58,7 @@ public enum TreeSpecies {
      *
      * @param data Data value to fetch
      * @return The {@link TreeSpecies} representing the given value, or null
-     *         if it doesn't exist
+     *     if it doesn't exist
      * @deprecated Magic value
      */
     @Deprecated

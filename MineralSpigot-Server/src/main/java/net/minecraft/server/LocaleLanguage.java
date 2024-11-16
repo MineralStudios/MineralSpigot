@@ -1,26 +1,23 @@
 package net.minecraft.server;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.IllegalFormatException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Pattern;
-
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
-
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class LocaleLanguage {
 
     private static final Pattern a = Pattern.compile("%(\\d+\\$)?[\\d\\.]*[df]");
     private static final Splitter b = Splitter.on('=').limit(2);
     private static LocaleLanguage c = new LocaleLanguage();
-    private final Map<String, String> d = new Object2ObjectOpenHashMap<>();
+    private final Map<String, String> d = Maps.newHashMap();
     private long e;
 
     public LocaleLanguage() {

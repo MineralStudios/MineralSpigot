@@ -2,12 +2,8 @@ package net.minecraft.server;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -17,9 +13,9 @@ public class AttributeModifiable implements AttributeInstance {
 
     private final AttributeMapBase a;
     private final IAttribute b;
-    private final Int2ObjectOpenHashMap<Set<AttributeModifier>> c = new Int2ObjectOpenHashMap<>();
-    private final Map<String, Set<AttributeModifier>> d = new Object2ObjectOpenHashMap<>();
-    private final Map<UUID, AttributeModifier> e = new Object2ObjectOpenHashMap<>();
+    private final Map<Integer, Set<AttributeModifier>> c = Maps.newHashMap();
+    private final Map<String, Set<AttributeModifier>> d = Maps.newHashMap();
+    private final Map<UUID, AttributeModifier> e = Maps.newHashMap();
     private double f;
     private boolean g = true;
     private double h;
@@ -30,7 +26,7 @@ public class AttributeModifiable implements AttributeInstance {
         this.f = iattribute.b();
 
         for (int i = 0; i < 3; ++i) {
-            this.c.put(i, Sets.newHashSet());
+            this.c.put(Integer.valueOf(i), Sets.newHashSet());
         }
 
     }
@@ -51,11 +47,11 @@ public class AttributeModifiable implements AttributeInstance {
     }
 
     public Collection<AttributeModifier> a(int i) {
-        return this.c.get(i);
+        return (Collection) this.c.get(Integer.valueOf(i));
     }
 
     public Collection<AttributeModifier> c() {
-        Set<AttributeModifier> hashset = new ObjectOpenHashSet<>();
+        HashSet hashset = Sets.newHashSet();
 
         for (int i = 0; i < 3; ++i) {
             hashset.addAll(this.a(i));
@@ -92,7 +88,7 @@ public class AttributeModifiable implements AttributeInstance {
 
     public void c(AttributeModifier attributemodifier) {
         for (int i = 0; i < 3; ++i) {
-            Set set = (Set) this.c.get(i);
+            Set set = (Set) this.c.get(Integer.valueOf(i));
 
             set.remove(attributemodifier);
         }
@@ -145,7 +141,7 @@ public class AttributeModifiable implements AttributeInstance {
     }
 
     private Collection<AttributeModifier> b(int i) {
-        Set<AttributeModifier> hashset = new ObjectOpenHashSet<>(this.a(i));
+        HashSet hashset = Sets.newHashSet(this.a(i));
 
         for (IAttribute iattribute = this.b.d(); iattribute != null; iattribute = iattribute.d()) {
             AttributeInstance attributeinstance = this.a.a(iattribute);

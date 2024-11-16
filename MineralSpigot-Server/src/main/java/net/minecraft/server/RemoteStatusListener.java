@@ -1,5 +1,9 @@
 package net.minecraft.server;
 
+import com.google.common.collect.Maps;
+
+import gg.mineral.server.config.GlobalConfig;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -12,11 +16,8 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
-
-import gg.mineral.server.config.GlobalConfig;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.util.Map.Entry;
 
 public class RemoteStatusListener extends RemoteConnectionThread {
 
@@ -67,9 +68,9 @@ public class RemoteStatusListener extends RemoteConnectionThread {
             this.b("Setting default query port to " + this.i);
         }
 
-        this.q = new Object2ObjectOpenHashMap<>();
+        this.q = Maps.newHashMap();
         this.v = new RemoteStatusReply(1460);
-        this.t = new Object2ObjectOpenHashMap<>();
+        this.t = Maps.newHashMap();
         this.u = (new Date()).getTime();
     }
 

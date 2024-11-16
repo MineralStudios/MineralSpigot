@@ -30,6 +30,7 @@ import org.github.paperspigot.exception.ServerInternalException;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -37,7 +38,6 @@ import gg.mineral.server.config.GlobalConfig;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ShortOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.Getter;
 
 // CraftBukkit start
@@ -2172,7 +2172,7 @@ public abstract class World implements IBlockAccess {
         }
     }
 
-    public Map<BlockPosition, TileEntity> capturedTileEntities = new Object2ObjectOpenHashMap<>();
+    public Map<BlockPosition, TileEntity> capturedTileEntities = Maps.newHashMap();
 
     public TileEntity getTileEntity(BlockPosition blockposition) {
         if (!this.isValidLocation(blockposition)) {

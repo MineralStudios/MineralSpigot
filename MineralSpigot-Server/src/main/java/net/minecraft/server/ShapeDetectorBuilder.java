@@ -4,15 +4,13 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
-
-import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.chars.CharArrayList;
-import it.unimi.dsi.fastutil.chars.CharList;
-import lombok.val;
-
+import com.google.common.collect.Maps;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-
+import java.util.Map;
+import java.util.Map.Entry;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,12 +18,12 @@ public class ShapeDetectorBuilder {
 
     private static final Joiner a = Joiner.on(",");
     private final List<String[]> b = Lists.newArrayList();
-    private final Char2ObjectOpenHashMap<Predicate<ShapeDetectorBlock>> c = new Char2ObjectOpenHashMap<>();
+    private final Map<Character, Predicate<ShapeDetectorBlock>> c = Maps.newHashMap();
     private int d;
     private int e;
 
     private ShapeDetectorBuilder() {
-        this.c.put(' ', Predicates.alwaysTrue());
+        this.c.put(Character.valueOf(' '), Predicates.alwaysTrue());
     }
 
     public ShapeDetectorBuilder a(String... astring) {
@@ -36,8 +34,7 @@ public class ShapeDetectorBuilder {
             }
 
             if (astring.length != this.d) {
-                throw new IllegalArgumentException("Expected aisle with height of " + this.d
-                        + ", but was given one with a height of " + astring.length + ")");
+                throw new IllegalArgumentException("Expected aisle with height of " + this.d + ", but was given one with a height of " + astring.length + ")");
             } else {
                 String[] astring1 = astring;
                 int i = astring.length;
@@ -46,9 +43,7 @@ public class ShapeDetectorBuilder {
                     String s = astring1[j];
 
                     if (s.length() != this.e) {
-                        throw new IllegalArgumentException(
-                                "Not all rows in the given aisle are the correct width (expected " + this.e
-                                        + ", found one with " + s.length() + ")");
+                        throw new IllegalArgumentException("Not all rows in the given aisle are the correct width (expected " + this.e + ", found one with " + s.length() + ")");
                     }
 
                     char[] achar = s.toCharArray();
@@ -76,7 +71,7 @@ public class ShapeDetectorBuilder {
     }
 
     public ShapeDetectorBuilder a(char c0, Predicate<ShapeDetectorBlock> predicate) {
-        this.c.put(c0, predicate);
+        this.c.put(Character.valueOf(c0), predicate);
         return this;
     }
 
@@ -86,14 +81,12 @@ public class ShapeDetectorBuilder {
 
     private Predicate<ShapeDetectorBlock>[][][] c() {
         this.d();
-        Predicate[][][] apredicate = (Predicate[][][]) ((Predicate[][][]) Array.newInstance(Predicate.class,
-                new int[] { this.b.size(), this.d, this.e }));
+        Predicate[][][] apredicate = (Predicate[][][]) ((Predicate[][][]) Array.newInstance(Predicate.class, new int[] { this.b.size(), this.d, this.e}));
 
         for (int i = 0; i < this.b.size(); ++i) {
             for (int j = 0; j < this.d; ++j) {
                 for (int k = 0; k < this.e; ++k) {
-                    apredicate[i][j][k] = (Predicate) this.c
-                            .get(((String[]) this.b.get(i))[j].charAt(k));
+                    apredicate[i][j][k] = (Predicate) this.c.get(Character.valueOf(((String[]) this.b.get(i))[j].charAt(k)));
                 }
             }
         }
@@ -102,20 +95,19 @@ public class ShapeDetectorBuilder {
     }
 
     private void d() {
-        CharList arraylist = new CharArrayList();
-        val iterator = this.c.char2ObjectEntrySet().iterator();
+        ArrayList arraylist = Lists.newArrayList();
+        Iterator iterator = this.c.entrySet().iterator();
 
         while (iterator.hasNext()) {
-            val entry = iterator.next();
+            Entry entry = (Entry) iterator.next();
 
             if (entry.getValue() == null) {
-                arraylist.add(entry.getCharKey());
+                arraylist.add(entry.getKey());
             }
         }
 
         if (!arraylist.isEmpty()) {
-            throw new IllegalStateException(
-                    "Predicates for character(s) " + ShapeDetectorBuilder.a.join(arraylist) + " are missing");
+            throw new IllegalStateException("Predicates for character(s) " + ShapeDetectorBuilder.a.join(arraylist) + " are missing");
         }
     }
 }

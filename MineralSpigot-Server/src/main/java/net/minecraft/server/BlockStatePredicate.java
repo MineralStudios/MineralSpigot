@@ -1,17 +1,15 @@
 package net.minecraft.server;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Maps;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.google.common.base.Predicate;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
 public class BlockStatePredicate implements Predicate<IBlockData> {
 
     private final BlockStateList a;
-    private final Map<IBlockState, Predicate> b = new Object2ObjectOpenHashMap<>();
+    private final Map<IBlockState, Predicate> b = Maps.newHashMap();
 
     private BlockStatePredicate(BlockStateList blockstatelist) {
         this.a = blockstatelist;
@@ -43,8 +41,7 @@ public class BlockStatePredicate implements Predicate<IBlockData> {
         }
     }
 
-    public <V extends Comparable<V>> BlockStatePredicate a(IBlockState<V> iblockstate,
-            Predicate<? extends V> predicate) {
+    public <V extends Comparable<V>> BlockStatePredicate a(IBlockState<V> iblockstate, Predicate<? extends V> predicate) {
         if (!this.a.d().contains(iblockstate)) {
             throw new IllegalArgumentException(this.a + " cannot support property " + iblockstate);
         } else {

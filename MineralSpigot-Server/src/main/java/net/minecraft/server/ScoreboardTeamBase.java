@@ -1,14 +1,12 @@
 package net.minecraft.server;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
+import com.google.common.collect.Maps;
 import java.util.Collection;
 import java.util.Map;
 
 public abstract class ScoreboardTeamBase {
 
-    public ScoreboardTeamBase() {
-    }
+    public ScoreboardTeamBase() {}
 
     public boolean isAlly(ScoreboardTeamBase scoreboardteambase) {
         return scoreboardteambase == null ? false : this == scoreboardteambase;
@@ -26,16 +24,14 @@ public abstract class ScoreboardTeamBase {
 
     public static enum EnumNameTagVisibility {
 
-        ALWAYS("always", 0), NEVER("never", 1), HIDE_FOR_OTHER_TEAMS("hideForOtherTeams", 2),
-        HIDE_FOR_OWN_TEAM("hideForOwnTeam", 3);
+        ALWAYS("always", 0), NEVER("never", 1), HIDE_FOR_OTHER_TEAMS("hideForOtherTeams", 2), HIDE_FOR_OWN_TEAM("hideForOwnTeam", 3);
 
-        private static Map<String, ScoreboardTeamBase.EnumNameTagVisibility> g = new Object2ObjectOpenHashMap<>();
+        private static Map<String, ScoreboardTeamBase.EnumNameTagVisibility> g = Maps.newHashMap();
         public final String e;
         public final int f;
 
         public static String[] a() {
-            return (String[]) ScoreboardTeamBase.EnumNameTagVisibility.g.keySet()
-                    .toArray(new String[ScoreboardTeamBase.EnumNameTagVisibility.g.size()]);
+            return (String[]) ScoreboardTeamBase.EnumNameTagVisibility.g.keySet().toArray(new String[ScoreboardTeamBase.EnumNameTagVisibility.g.size()]);
         }
 
         public static ScoreboardTeamBase.EnumNameTagVisibility a(String s) {
@@ -54,8 +50,7 @@ public abstract class ScoreboardTeamBase {
             for (int j = 0; j < i; ++j) {
                 ScoreboardTeamBase.EnumNameTagVisibility scoreboardteambase_enumnametagvisibility = ascoreboardteambase_enumnametagvisibility[j];
 
-                ScoreboardTeamBase.EnumNameTagVisibility.g.put(scoreboardteambase_enumnametagvisibility.e,
-                        scoreboardteambase_enumnametagvisibility);
+                ScoreboardTeamBase.EnumNameTagVisibility.g.put(scoreboardteambase_enumnametagvisibility.e, scoreboardteambase_enumnametagvisibility);
             }
 
         }

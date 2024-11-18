@@ -1692,6 +1692,7 @@ public abstract class EntityLiving extends Entity {
         return f1;
     }
 
+    // COPY TO CUSTOM SERVER SOFTWARE
     public void m() {
         if (this.bn > 0) {
             --this.bn;

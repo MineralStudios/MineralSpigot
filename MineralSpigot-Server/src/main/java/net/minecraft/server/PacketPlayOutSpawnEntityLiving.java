@@ -3,13 +3,12 @@ package net.minecraft.server;
 import java.io.IOException;
 import java.util.List;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-@Getter
+@Data
 public class PacketPlayOutSpawnEntityLiving implements Packet<PacketListenerPlayOut> {
-
     private int a;
     private int b;
     private int c;

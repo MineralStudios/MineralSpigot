@@ -47,6 +47,7 @@ public class EntityTrackerEntry {
     // afterward.
     public Object2BooleanOpenHashMap<EntityPlayer> trackedPlayerMap = new Object2BooleanOpenHashMap<>();
     public Set<EntityPlayer> trackedPlayers = trackedPlayerMap.keySet();
+    public boolean receiveRelativeMovementUpdates, isArrow, isFishingHook;
     // PaperSpigot end
 
     public EntityTrackerEntry(Entity entity, int i, int j, boolean flag) {
@@ -61,6 +62,11 @@ public class EntityTrackerEntry {
         this.xRot = MathHelper.d(entity.pitch * 256.0F / 360.0F);
         this.i = MathHelper.d(entity.getHeadRotation() * 256.0F / 360.0F);
         this.y = entity.onGround;
+
+        this.isArrow = entity instanceof EntityArrow;
+        this.isFishingHook = entity instanceof EntityFishingHook;
+
+        this.receiveRelativeMovementUpdates = !this.u || (isArrow || isFishingHook);
     }
 
     public boolean equals(Object object) {
@@ -120,7 +126,7 @@ public class EntityTrackerEntry {
             this.b();
         }
 
-        if (this.m % this.c == 0 || this.tracker.ai || this.tracker.getDataWatcher().a()) {
+        if (this.tracker.ai || isFishingHook || this.m % this.c == 0) {
             int i;
             int j;
 
@@ -138,7 +144,7 @@ public class EntityTrackerEntry {
                 boolean flag = Math.abs(j1) >= 4 || Math.abs(k1) >= 4 || Math.abs(l1) >= 4 || this.m % 60 == 0;
                 boolean flag1 = Math.abs(l - this.yRot) >= 4 || Math.abs(i1 - this.xRot) >= 4;
 
-                if (this.m > 0 || this.tracker instanceof EntityArrow) { // PaperSpigot - Moved up
+                if (this.receiveRelativeMovementUpdates && this.m > 0) { // PaperSpigot - Moved up
                     // CraftBukkit start - Code moved from below
                     if (flag) {
                         this.xLoc = i;

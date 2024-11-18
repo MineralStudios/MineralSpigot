@@ -42,7 +42,7 @@ public class EntityTracker {
         } else if (entity instanceof EntityFishingHook) {
             this.addEntity(entity, 64, 5, true);
         } else if (entity instanceof EntityArrow) {
-            this.addEntity(entity, 64, 20, false);
+            this.addEntity(entity, 64, 20, true);
         } else if (entity instanceof EntitySmallFireball) {
             this.addEntity(entity, 64, 10, false);
         } else if (entity instanceof EntityFireball) {
@@ -64,19 +64,19 @@ public class EntityTracker {
         } else if (entity instanceof EntityItem) {
             this.addEntity(entity, 64, 20, true);
         } else if (entity instanceof EntityMinecartAbstract) {
-            this.addEntity(entity, 80, 3, true);
+            this.addEntity(entity, 80, 3, false);
         } else if (entity instanceof EntityBoat) {
-            this.addEntity(entity, 80, 3, true);
+            this.addEntity(entity, 80, 3, false);
         } else if (entity instanceof EntitySquid) {
-            this.addEntity(entity, 64, 3, true);
+            this.addEntity(entity, 64, 3, false);
         } else if (entity instanceof EntityWither) {
             this.addEntity(entity, 80, 3, false);
         } else if (entity instanceof EntityBat) {
             this.addEntity(entity, 80, 3, false);
         } else if (entity instanceof EntityEnderDragon) {
-            this.addEntity(entity, 160, 3, true);
+            this.addEntity(entity, 160, 3, false);
         } else if (entity instanceof IAnimal) {
-            this.addEntity(entity, 80, 3, true);
+            this.addEntity(entity, 80, 3, false);
         } else if (entity instanceof EntityTNTPrimed) {
             this.addEntity(entity, 160, 10, true);
         } else if (entity instanceof EntityFallingBlock) {
@@ -84,7 +84,7 @@ public class EntityTracker {
         } else if (entity instanceof EntityHanging) {
             this.addEntity(entity, 160, Integer.MAX_VALUE, false);
         } else if (entity instanceof EntityArmorStand) {
-            this.addEntity(entity, 160, 3, true);
+            this.addEntity(entity, 160, 3, false);
         } else if (entity instanceof EntityExperienceOrb) {
             this.addEntity(entity, 160, 20, true);
         } else if (entity instanceof EntityEnderCrystal) {

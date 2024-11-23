@@ -213,13 +213,15 @@ public class UserCache {
             this.c.clear();
             this.d.clear();
             this.e.clear();
-            Iterator iterator = Lists.reverse(list).iterator();
+            if (list != null) {
+                Iterator iterator = Lists.reverse(list).iterator();
 
-            while (iterator.hasNext()) {
-                UserCache.UserCacheEntry usercache_usercacheentry = (UserCache.UserCacheEntry) iterator.next();
+                while (iterator.hasNext()) {
+                    UserCache.UserCacheEntry usercache_usercacheentry = (UserCache.UserCacheEntry) iterator.next();
 
-                if (usercache_usercacheentry != null) {
-                    this.a(usercache_usercacheentry.a(), usercache_usercacheentry.b());
+                    if (usercache_usercacheentry != null) {
+                        this.a(usercache_usercacheentry.a(), usercache_usercacheentry.b());
+                    }
                 }
             }
         } catch (FileNotFoundException filenotfoundexception) {

@@ -267,6 +267,8 @@ public class GlobalConfig {
     @Setting("entity")
     private boolean disableExplosionKnockback = false;
     @Setting("entity")
+    private boolean disablePearlKnockback = false;
+    @Setting("entity")
     private boolean disableTeleportationSuffocationCheck = false;
     @Setting("entity")
     private double maxHealth = 2048.0d;

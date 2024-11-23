@@ -826,8 +826,11 @@ public abstract class EntityLiving extends Entity {
 
                 // PaperSpigot start - Disable explosion knockback
                 boolean knockbackCancelled = false;
-                if (flag && !(knockbackCancelled = GlobalConfig.getInstance().isDisableExplosionKnockback()
-                        && damagesource.isExplosion() && this instanceof EntityHuman)) {
+                boolean disablePearlKb = GlobalConfig.getInstance().isDisablePearlKnockback()
+                        && damagesource == DamageSource.FALL;
+                if (!disablePearlKb && flag
+                        && !(knockbackCancelled = GlobalConfig.getInstance().isDisableExplosionKnockback()
+                                && damagesource.isExplosion() && this instanceof EntityHuman)) {
                     // PaperSpigot end
                     this.world.broadcastEntityEffect(this, (byte) 2);
                     if (damagesource != DamageSource.DROWN) {

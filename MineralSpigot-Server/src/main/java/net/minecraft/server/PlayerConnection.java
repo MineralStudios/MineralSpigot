@@ -7,10 +7,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
 // CraftBukkit start
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
-import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -1059,9 +1059,9 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     @Getter
-    private List<Object2BooleanFunction<Packet<?>>> outgoingPacketListeners = new ArrayList<>();
+    private List<Object2BooleanFunction<Packet<?>>> outgoingPacketListeners = new CopyOnWriteArrayList<>();
     @Getter
-    private List<Object2BooleanFunction<Packet<?>>> incomingPacketListeners = new ArrayList<>();
+    private List<Object2BooleanFunction<Packet<?>>> incomingPacketListeners = new CopyOnWriteArrayList<>();
 
     public void sendPacket(final Packet packet) {
         if (packet instanceof PacketPlayOutChat) {

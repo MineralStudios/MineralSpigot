@@ -195,7 +195,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
             throwable.printStackTrace(); // Spigot
     }
 
-    protected void a(ChannelHandlerContext channelhandlercontext, Packet packet) throws Exception {
+    public void a(ChannelHandlerContext channelhandlercontext, Packet packet) throws Exception {
         if (this.channel.isOpen()) {
             // PandaSpigot start - packet limiter
             if (this.stopReadingPackets) {

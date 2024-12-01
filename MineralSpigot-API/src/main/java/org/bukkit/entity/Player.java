@@ -35,6 +35,8 @@ public interface Player extends HumanEntity, Conversable, CommandSender, Offline
 
     public boolean isFakePlayer();
 
+    public List<String> getHiddenPlugins();
+
     public List<String> getBotIncompatiblePlugins();
 
     /**

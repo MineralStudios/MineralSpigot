@@ -224,6 +224,26 @@ public class GlobalConfig {
     private float playerBlockingDamageMultiplier = 0.5f;
     @Setting("combat")
     private boolean disablePlayerCrits = false;
+    @Setting("combat.backtrack")
+    private boolean backtrackRandom = false;
+    @Setting("combat.backtrack")
+    private boolean backtrackEnabled = false;
+    @Setting("combat.backtrack")
+    private boolean comboMode = false;
+    @Setting("combat.backtrack")
+    private double delayDistanceMin; // in blocks
+    @Setting("combat.backtrack")
+    private double delayDistanceMax; // in blocks
+    @Setting("combat.backtrack")
+    private int delayFactor; // in milliseconds
+    @Setting("combat.backtrack")
+    private int decayFactor; // in milliseconds
+    @Setting("combat.backtrack")
+    private int maxDelayMs; // in milliseconds
+    @Setting("combat.backtrack")
+    private int delayResetTime; // in ticks (20 ticks per second)
+    @Setting("combat.backtrack")
+    private int rMin, rMax;
     @Setting("effect")
     private double strengthEffectModifier = 1.3D;
     @Setting("effect")
@@ -363,6 +383,8 @@ public class GlobalConfig {
     private boolean queryPlugins = true;
     @Setting("plugin")
     private String updateFolder = "update";
+    @Setting("plugin")
+    private List<String> hiddenPlugins = Arrays.asList("SpookyAC");
     @Setting("sound")
     private boolean disableMoodSounds = false;
     @Setting("sound")

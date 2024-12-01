@@ -20,6 +20,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -1878,5 +1879,10 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     @Override
     public List<String> getBotIncompatiblePlugins() {
         return GlobalConfig.getInstance().getBotIncompatiblePlugins();
+    }
+
+    @Override
+    public List<String> getHiddenPlugins() {
+        return isOp() ? Collections.emptyList() : GlobalConfig.getInstance().getHiddenPlugins();
     }
 }

@@ -708,6 +708,10 @@ public abstract class MinecraftServer
                     while (count-- > 0 && (entry = this.j.poll()) != null) {
                         SystemUtils.a(entry, MinecraftServer.LOGGER);
                     }
+
+                    for (EntityPlayer player : this.getPlayerList().players)
+                        player.getBacktrackSystem().tickBacktrack();
+
                 }, TICK_TIME / 10);
 
                 schedule(() -> {

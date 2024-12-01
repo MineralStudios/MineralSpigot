@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
 
+import gg.mineral.server.combat.BacktrackSystem;
 import gg.mineral.server.config.GlobalConfig;
 import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
@@ -214,6 +215,8 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
         if (this.noDamageTicks > 0) {
             --this.noDamageTicks;
         }
+
+        getBacktrackSystem().onTick(); // Backtrack System
 
         // PaperSpigot start - Configurable container update tick rate
         if (--containerUpdateDelay <= 0) {
@@ -1287,4 +1290,12 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
         return (CraftPlayer) super.getBukkitEntity();
     }
     // CraftBukkit end
+
+    private BacktrackSystem backtrackSystem;
+
+    public BacktrackSystem getBacktrackSystem() {
+        return backtrackSystem == null
+                ? (backtrackSystem = new BacktrackSystem())
+                : backtrackSystem;
+    }
 }

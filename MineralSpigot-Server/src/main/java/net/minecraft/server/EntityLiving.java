@@ -1185,6 +1185,24 @@ public abstract class EntityLiving extends Entity {
                 return false;
             }
 
+            // Backtrack system
+            if (damagesource.p().equalsIgnoreCase("player")) {
+                EntityDamageSource entitydamagesource = (EntityDamageSource) damagesource;
+
+                if (entitydamagesource.getEntity() instanceof EntityPlayer attacker) {
+                    attacker.getBacktrackSystem()
+                            .onAttack();
+                    if (this instanceof EntityPlayer victim) {
+                        double dX = this.locX - attacker.locX;
+                        double dZ = this.locZ - attacker.locZ;
+                        double dY = this.locY - attacker.locY;
+                        victim.getBacktrackSystem()
+                                .onDamage(net.minecraft.server.MathHelper.sqrt(dX * dX + dZ * dZ + dY * dY));
+                    }
+                }
+            }
+            // Backtrack system end
+
             f = (float) event.getFinalDamage();
 
             // Apply damage to helmet

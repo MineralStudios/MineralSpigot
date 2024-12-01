@@ -1,8 +1,21 @@
 package net.minecraft.server;
 
+import java.net.SocketAddress;
+import java.util.Queue;
+
+import javax.crypto.SecretKey;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 import com.google.common.collect.Queues;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+import gg.mineral.server.combat.BacktrackSystem;
 import gg.mineral.server.config.GlobalConfig;
 import gg.mineral.server.connection.PacketLimit;
 import io.netty.channel.Channel;
@@ -19,16 +32,7 @@ import io.netty.handler.timeout.TimeoutException;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-import java.net.SocketAddress;
-import java.util.Queue;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import javax.crypto.SecretKey;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
+import lombok.val;
 
 public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
 
@@ -236,11 +240,36 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
                     }
                 }
             }
-            // PandaSpigot end - packet limiter
-            try {
-                packet.a(this.m);
-            } catch (CancelledPacketHandleException cancelledpackethandleexception) {
-                ;
+
+            val packetListener = this.m;
+
+            if (packetListener instanceof PlayerConnection playerConnection) {
+                val player = playerConnection.player;
+                val backtrackSystem = player.getBacktrackSystem();
+                int currentDelay = backtrackSystem.isEnabled() && packet instanceof PacketPlayInFlying
+                        ? backtrackSystem.getCurrentDelay()
+                        : 0;
+
+                // System.out.println("Receiving packet with delay: " + currentDelay + "ms");
+
+                if ((currentDelay > 0 || !backtrackSystem.getPacketReadTasks().isEmpty())
+                        && !(packet instanceof PacketPlayInKeepAlive))
+                    backtrackSystem.getPacketReadTasks()
+                            .add(new BacktrackSystem.PacketRecieveTask(packet, playerConnection,
+                                    System.currentTimeMillis() + currentDelay));
+                else
+                    try {
+                        packet.a(this.m);
+                    } catch (CancelledPacketHandleException cancelledpackethandleexception) {
+                        ;
+                    }
+            } else {
+                // PandaSpigot end - packet limiter
+                try {
+                    packet.a(this.m);
+                } catch (CancelledPacketHandleException cancelledpackethandleexception) {
+                    ;
+                }
             }
         }
 

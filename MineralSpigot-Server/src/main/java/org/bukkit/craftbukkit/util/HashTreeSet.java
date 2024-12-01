@@ -1,18 +1,17 @@
 package org.bukkit.craftbukkit.util;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class HashTreeSet<V> implements Set<V> {
 
-    private HashSet<V> hash = new HashSet<V>();
+    private gnu.trove.set.hash.THashSet<V> hash = new gnu.trove.set.hash.THashSet<>();
     private TreeSet<V> tree = new TreeSet<V>();
 
     public HashTreeSet() {
-
+        hash.setAutoCompactionFactor(0.0f);
     }
 
     @Override

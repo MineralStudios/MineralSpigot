@@ -1,6 +1,8 @@
 package net.minecraft.server;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -15,7 +17,12 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Server;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.craftbukkit.inventory.CraftInventoryView;
@@ -47,8 +54,12 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.PluginLoader;
 import org.bukkit.util.NumberConversions;
 // CraftBukkit end
 
@@ -56,6 +67,8 @@ import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Floats;
 
+import gg.mineral.server.combat.KnockbackProfileList;
+import gg.mineral.server.combat.NoDamageTickScheduler;
 import gg.mineral.server.config.GlobalConfig;
 import io.netty.buffer.Unpooled;
 import io.netty.util.concurrent.Future;
@@ -130,7 +143,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
             throws CancelledPacketHandleException {
         IAsyncTaskHandler taskHandler = this.player.u();
 
-        if (taskHandler.isMainThread()) {
+        if (taskHandler.isMainThread() || NoDamageTickScheduler.isMainThread()) {
             return false;
         }
 
@@ -1208,6 +1221,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                 // Spigot start
                 final String message = s;
                 this.minecraftServer.processQueue.add(new Waitable() {
+
                     @Override
                     protected Object evaluate() {
                         getPlayer().acceptConversationInput(message);
@@ -1217,6 +1231,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                 // Spigot end
             } else if (this.player.getChatFlags() == EntityHuman.EnumChatVisibility.SYSTEM) { // Re-add "Command Only"
                                                                                               // flag check
+
                 ChatMessage chatmessage = new ChatMessage("chat.cannotSend", new Object[0]);
 
                 chatmessage.getChatModifier().setColor(EnumChatFormat.RED);
@@ -1319,6 +1334,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                         event.getRecipients());
                 queueEvent.setCancelled(event.isCancelled());
                 Waitable waitable = new Waitable() {
+
                     @Override
                     protected Object evaluate() {
                         org.bukkit.Bukkit.getPluginManager().callEvent(queueEvent);
@@ -1349,8 +1365,11 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                 }
                 try {
                     waitable.get();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt(); // This is proper habit for java. If we aren't handling it, pass
+                } catch (
+
+                InterruptedException e) {
+                    Thread.currentThread().interrupt(); // This is proper habit for java. If we aren't handling
+                                                        // it, pass
                                                         // it on!
                 } catch (ExecutionException e) {
                     throw new RuntimeException("Exception processing chat event", e.getCause());
@@ -1445,6 +1464,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
         if (event.isCancelled())
             return;
         // CraftBukkit end
+
         this.player.bw();
     }
 
@@ -1522,9 +1542,9 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInUseEntity packetplayinuseentity) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinuseentity))
-                return;
+        // for (val packetListener : incomingPacketListeners)
+        // if (packetListener.apply(packetplayinuseentity))
+        // return;
         if (this.player.dead)
             return; // CraftBukkit
         if (ensureMainThread(packetplayinuseentity))
@@ -1612,6 +1632,20 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
 
                     // if (!entity.canHit())
                     // return;
+
+                    if (entity instanceof EntityLiving lastAttackedEntity) {
+                        val kbProfile = lastAttackedEntity.kbProfile != null ? lastAttackedEntity.kbProfile
+                                : lastAttackedEntity.maxNoDamageTicks < 10
+                                        ? KnockbackProfileList.getComboKnockbackProfile()
+                                        : KnockbackProfileList.getDefaultKnockbackProfile();
+
+                        int attackBuffer = kbProfile.getAttackBuffer();
+
+                        if (attackBuffer > 0 && lastAttackedEntity.noDamageTicks > 0
+                                && lastAttackedEntity.noDamageTicks <= attackBuffer)
+                            NoDamageTickScheduler.getTasks().put(() -> this.player.attack(lastAttackedEntity),
+                                    lastAttackedEntity.noDamageTicks / 2);
+                    }
 
                     this.player.attack(entity);
 

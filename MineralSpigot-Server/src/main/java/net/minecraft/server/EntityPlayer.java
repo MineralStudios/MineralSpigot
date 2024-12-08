@@ -5,14 +5,20 @@ import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
 
 import gg.mineral.server.combat.BacktrackSystem;
+import gg.mineral.server.combat.KnockbackProfileList;
 import gg.mineral.server.config.GlobalConfig;
 import io.netty.buffer.Unpooled;
+import lombok.val;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.annotation.Nullable;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -192,7 +198,7 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
                 new PacketPlayOutCombatEvent(this.bs(), PacketPlayOutCombatEvent.EnumCombatEventType.END_COMBAT));
     }
 
-    long lastTick = MinecraftServer.currentTick;
+    public long lastTick = MinecraftServer.currentTick;
 
     public void t_() {
 
@@ -212,9 +218,8 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
         // CraftBukkit end
         this.playerInteractManager.a();
         --this.invulnerableTicks;
-        if (this.noDamageTicks > 0) {
-            --this.noDamageTicks;
-        }
+        // if (this.noDamageTicks > 0)
+        // --this.noDamageTicks;
 
         getBacktrackSystem().onTick(); // Backtrack System
 

@@ -18,10 +18,11 @@ import net.minecraft.server.EntityLiving;
 @Getter
 public class KnockbackProfile extends Knockback {
     private Script script;
-    private Map<String, Object> configValues;
+    private final Map<String, Object> configValues = new Object2ObjectOpenHashMap<>();
     private final String scriptFilePath, name;
     private Binding binding;
     private KnockbackProtocol protocol;
+    private int attackBuffer = 0;
 
     public static KnockbackProfile createNew(String name) throws KBProfileAlreadyExistsException, IOException {
         val knockbackFolder = new File("knockback");
@@ -61,7 +62,9 @@ public class KnockbackProfile extends Knockback {
             script.run();
 
             // Retrieve all variables from the script
-            configValues = new Object2ObjectOpenHashMap<>(binding.getVariables());
+            configValues.putAll(binding.getVariables());
+
+            this.attackBuffer = (int) configValues.getOrDefault("attackBuffer", 0);
 
             protocol = (KnockbackProtocol) configValues.get("protocol");
 

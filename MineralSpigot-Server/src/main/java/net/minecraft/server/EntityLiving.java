@@ -951,8 +951,8 @@ public abstract class EntityLiving extends Entity {
                     : this.maxNoDamageTicks < 10 ? KnockbackProfileList.getComboKnockbackProfile()
                             : KnockbackProfileList.getDefaultKnockbackProfile();
 
-            if (entity instanceof EntityLiving)
-                kbProfile.callFirstStage((EntityLiving) entity, this);
+            if (entity instanceof EntityLiving living)
+                kbProfile.callFirstStage(living, this);
             else {
 
                 double magnitude = MathHelper.sqrt(d0 * d0 + d1 * d1);

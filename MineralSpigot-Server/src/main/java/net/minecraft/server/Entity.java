@@ -35,9 +35,14 @@ import org.bukkit.plugin.PluginManager;
 import org.spigotmc.event.entity.EntityDismountEvent;
 // PaperSpigot end
 
+import gg.mineral.server.combat.NoDamageTickScheduler;
 import gg.mineral.server.config.GlobalConfig;
 
 public abstract class Entity implements ICommandListener {
+
+    static {
+        NoDamageTickScheduler.init();
+    }
 
     // CraftBukkit start
     private static final int CURRENT_LEVEL = 2;

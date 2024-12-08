@@ -40,6 +40,7 @@ import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 
+import gg.mineral.server.combat.NoDamageTickScheduler;
 import gg.mineral.server.config.GlobalConfig;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
@@ -52,7 +53,6 @@ import joptsimple.OptionSet;
 
 public abstract class MinecraftServer
         implements ICommandListener, IAsyncTaskHandler { // PandaSpigot - Modern tick loop
-
     public static final Logger LOGGER = LogManager.getLogger();
     public static final File a = new File("usercache.json");
     private static MinecraftServer l;

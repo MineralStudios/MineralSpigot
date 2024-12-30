@@ -844,7 +844,7 @@ public final class CraftServer implements Server {
             return world;
         }
 
-        if ((folder.exists()) && (!folder.isDirectory())) {
+        if (!creator.ram() && (folder.exists()) && (!folder.isDirectory())) {
             throw new IllegalArgumentException("File exists with the name '" + name + "' and isn't a folder");
         }
 
@@ -852,26 +852,28 @@ public final class CraftServer implements Server {
             generator = getGenerator(name);
         }
 
-        Convertable converter = new WorldLoaderServer(getWorldContainer());
-        if (converter.isConvertable(name)) {
-            getLogger().info("Converting world '" + name + "'");
-            converter.convert(name, new IProgressUpdate() {
-                private long b = System.currentTimeMillis();
+        if (!creator.ram()) {
+            Convertable converter = new WorldLoaderServer(getWorldContainer());
+            if (converter.isConvertable(name)) {
+                getLogger().info("Converting world '" + name + "'");
+                converter.convert(name, new IProgressUpdate() {
+                    private long b = System.currentTimeMillis();
 
-                public void a(String s) {
-                }
-
-                public void a(int i) {
-                    if (System.currentTimeMillis() - this.b >= 1000L) {
-                        this.b = System.currentTimeMillis();
-                        MinecraftServer.LOGGER.info("Converting... " + i + "%");
+                    public void a(String s) {
                     }
 
-                }
+                    public void a(int i) {
+                        if (System.currentTimeMillis() - this.b >= 1000L) {
+                            this.b = System.currentTimeMillis();
+                            MinecraftServer.LOGGER.info("Converting... " + i + "%");
+                        }
 
-                public void c(String s) {
-                }
-            });
+                    }
+
+                    public void c(String s) {
+                    }
+                });
+            }
         }
 
         int dimension = CraftWorld.CUSTOM_DIMENSION_OFFSET + console.worlds.size();
@@ -887,7 +889,7 @@ public final class CraftServer implements Server {
         } while (used);
         boolean hardcore = false;
 
-        IDataManager sdm = new ServerNBTManager(getWorldContainer(), name, true);
+        IDataManager sdm = new ServerNBTManager(getWorldContainer(), name, true, creator.ram());
         WorldData worlddata = sdm.getWorldData();
         if (worlddata == null) {
             WorldSettings worldSettings = new WorldSettings(creator.seed(),
@@ -918,31 +920,33 @@ public final class CraftServer implements Server {
         }
 
         pluginManager.callEvent(new WorldInitEvent(internal.getWorld()));
-        System.out.print("Preparing start region for level " + (console.worlds.size() - 1) + " (Seed: "
-                + internal.getSeed() + ")");
+        if (!creator.ram()) {
+            System.out.print("Preparing start region for level " + (console.worlds.size() - 1) + " (Seed: "
+                    + internal.getSeed() + ")");
 
-        if (internal.getWorld().getKeepSpawnInMemory()) {
-            short short1 = 196;
-            long i = System.currentTimeMillis();
-            for (int j = -short1; j <= short1; j += 16) {
-                for (int k = -short1; k <= short1; k += 16) {
-                    long l = System.currentTimeMillis();
+            if (internal.getWorld().getKeepSpawnInMemory()) {
+                short short1 = 196;
+                long i = System.currentTimeMillis();
+                for (int j = -short1; j <= short1; j += 16) {
+                    for (int k = -short1; k <= short1; k += 16) {
+                        long l = System.currentTimeMillis();
 
-                    if (l < i) {
-                        i = l;
+                        if (l < i) {
+                            i = l;
+                        }
+
+                        if (l > i + 1000L) {
+                            int i1 = (short1 * 2 + 1) * (short1 * 2 + 1);
+                            int j1 = (j + short1) * (short1 * 2 + 1) + k + 1;
+
+                            System.out.println("Preparing spawn area for " + name + ", " + (j1 * 100 / i1) + "%");
+                            i = l;
+                        }
+
+                        BlockPosition chunkcoordinates = internal.getSpawn();
+                        internal.chunkProviderServer.getChunkAt(chunkcoordinates.getX() + j >> 4,
+                                chunkcoordinates.getZ() + k >> 4);
                     }
-
-                    if (l > i + 1000L) {
-                        int i1 = (short1 * 2 + 1) * (short1 * 2 + 1);
-                        int j1 = (j + short1) * (short1 * 2 + 1) + k + 1;
-
-                        System.out.println("Preparing spawn area for " + name + ", " + (j1 * 100 / i1) + "%");
-                        i = l;
-                    }
-
-                    BlockPosition chunkcoordinates = internal.getSpawn();
-                    internal.chunkProviderServer.getChunkAt(chunkcoordinates.getX() + j >> 4,
-                            chunkcoordinates.getZ() + k >> 4);
                 }
             }
         }

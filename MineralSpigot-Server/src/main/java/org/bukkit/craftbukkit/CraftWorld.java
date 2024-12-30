@@ -12,6 +12,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
+import lombok.Getter;
 import net.minecraft.server.*;
 
 import org.apache.commons.lang.Validate;
@@ -76,6 +77,9 @@ public class CraftWorld implements World {
 
     private static final Random rand = new Random();
 
+    @Getter
+    private boolean ram;
+
     public CraftWorld(WorldServer world, ChunkGenerator gen, Environment env) {
         this.world = world;
         this.generator = gen;
@@ -85,6 +89,11 @@ public class CraftWorld implements World {
         if (server.chunkGCPeriod > 0) {
             chunkGCTickCount = rand.nextInt(server.chunkGCPeriod);
         }
+    }
+
+    public CraftWorld(WorldServer world, ChunkGenerator gen, Environment env, boolean ram) {
+        this(world, gen, env);
+        this.ram = ram;
     }
 
     public Block getBlockAt(int x, int y, int z) {

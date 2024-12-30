@@ -29,8 +29,10 @@ public class WorldNBTStorage implements IDataManager, IPlayerFileData {
     private final long sessionId = MinecraftServer.az();
     private final String f;
     private UUID uuid = null; // CraftBukkit
+    protected final boolean ram;
 
-    public WorldNBTStorage(File file, String s, boolean flag) {
+    public WorldNBTStorage(File file, String s, boolean flag,boolean ram) {
+        this.ram = ram;
         this.baseDir = new File(file, s);
         this.baseDir.mkdirs();
         this.playerDir = new File(this.baseDir, "playerdata");
@@ -45,6 +47,7 @@ public class WorldNBTStorage implements IDataManager, IPlayerFileData {
     }
 
     private void h() {
+        if (ram) return;
         try {
             File file = new File(this.baseDir, "session.lock");
             DataOutputStream dataoutputstream = new DataOutputStream(new FileOutputStream(file));
@@ -67,6 +70,7 @@ public class WorldNBTStorage implements IDataManager, IPlayerFileData {
     }
 
     public void checkSession() throws ExceptionWorldConflict {
+        if (ram) return;
         try {
             File file = new File(this.baseDir, "session.lock");
             DataInputStream datainputstream = new DataInputStream(new FileInputStream(file));
@@ -91,6 +95,7 @@ public class WorldNBTStorage implements IDataManager, IPlayerFileData {
     }
 
     public WorldData getWorldData() {
+        if (ram) return null;
         File file = new File(this.baseDir, "level.dat");
         NBTTagCompound nbttagcompound;
         NBTTagCompound nbttagcompound1;
@@ -122,6 +127,7 @@ public class WorldNBTStorage implements IDataManager, IPlayerFileData {
     }
 
     public void saveWorldData(WorldData worlddata, NBTTagCompound nbttagcompound) {
+        if (ram) return;
         NBTTagCompound nbttagcompound1 = worlddata.a(nbttagcompound);
         NBTTagCompound nbttagcompound2 = new NBTTagCompound();
 
@@ -154,6 +160,7 @@ public class WorldNBTStorage implements IDataManager, IPlayerFileData {
     }
 
     public void saveWorldData(WorldData worlddata) {
+        if (ram) return;
         NBTTagCompound nbttagcompound = worlddata.a();
         NBTTagCompound nbttagcompound1 = new NBTTagCompound();
 
@@ -186,8 +193,9 @@ public class WorldNBTStorage implements IDataManager, IPlayerFileData {
     }
 
     public void save(EntityHuman entityhuman) {
+        if (ram) return;
         try {
-            if (GlobalConfig.getInstance().isDisablePlayerData())
+            if (GlobalConfig.getInstance().isDisablePlayerData() || ram)
                 return; // PandaSpigot - Configurable player data
             NBTTagCompound nbttagcompound = new NBTTagCompound();
 
@@ -208,7 +216,7 @@ public class WorldNBTStorage implements IDataManager, IPlayerFileData {
     }
 
     public NBTTagCompound load(EntityHuman entityhuman) {
-        if (GlobalConfig.getInstance().isDisablePlayerData())
+        if (GlobalConfig.getInstance().isDisablePlayerData() || ram)
             return null; // PandaSpigot - Configurable player data
         NBTTagCompound nbttagcompound = null;
 
@@ -261,6 +269,7 @@ public class WorldNBTStorage implements IDataManager, IPlayerFileData {
 
     // CraftBukkit start
     public NBTTagCompound getPlayerData(String s) {
+        if (ram) return null;
         try {
             File file1 = new File(this.playerDir, s + ".dat");
 
@@ -280,6 +289,7 @@ public class WorldNBTStorage implements IDataManager, IPlayerFileData {
     }
 
     public String[] getSeenPlayers() {
+        if (ram) return new String[0];
         String[] astring = this.playerDir.list();
 
         if (astring == null) {
@@ -308,6 +318,7 @@ public class WorldNBTStorage implements IDataManager, IPlayerFileData {
 
     // CraftBukkit start
     public UUID getUUID() {
+        if (ram) return uuid = UUID.randomUUID();
         if (uuid != null)
             return uuid;
         File file1 = new File(this.baseDir, "uid.dat");

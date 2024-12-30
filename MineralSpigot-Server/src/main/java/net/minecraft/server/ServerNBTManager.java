@@ -6,8 +6,8 @@ import lombok.val;
 
 public class ServerNBTManager extends WorldNBTStorage {
 
-    public ServerNBTManager(File file, String s, boolean flag) {
-        super(file, s, flag);
+    public ServerNBTManager(File file, String s, boolean flag, boolean ram) {
+        super(file, s, flag,ram);
     }
 
     public IChunkLoader createChunkLoader(WorldProvider worldprovider) {
@@ -16,11 +16,11 @@ public class ServerNBTManager extends WorldNBTStorage {
 
         if (worldprovider instanceof WorldProviderHell) {
             file1 = new File(file, "DIM-1");
-            file1.mkdirs();
+            if (!ram)file1.mkdirs();
             return new ChunkRegionLoader(file1);
         } else if (worldprovider instanceof WorldProviderTheEnd) {
             file1 = new File(file, "DIM1");
-            file1.mkdirs();
+            if (!ram)file1.mkdirs();
             return new ChunkRegionLoader(file1);
         } else {
             return new ChunkRegionLoader(file);
@@ -33,6 +33,8 @@ public class ServerNBTManager extends WorldNBTStorage {
     }
 
     public void a() {
+        if (ram) return;
+
         RegionFileCache.a();
     }
 }

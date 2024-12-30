@@ -104,7 +104,7 @@ public class WorldLoader implements Convertable {
     }
 
     public IDataManager a(String s, boolean flag) {
-        return new WorldNBTStorage(this.a, s, flag);
+        return new WorldNBTStorage(this.a, s, flag, false);
     }
 
     public boolean isConvertable(String s) {

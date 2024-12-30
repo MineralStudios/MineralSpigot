@@ -1,6 +1,8 @@
 package net.minecraft.server;
 
 import com.google.common.collect.Maps;
+import lombok.Getter;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -11,7 +13,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
 public class NBTTagCompound extends NBTBase {
-
+    @Getter
     private Map<String, NBTBase> map = Maps.newHashMap();
 
     public NBTTagCompound() {}

@@ -31,7 +31,7 @@ public class WorldLoaderServer extends WorldLoader {
     }
 
     public IDataManager a(String s, boolean flag) {
-        return new ServerNBTManager(this.a, s, flag);
+        return new ServerNBTManager(this.a, s, flag, false);
     }
 
     public boolean isConvertable(String s) {

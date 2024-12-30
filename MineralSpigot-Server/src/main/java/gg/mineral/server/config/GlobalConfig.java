@@ -483,6 +483,8 @@ public class GlobalConfig {
     private int largeFeatureSeed = 14357617;
     @Setting("world")
     private String worldsFolder = "worlds";
+    @Setting("world")
+    private String schematicWorldsFolder = "schematicWorlds";
     @Setting("world.anti-xray")
     private boolean antiXray = false;
     @Setting("world.anti-xray")

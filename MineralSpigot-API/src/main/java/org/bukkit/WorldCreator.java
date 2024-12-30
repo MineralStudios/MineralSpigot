@@ -15,6 +15,7 @@ public class WorldCreator {
     private ChunkGenerator generator = null;
     private WorldType type = WorldType.NORMAL;
     private boolean generateStructures = true;
+    private boolean ram;
     private String generatorSettings = "";
 
     /**
@@ -31,6 +32,15 @@ public class WorldCreator {
         this.seed = (new Random()).nextLong();
     }
 
+    public WorldCreator ram(boolean ram) {
+        this.ram = ram;
+        return this;
+    }
+
+    public boolean ram() {
+        return ram;
+    }
+
     /**
      * Copies the options from the specified world
      *
@@ -44,6 +54,7 @@ public class WorldCreator {
 
         seed = world.getSeed();
         environment = world.getEnvironment();
+        ram = world.isRam();
         generator = world.getGenerator();
 
         return this;
@@ -62,6 +73,7 @@ public class WorldCreator {
 
         seed = creator.seed();
         environment = creator.environment();
+        ram = creator.ram;
         generator = creator.generator();
 
         return this;

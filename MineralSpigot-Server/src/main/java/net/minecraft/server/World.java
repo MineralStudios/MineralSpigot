@@ -195,6 +195,7 @@ public abstract class World implements IBlockAccess {
     protected World(IDataManager idatamanager, WorldData worlddata, WorldProvider worldprovider,
             MethodProfiler methodprofiler, boolean flag, ChunkGenerator gen, org.bukkit.World.Environment env) {
         this.generator = gen;
+        // todo: isRam
         this.world = new CraftWorld((WorldServer) this, gen, env);
         this.ticksPerAnimalSpawns = this.getServer().getTicksPerAnimalSpawns(); // CraftBukkit
         this.ticksPerMonsterSpawns = this.getServer().getTicksPerMonsterSpawns(); // CraftBukkit

@@ -137,6 +137,8 @@ public interface World extends PluginMessageRecipient, Metadatable {
      */
     public Chunk getChunkAt(Block block);
 
+    boolean isRam();
+
     // PaperSpigot start - Async chunk load API
     public static interface ChunkLoadCallback {
         public void onLoad(Chunk chunk);

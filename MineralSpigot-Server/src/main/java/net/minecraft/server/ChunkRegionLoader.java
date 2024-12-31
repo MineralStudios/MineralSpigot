@@ -21,9 +21,16 @@ public class ChunkRegionLoader implements IChunkLoader, IAsyncChunkSaver {
     public Set<ChunkCoordIntPair> c = Collections.newSetFromMap(new ConcurrentHashMap());
     private final File d;
     private boolean e = false;
+    private final boolean ram;
 
     public ChunkRegionLoader(File file) {
         this.d = file;
+        this.ram = false;
+    }
+
+    public ChunkRegionLoader(File file, boolean ram) {
+        this.d = file;
+        this.ram = ram;
     }
 
     // CraftBukkit start
@@ -35,6 +42,9 @@ public class ChunkRegionLoader implements IChunkLoader, IAsyncChunkSaver {
                 return true;
             }
         }
+
+        if (ram)
+            return false;
 
         final RegionFile region = RegionFileCache.a(this.d, i, j, false); // PaperSpigot
         return region != null && region.chunkExists(i & 31, j & 31); // PaperSpigot
@@ -60,6 +70,8 @@ public class ChunkRegionLoader implements IChunkLoader, IAsyncChunkSaver {
         NBTTagCompound nbttagcompound = (NBTTagCompound) this.b.get(chunkcoordintpair);
 
         if (nbttagcompound == null) {
+            if (ram)
+                return null;
             DataInputStream datainputstream = RegionFileCache.c(this.d, i, j);
 
             if (datainputstream == null) {
@@ -166,6 +178,8 @@ public class ChunkRegionLoader implements IChunkLoader, IAsyncChunkSaver {
     }
 
     private void b(ChunkCoordIntPair chunkcoordintpair, NBTTagCompound nbttagcompound) throws IOException {
+        if (ram)
+            return;
         DataOutputStream dataoutputstream = RegionFileCache.d(this.d, chunkcoordintpair.x, chunkcoordintpair.z);
 
         NBTCompressedStreamTools.a(nbttagcompound, (DataOutput) dataoutputstream);

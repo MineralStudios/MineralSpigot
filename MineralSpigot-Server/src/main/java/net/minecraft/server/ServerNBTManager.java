@@ -17,13 +17,13 @@ public class ServerNBTManager extends WorldNBTStorage {
         if (worldprovider instanceof WorldProviderHell) {
             file1 = new File(file, "DIM-1");
             if (!ram)file1.mkdirs();
-            return new ChunkRegionLoader(file1);
+            return new ChunkRegionLoader(file1,ram);
         } else if (worldprovider instanceof WorldProviderTheEnd) {
             file1 = new File(file, "DIM1");
             if (!ram)file1.mkdirs();
-            return new ChunkRegionLoader(file1);
+            return new ChunkRegionLoader(file1,ram);
         } else {
-            return new ChunkRegionLoader(file);
+            return new ChunkRegionLoader(file,ram);
         }
     }
 

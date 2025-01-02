@@ -12,6 +12,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
+import gg.mineral.server.config.GlobalConfig;
 import lombok.Getter;
 import net.minecraft.server.*;
 
@@ -797,6 +798,9 @@ public class CraftWorld implements World {
     }
 
     public void save(boolean forceSave) {
+        if (!GlobalConfig.getInstance().isDisableChunkSaving())
+            return;
+
         // Spigot end
         this.server.checkSaveState();
         try {

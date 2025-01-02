@@ -798,7 +798,7 @@ public class CraftWorld implements World {
     }
 
     public void save(boolean forceSave) {
-        if (!GlobalConfig.getInstance().isDisableChunkSaving())
+        if (GlobalConfig.getInstance().isDisableChunkSaving())
             return;
 
         // Spigot end

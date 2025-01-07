@@ -3,6 +3,7 @@ package net.minecraft.server;
 import java.util.List;
 
 // CraftBukkit start
+import lombok.Setter;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -24,6 +25,7 @@ public class EntityArrow extends Entity implements IProjectile {
     private int ar;
     private int as;
     private double damage = 2.0D;
+    @Setter
     public int knockbackStrength;
 
     // Spigot Start
@@ -531,10 +533,6 @@ public class EntityArrow extends Entity implements IProjectile {
 
     public double j() {
         return this.damage;
-    }
-
-    public void setKnockbackStrength(int i) {
-        this.knockbackStrength = i;
     }
 
     public boolean aD() {

@@ -848,7 +848,7 @@ public abstract class EntityLiving extends Entity {
                         }
 
                         this.aw = (float) (MathHelper.b(d1, d0) * 180.0D / 3.1415927410125732D - (double) this.yaw);
-                        this.a(entity, f, d0, d1);
+                        this.a(entity, f, d0, d1, damagesource);
                     } else {
                         this.aw = (float) ((int) (Math.random() * 2.0D) * 180);
                     }
@@ -943,7 +943,7 @@ public abstract class EntityLiving extends Entity {
     protected void dropEquipment(boolean flag, int i) {
     }
 
-    public void a(Entity entity, float f, double d0, double d1) {
+    public void a(Entity entity, float f, double d0, double d1, DamageSource damagesource) {
         if (this.random.nextDouble() >= this.getAttributeInstance(GenericAttributes.c).getValue()) {
             this.ai = true;
 
@@ -951,23 +951,24 @@ public abstract class EntityLiving extends Entity {
                     : this.maxNoDamageTicks < 10 ? KnockbackProfileList.getComboKnockbackProfile()
                             : KnockbackProfileList.getDefaultKnockbackProfile();
 
-            if (entity instanceof EntityLiving living)
+            if (damagesource.p().equalsIgnoreCase("player") && entity instanceof EntityLiving living && kbProfile != null)
                 kbProfile.callFirstStage(living, this);
             else {
 
-                double magnitude = MathHelper.sqrt(d0 * d0 + d1 * d1);
+                    float f1 = MathHelper.sqrt(d0 * d0 + d1 * d1);
+                    float f2 = 0.4F;
 
-                double friction = 2;
-                this.motX /= friction;
-                this.motY /= friction;
-                this.motZ /= friction;
+                    this.motX /= 2.0D;
+                    this.motY /= 2.0D;
+                    this.motZ /= 2.0D;
+                    this.motX -= d0 / (double) f1 * (double) f2;
+                    this.motY += f2;
+                    this.motZ -= d1 / (double) f1 * (double) f2;
+                    if (this.motY > 0.4000000059604645D) {
+                        this.motY = 0.4000000059604645D;
+                    }
 
-                this.motX -= d0 / magnitude * 0.35;
-                this.motY += 0.35;
-                this.motZ -= d1 / magnitude * 0.35;
 
-                if (this.motY > 0.4)
-                    this.motY = 0.4;
 
             }
 

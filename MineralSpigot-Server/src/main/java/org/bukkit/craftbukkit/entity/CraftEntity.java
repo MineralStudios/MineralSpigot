@@ -44,7 +44,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
 
     protected final CraftServer server;
     protected Entity entity;
-    private EntityDamageEvent lastDamageEvent;
+   // private EntityDamageEvent lastDamageEvent;
 
     public CraftEntity(final CraftServer server, final Entity entity) {
         this.server = server;
@@ -440,11 +440,12 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
     }
 
     public void setLastDamageCause(EntityDamageEvent event) {
-        lastDamageEvent = event;
+        //lastDamageEvent = event;
     }
 
     public EntityDamageEvent getLastDamageCause() {
-        return lastDamageEvent;
+        //return lastDamageEvent;
+        return null;
     }
 
     public UUID getUniqueId() {

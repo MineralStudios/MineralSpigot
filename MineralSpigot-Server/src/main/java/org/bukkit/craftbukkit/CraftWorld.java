@@ -113,6 +113,29 @@ public class CraftWorld implements World {
         return world.getHighestBlockYAt(new BlockPosition(x, 0, z)).getY();
     }
 
+        @Getter
+        private boolean ticking = false;
+
+    public boolean checkTicking() {
+                boolean shouldTick = hasPlayers();
+                if(ticking) {
+                       if(!shouldTick) { // Empty
+                                ticking = false;
+                                world.getServer().getLogger().info("Stopping world " + getName());
+                                getHandle().chunkProviderServer.unloadAllChunks();
+                            }
+                   } else if(shouldTick) {
+                        ticking = true;
+                        world.getServer().getLogger().info("Starting world " + getName());
+                        setKeepSpawnInMemory(getKeepSpawnInMemory());
+                    }
+                return ticking;
+            }
+
+            public boolean hasPlayers() {
+                return !world.players.isEmpty();
+            }
+
     public Location getSpawnLocation() {
         BlockPosition spawn = world.getSpawn();
         return new Location(this, spawn.getX(), spawn.getY(), spawn.getZ());

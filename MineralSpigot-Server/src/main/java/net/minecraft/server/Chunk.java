@@ -38,6 +38,7 @@ public class Chunk {
     public final int[] heightMap;
     public final int locX;
     public final int locZ;
+    public final long chunkKey; // Paper
     private boolean k;
     public final Map<BlockPosition, TileEntity> tileEntities;
     public final List<Entity>[] entitySlices; // Spigot
@@ -149,6 +150,7 @@ public class Chunk {
         this.world = world;
         this.locX = i;
         this.locZ = j;
+        this.chunkKey = org.bukkit.craftbukkit.util.LongHash.toLong(this.locX, this.locZ); // Paper
         this.heightMap = new int[256];
 
         for (int k = 0; k < this.entitySlices.length; ++k)

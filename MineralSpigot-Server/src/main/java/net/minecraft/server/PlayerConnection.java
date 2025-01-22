@@ -242,9 +242,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInSteerVehicle packetplayinsteervehicle) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinsteervehicle))
-                return;
+
         if (ensureMainThread(packetplayinsteervehicle))
             return; // Blossom
         this.player.a(packetplayinsteervehicle.a(), packetplayinsteervehicle.b(), packetplayinsteervehicle.c(),
@@ -258,9 +256,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInFlying packetplayinflying) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinflying))
-                return;
+
         if (ensureMainThread(packetplayinflying))
             return; // Blossom
         if (this.b(packetplayinflying)) {
@@ -689,9 +685,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInBlockDig packetplayinblockdig) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinblockdig))
-                return;
+
         if (ensureMainThread(packetplayinblockdig))
             return; // Blossom
 
@@ -795,9 +789,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     private int packets = 0;
 
     public void a(PacketPlayInBlockPlace packetplayinblockplace) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinblockplace))
-                return;
+
         if (ensureMainThread(packetplayinblockplace))
             return; // Blossom
 
@@ -961,9 +953,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInSpectate packetplayinspectate) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinspectate))
-                return;
+
         if (ensureMainThread(packetplayinspectate))
             return; // Blossom
 
@@ -1027,9 +1017,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
 
     // CraftBukkit start
     public void a(PacketPlayInResourcePackStatus packetplayinresourcepackstatus) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinresourcepackstatus))
-                return;
+
         this.server.getPluginManager().callEvent(new PlayerResourcePackStatusEvent(getPlayer(),
                 PlayerResourcePackStatusEvent.Status.values()[packetplayinresourcepackstatus.b.ordinal()]));
     }
@@ -1071,11 +1059,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
 
     }
 
-    @Getter
-    private List<Object2BooleanFunction<Packet<?>>> outgoingPacketListeners = new CopyOnWriteArrayList<>();
-    @Getter
-    private List<Object2BooleanFunction<Packet<?>>> incomingPacketListeners = new CopyOnWriteArrayList<>();
-
     public void sendPacket(final Packet packet) {
         if (packet instanceof PacketPlayOutChat) {
             PacketPlayOutChat packetplayoutchat = (PacketPlayOutChat) packet;
@@ -1102,10 +1085,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
 
         try {
 
-            for (val packetListener : outgoingPacketListeners)
-                if (packetListener.apply(packet))
-                    return;
-
             this.networkManager.handle(packet);
         } catch (Throwable throwable) {
             System.out.println("Error sending packet " + packet);
@@ -1127,9 +1106,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInHeldItemSlot packetplayinhelditemslot) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinhelditemslot))
-                return;
         // CraftBukkit start
         if (this.player.dead)
             return;
@@ -1155,9 +1131,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInChat packetplayinchat) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinchat))
-                return;
         // CraftBukkit start - async chat
         boolean isSync = packetplayinchat.a().startsWith("/");
         if (packetplayinchat.a().startsWith("/")) {
@@ -1425,9 +1398,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInArmAnimation packetplayinarmanimation) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinarmanimation))
-                return;
         if (this.player.dead)
             return; // CraftBukkit
         if (ensureMainThread(packetplayinarmanimation))
@@ -1469,9 +1439,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInEntityAction packetplayinentityaction) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinentityaction))
-                return;
         if (ensureMainThread(packetplayinentityaction))
             return; // Blossom
         // CraftBukkit start
@@ -1665,9 +1632,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInClientCommand packetplayinclientcommand) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinclientcommand))
-                return;
 
         if (ensureMainThread(packetplayinclientcommand))
             return; // Blossom
@@ -1714,9 +1678,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInCloseWindow packetplayinclosewindow) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinclosewindow))
-                return;
         if (this.player.dead)
             return; // CraftBukkit
         if (ensureMainThread(packetplayinclosewindow)) // Blossom
@@ -1728,9 +1689,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInWindowClick packetplayinwindowclick) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinwindowclick))
-                return;
         if (this.player.dead)
             return; // CraftBukkit
         if (ensureMainThread(packetplayinwindowclick)) // Blossom
@@ -2108,9 +2066,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInEnchantItem packetplayinenchantitem) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinenchantitem))
-                return;
         if (ensureMainThread(packetplayinenchantitem))
             return; // Blossom
         this.player.resetIdleTimer();
@@ -2123,9 +2078,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInSetCreativeSlot packetplayinsetcreativeslot) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinsetcreativeslot))
-                return;
         if (ensureMainThread(packetplayinsetcreativeslot))
             return; // Blossom
         if (this.player.playerInteractManager.isCreative()) {
@@ -2228,9 +2180,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInTransaction packetplayintransaction) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayintransaction))
-                return;
         if (this.player.dead)
             return; // CraftBukkit
         if (ensureMainThread(packetplayintransaction)) // Blossom
@@ -2246,9 +2195,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInUpdateSign packetplayinupdatesign) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinupdatesign))
-                return;
         if (this.player.dead)
             return; // CraftBukkit
         if (ensureMainThread(packetplayinupdatesign)) // Blossom
@@ -2316,9 +2262,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInKeepAlive packetplayinkeepalive) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinkeepalive))
-                return;
         if (packetplayinkeepalive.a() == this.i) {
             int i = (int) (this.d() - this.j);
 
@@ -2332,9 +2275,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInAbilities packetplayinabilities) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinabilities))
-                return;
         if (ensureMainThread(packetplayinabilities))
             return; // Blossom
         // CraftBukkit start
@@ -2353,9 +2293,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInTabComplete packetplayintabcomplete) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayintabcomplete))
-                return;
         // PandaSpigot start - Async Tab Completion
         // CraftBukkit start
         if (chatSpamField.addAndGet(this, 10) > 500
@@ -2401,9 +2338,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInSettings packetplayinsettings) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinsettings))
-                return;
         if (ensureMainThread(packetplayinsettings))
             return; // Blossom
         this.player.a(packetplayinsettings);
@@ -2451,9 +2385,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     // PandaSpigot end
 
     public void a(PacketPlayInCustomPayload packetplayincustompayload) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayincustompayload))
-                return;
         if (ensureMainThread(packetplayincustompayload))
             return; // Blossom
         PacketDataSerializer packetdataserializer;

@@ -1424,6 +1424,8 @@ public abstract class World implements IBlockAccess {
             return arraylist; // PandaSpigot - Optimize falling block movement
         if (entity instanceof EntityArmorStand)
             return arraylist; // PandaSpigot - Optimize armor stand movement
+        if (entity instanceof EntityPlayer entityPlayer && GlobalConfig.getInstance().isOptimizePlayerMovement() && entityPlayer.vehicle == null)
+            return arraylist; // PaperSpigot - Optimize player movement
 
         double d0 = 0.25D;
         List list = this.getEntities(entity, axisalignedbb.grow(d0, d0, d0));

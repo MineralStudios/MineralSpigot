@@ -25,9 +25,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.imageio.ImageIO;
 
-import gg.mineral.server.world.Schematic;
-import lombok.SneakyThrows;
-import lombok.val;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,7 +40,6 @@ import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 
-import gg.mineral.server.combat.NoDamageTickScheduler;
 import gg.mineral.server.config.GlobalConfig;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
@@ -52,9 +48,6 @@ import io.netty.handler.codec.base64.Base64;
 import java.util.concurrent.CopyOnWriteArrayList;
 //import jline.console.ConsoleReader; // PandaSpigot - comment out
 import joptsimple.OptionSet;
-import org.bukkit.Location;
-import org.bukkit.WorldCreator;
-import org.bukkit.generator.ChunkGenerator;
 // CraftBukkit end
 
 public abstract class MinecraftServer
@@ -364,31 +357,6 @@ public abstract class MinecraftServer
 
         // CraftBukkit end
         this.a(this.getDifficulty());
-
-        val schematicFolder = GlobalConfig.getInstance().getSchematicWorldsFolder();
-
-        if (schematicFolder != null) {
-            // Iterate over files
-            val files = new File(schematicFolder).listFiles();
-
-
-            if (files != null) {
-                for (val file : files) {
-                    if (file.isFile()) {
-                        val name = file.getName();
-                        if (name.endsWith(".schematic")) {
-                            val worldName = name.substring(0, name.length() - ".schematic".length());
-                            try {
-                                val schematic = Schematic.load(file);
-                                Schematic.SCHEMATICS.put(worldName, schematic);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
         this.k();
     }
@@ -976,6 +944,7 @@ public abstract class MinecraftServer
 
             // if (i == 0 || this.getAllowNether()) {
             WorldServer worldserver = this.worlds.get(i);
+            if(!worldserver.getWorld().checkTicking()) continue; // SportBukkit
             worldserver.hasEntityMoveEvent = io.papermc.paper.event.entity.EntityMoveEvent.getHandlerList()
                     .getRegisteredListeners().length > 0; // PandaSpigot
             worldserver.hasPhysicsEvent = org.bukkit.event.block.BlockPhysicsEvent.getHandlerList()

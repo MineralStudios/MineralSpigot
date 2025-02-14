@@ -37,7 +37,26 @@ public class ChunkProviderServer implements IChunkProvider {
     public IChunkProvider chunkProvider;
     public IChunkLoader chunkLoader;
     public boolean forceChunkLoad = false; // CraftBukkit - true -> false
-    public LongObjectHashMap<Chunk> chunks = new LongObjectHashMap<Chunk>();
+        // Paper start
+                protected Chunk lastChunkByPos = null;
+    public LongObjectHashMap<Chunk> chunks = new LongObjectHashMap<>() {
+        @Override
+        public Chunk get(long key) {
+            if (lastChunkByPos != null && key == lastChunkByPos.chunkKey) {
+                return lastChunkByPos;
+            }
+            return lastChunkByPos = super.get(key);
+        }
+
+        @Override
+        public Chunk remove(long key) {
+            if (lastChunkByPos != null && key == lastChunkByPos.chunkKey) {
+                lastChunkByPos = null;
+            }
+            return super.remove(key);
+        }
+    }; // CraftBukkit
+    // Paper end
     public WorldServer world;
 
     public ChunkProviderServer(WorldServer worldserver, IChunkLoader ichunkloader, IChunkProvider ichunkprovider) {
@@ -48,6 +67,45 @@ public class ChunkProviderServer implements IChunkProvider {
         this.chunkLoader = ichunkloader;
         this.chunkProvider = ichunkprovider;
     }
+
+        // SportPaper start
+                public void unloadAllChunks() {
+                for(Chunk chunk : chunks.values()) {
+                        unloadChunk(chunk);
+                    }
+           }
+
+            public void unloadChunk(Chunk chunk) {
+                Server server = this.world.getServer();
+                ChunkUnloadEvent event = new ChunkUnloadEvent(chunk.bukkitChunk);
+                server.getPluginManager().callEvent(event);
+                if (!event.isCancelled()) {
+
+                                chunk.removeEntities();
+                        this.saveChunk(chunk);
+                       this.saveChunkNOP(chunk);
+                        this.chunks.remove(chunk.chunkKey); // CraftBukkit
+                        if (this.unloadQueue.contains(chunk.chunkKey)) {
+                                this.unloadQueue.remove(chunk.chunkKey);
+                           }
+
+                                // Update neighbor counts
+                                        for (int x = -2; x < 3; x++) {
+                                for (int z = -2; z < 3; z++) {
+                                        if (x == 0 && z == 0) {
+                                                continue;
+                                           }
+
+                                                Chunk neighbor = this.getChunkIfLoaded(chunk.locX + x, chunk.locZ + z);
+                                        if (neighbor != null) {
+                                                neighbor.setNeighborUnloaded(-x, -z);
+                                                chunk.setNeighborUnloaded(x, z);
+                                            }
+                                    }
+                            }
+                    }
+            }
+   // SportPaper end
 
     public boolean isChunkLoaded(int i, int j) {
         return this.chunks.containsKey(LongHash.toLong(i, j)); // CraftBukkit
@@ -393,34 +451,7 @@ public class ChunkProviderServer implements IChunkProvider {
                 if (chunk == null)
                     continue;
 
-                ChunkUnloadEvent event = new ChunkUnloadEvent(chunk.bukkitChunk);
-                server.getPluginManager().callEvent(event);
-                if (!event.isCancelled()) {
-
-                    if (chunk != null) {
-                        chunk.removeEntities();
-                        this.saveChunk(chunk);
-                        this.saveChunkNOP(chunk);
-                        this.chunks.remove(chunkcoordinates); // CraftBukkit
-                    }
-
-                    // this.unloadQueue.remove(olong);
-
-                    // Update neighbor counts
-                    for (int x = -2; x < 3; x++) {
-                        for (int z = -2; z < 3; z++) {
-                            if (x == 0 && z == 0) {
-                                continue;
-                            }
-
-                            Chunk neighbor = this.getChunkIfLoaded(chunk.locX + x, chunk.locZ + z);
-                            if (neighbor != null) {
-                                neighbor.setNeighborUnloaded(-x, -z);
-                                chunk.setNeighborUnloaded(x, z);
-                            }
-                        }
-                    }
-                }
+                unloadChunk(chunk); // SportPaper - Move to own method
             }
             // CraftBukkit end
 

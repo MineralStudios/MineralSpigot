@@ -137,6 +137,8 @@ public class GlobalConfig {
     @Setting("performance")
     private boolean cacheChunkMaps = true;
     @Setting("performance")
+    private boolean optimizePlayerMovement = true;
+    @Setting("performance")
     private int containerUpdateTickRate = 1;
     @Setting("performance")
     private int userCacheCap = 1000;

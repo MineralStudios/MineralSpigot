@@ -248,14 +248,14 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
             this.getUserCache().c();
         }
 
-        if (!NameReferencingFileConverter.a()) {
+        if (!GlobalConfig.getInstance().getLevelName().isEmpty()&& !NameReferencingFileConverter.a()) {
             return false;
         } else {
             this.convertable = new WorldLoaderServer(server.getWorldContainer()); // CraftBukkit - moved from
             // MinecraftServer constructor
             long j = System.nanoTime();
 
-            if (this.U() == null) {
+            if (this.U() == null && !GlobalConfig.getInstance().getLevelName().isEmpty()) {
                 this.setWorld(GlobalConfig.getInstance().getLevelName());
             }
 
@@ -289,8 +289,10 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
             this.c(GlobalConfig.getInstance().getMaxBuildHeight());
             this.c((this.getMaxBuildHeight() + 8) / 16 * 16);
             this.c(MathHelper.clamp(this.getMaxBuildHeight(), 64, 256));
-            DedicatedServer.LOGGER.info("Preparing level \"" + this.U() + "\"");
-            this.a(this.U(), this.U(), k, worldtype, s2);
+            if (this.U() != null) {
+                DedicatedServer.LOGGER.info("Preparing level \"" + this.U() + "\"");
+                this.a(this.U(), this.U(), k, worldtype, s2);
+            }
             long i1 = System.nanoTime() - j;
             String s3 = String.format("%.3fs", new Object[]{Double.valueOf((double) i1 / 1.0E9D)});
 
@@ -561,7 +563,7 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
             flag3 = NameReferencingFileConverter.d((MinecraftServer) this);
         }
 
-        boolean flag4 = false;
+        boolean flag4 = GlobalConfig.getInstance().getLevelName().isEmpty();
 
         for (i = 0; !flag4 && i <= 2; ++i) {
             if (i > 0) {

@@ -10,6 +10,7 @@ public class ServerNBTManager extends WorldNBTStorage {
         super(file, s, flag,ram);
     }
 
+    @Override
     public IChunkLoader createChunkLoader(WorldProvider worldprovider) {
         val file = this.getDirectory();
         File file1;
@@ -27,11 +28,13 @@ public class ServerNBTManager extends WorldNBTStorage {
         }
     }
 
+    @Override
     public void saveWorldData(WorldData worlddata, NBTTagCompound nbttagcompound) {
         worlddata.e(19133);
         super.saveWorldData(worlddata, nbttagcompound);
     }
 
+    @Override
     public void a() {
         if (ram) return;
 

@@ -9,6 +9,7 @@ import gg.mineral.server.combat.KnockbackProfile;
 import gg.mineral.server.combat.KnockbackProfileList;
 import gg.mineral.server.config.GlobalConfig;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.local.LocalChannel;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.Getter;
 import lombok.Setter;
@@ -1867,13 +1868,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     @Override
     public boolean isFakePlayer() {
         return getHandle().playerConnection != null && getHandle().playerConnection.networkManager.channel == null
-                || getHandle().playerConnection != null && isLocalhost(
-                        (InetSocketAddress) getHandle().playerConnection.networkManager.channel.remoteAddress());
-    }
-
-    private boolean isLocalhost(InetSocketAddress address) {
-        String hostAddress = address.getAddress().getHostAddress();
-        return "127.0.0.1".equals(hostAddress) || "::1".equals(hostAddress);
+                || getHandle().playerConnection != null && getHandle().playerConnection.networkManager.channel instanceof LocalChannel;
     }
 
     @Override

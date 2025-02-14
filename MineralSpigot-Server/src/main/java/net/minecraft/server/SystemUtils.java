@@ -2,9 +2,19 @@ package net.minecraft.server;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
+
 import org.apache.logging.log4j.Logger;
 
 public class SystemUtils {
+    // PandaSpigot start - Modern tick Loop
+    public static long getMonotonicMillis() {
+        return getMonotonicNanos() / 1000000L;
+    }
+
+    public static long getMonotonicNanos() {
+        return System.nanoTime();
+    }
+    // PandaSpigot end
 
     public static <V> V a(FutureTask<V> futuretask, Logger logger) {
         try {

@@ -13,11 +13,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 // CraftBukkit start
 import java.io.PrintStream;
+
 import org.apache.logging.log4j.Level;
 
 import org.bukkit.craftbukkit.LoggerOutputStream;
@@ -30,9 +32,9 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
 
     private static final Logger LOGGER = LogManager.getLogger();
     private final List<ServerCommand> l = Collections.synchronizedList(Lists.<ServerCommand>newArrayList()); // CraftBukkit
-                                                                                                             // - fix
-                                                                                                             // decompile
-                                                                                                             // error
+    // - fix
+    // decompile
+    // error
     private RemoteStatusListener m;
     private RemoteControlListener n;
     private boolean generateStructures;
@@ -41,8 +43,9 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
 
     // CraftBukkit start - Signature changed
     // PandaSpigot start - Modern tick loop
-    public DedicatedServer(joptsimple.OptionSet options) {
-        super(options, Proxy.NO_PROXY, DedicatedServer.a);
+    public DedicatedServer(joptsimple.OptionSet options, Thread serverThread) {
+        super(options, Proxy.NO_PROXY, DedicatedServer.a, serverThread);
+        // PandaSpigot end
         // PandaSpigot end
         // CraftBukkit end
         Thread thread = new Thread("Server Infinisleeper") {
@@ -78,7 +81,7 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
                  * // PandaSpigot end
                  * jline.console.ConsoleReader bufferedreader = reader; // CraftBukkit
                  * String s;
-                 * 
+                 *
                  * try {
                  * // CraftBukkit start - JLine disabling compatibility
                  * while (!isStopped() && isRunning()) {
@@ -123,7 +126,7 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
          * logger.removeAppender(appender);
          * }
          * }
-         * 
+         *
          * new Thread(new
          * org.bukkit.craftbukkit.util.TerminalConsoleWriterThread(System.out,
          * this.reader)).start();
@@ -210,7 +213,7 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
                 this.aq().bind(bindAddress); // PandaSpigot - Unix domain socket support
             } catch (IOException ioexception) {
                 DedicatedServer.LOGGER.warn("**** FAILED TO BIND TO PORT!");
-                DedicatedServer.LOGGER.warn("The exception was: {}", new Object[] { ioexception.toString() });
+                DedicatedServer.LOGGER.warn("The exception was: {}", new Object[]{ioexception.toString()});
                 DedicatedServer.LOGGER.warn("Perhaps a server is already running on that port?");
                 return false;
             }
@@ -249,7 +252,7 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
             return false;
         } else {
             this.convertable = new WorldLoaderServer(server.getWorldContainer()); // CraftBukkit - moved from
-                                                                                  // MinecraftServer constructor
+            // MinecraftServer constructor
             long j = System.nanoTime();
 
             if (this.U() == null) {
@@ -289,7 +292,7 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
             DedicatedServer.LOGGER.info("Preparing level \"" + this.U() + "\"");
             this.a(this.U(), this.U(), k, worldtype, s2);
             long i1 = System.nanoTime() - j;
-            String s3 = String.format("%.3fs", new Object[] { Double.valueOf((double) i1 / 1.0E9D) });
+            String s3 = String.format("%.3fs", new Object[]{Double.valueOf((double) i1 / 1.0E9D)});
 
             DedicatedServer.LOGGER.info("Done (" + s3 + ")! For help, type \"help\" or \"?\"");
             if (GlobalConfig.getInstance().isEnableQuery()) {
@@ -310,7 +313,7 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
                     this.aq().bind(bindAddress); // PandaSpigot - Unix domain socket support
                 } catch (IOException ioexception) {
                     DedicatedServer.LOGGER.warn("**** FAILED TO BIND TO PORT!");
-                    DedicatedServer.LOGGER.warn("The exception was: {}", new Object[] { ioexception.toString() });
+                    DedicatedServer.LOGGER.warn("The exception was: {}", new Object[]{ioexception.toString()});
                     DedicatedServer.LOGGER.warn("Perhaps a server is already running on that port?");
                     return false;
                 }
@@ -506,8 +509,8 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
 
     protected boolean aR() {
         server.getLogger().info("**** Beginning UUID conversion, this may take A LONG time ****"); // Spigot, let the
-                                                                                                   // user know whats
-                                                                                                   // up!
+        // user know whats
+        // up!
         boolean flag = false;
 
         int i;

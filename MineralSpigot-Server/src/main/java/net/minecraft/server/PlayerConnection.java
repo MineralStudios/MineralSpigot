@@ -1,28 +1,21 @@
 package net.minecraft.server;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArrayList;
 // CraftBukkit start
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
+import gg.mineral.server.combat.PlayerAttack;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Server;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.craftbukkit.inventory.CraftInventoryView;
@@ -54,12 +47,8 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
-import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.InventoryView;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginLoader;
 import org.bukkit.util.NumberConversions;
 // CraftBukkit end
 
@@ -68,14 +57,11 @@ import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Floats;
 
 import gg.mineral.server.combat.KnockbackProfileList;
-import gg.mineral.server.combat.NoDamageTickScheduler;
 import gg.mineral.server.config.GlobalConfig;
 import io.netty.buffer.Unpooled;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.objects.Object2BooleanFunction;
-import lombok.Getter;
 import lombok.val;
 
 public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerListBox {
@@ -143,7 +129,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
             throws CancelledPacketHandleException {
         IAsyncTaskHandler taskHandler = this.player.u();
 
-        if (taskHandler.isMainThread() || NoDamageTickScheduler.isMainThread()) {
+        if (taskHandler.isMainThread()) {
             return false;
         }
 
@@ -164,8 +150,8 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     private final static IntOpenHashSet invalidItems = new IntOpenHashSet(
             java.util.Arrays.asList(8, 9, 10, 11, 26, 34, 36, 43, 51, 52, 55, 59, 60, 62, 63, 64, 68, 71, 74, 75, 83,
                     90, 92, 93, 94, 104, 105, 115, 117, 118, 119, 125, 127, 132, 140, 141, 142, 144)); // TODO: Check
-                                                                                                       // after every
-                                                                                                       // update.
+    // after every
+    // update.
     // CraftBukkit end
 
     public void c() {
@@ -181,7 +167,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
 
         this.minecraftServer.methodProfiler.b();
         // CraftBukkit start
-        for (int spam; (spam = this.chatThrottle) > 0 && !chatSpamField.compareAndSet(this, spam, spam - 1);)
+        for (int spam; (spam = this.chatThrottle) > 0 && !chatSpamField.compareAndSet(this, spam, spam - 1); )
             ;
         /*
          * Use thread-safe field access instead
@@ -242,9 +228,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInSteerVehicle packetplayinsteervehicle) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinsteervehicle))
-                return;
         if (ensureMainThread(packetplayinsteervehicle))
             return; // Blossom
         this.player.a(packetplayinsteervehicle.a(), packetplayinsteervehicle.b(), packetplayinsteervehicle.c(),
@@ -258,9 +241,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInFlying packetplayinflying) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinflying))
-                return;
         if (ensureMainThread(packetplayinflying))
             return; // Blossom
         if (this.b(packetplayinflying)) {
@@ -298,13 +278,13 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                 }
                 // Spigot End
                 Location from = new Location(player.getWorld(), lastPosX, lastPosY, lastPosZ, lastYaw, lastPitch); // Get
-                                                                                                                   // the
-                                                                                                                   // Players
-                                                                                                                   // previous
-                                                                                                                   // Event
-                                                                                                                   // location.
+                // the
+                // Players
+                // previous
+                // Event
+                // location.
                 Location to = player.getLocation().clone(); // Start off the To location as the Players current
-                                                            // location.
+                // location.
 
                 // If the packet contains movement information then we update the To location
                 // with the correct XYZ.
@@ -482,18 +462,18 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                     // Spigot: make "moved too quickly" limit configurable
                     if (d15 - d14 > GlobalConfig.getInstance().getMovedTooQuicklyThreshold() && this.checkMovement
                             && (!this.minecraftServer.T() || !this.minecraftServer.S().equals(this.player.getName()))) { // CraftBukkit
-                                                                                                                         // -
-                                                                                                                         // Added
-                                                                                                                         // this.checkMovement
-                                                                                                                         // condition
-                                                                                                                         // to
-                                                                                                                         // solve
-                                                                                                                         // this
-                                                                                                                         // check
-                                                                                                                         // being
-                                                                                                                         // triggered
-                                                                                                                         // by
-                                                                                                                         // teleports
+                        // -
+                        // Added
+                        // this.checkMovement
+                        // condition
+                        // to
+                        // solve
+                        // this
+                        // check
+                        // being
+                        // triggered
+                        // by
+                        // teleports
                         PlayerConnection.c.warn(this.player.getName() + " moved too quickly! " + d11 + "," + d12 + ","
                                 + d13 + " (" + d11 + ", " + d12 + ", " + d13 + ")");
                         this.a(this.o, this.p, this.q, this.player.yaw, this.player.pitch);
@@ -575,13 +555,13 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
 
     public void a(double d0, double d1, double d2, float f, float f1) {
         this.a(d0, d1, d2, f, f1, Collections.<PacketPlayOutPosition.EnumPlayerTeleportFlags>emptySet()); // CraftBukkit
-                                                                                                          // fix
-                                                                                                          // decompile
-                                                                                                          // errors
+        // fix
+        // decompile
+        // errors
     }
 
     public void a(double d0, double d1, double d2, float f, float f1,
-            Set<PacketPlayOutPosition.EnumPlayerTeleportFlags> set) {
+                  Set<PacketPlayOutPosition.EnumPlayerTeleportFlags> set) {
         // CraftBukkit start - Delegate to teleport(Location)
         Player player = this.getPlayer();
         Location from = player.getLocation();
@@ -689,9 +669,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInBlockDig packetplayinblockdig) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinblockdig))
-                return;
         if (ensureMainThread(packetplayinblockdig))
             return; // Blossom
 
@@ -795,9 +772,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     private int packets = 0;
 
     public void a(PacketPlayInBlockPlace packetplayinblockplace) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinblockplace))
-                return;
         if (ensureMainThread(packetplayinblockplace))
             return; // Blossom
 
@@ -891,9 +865,9 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
             // CraftBukkit end
         } else if (blockposition.getY() >= this.minecraftServer.getMaxBuildHeight() - 1
                 && (enumdirection == EnumDirection.UP
-                        || blockposition.getY() >= this.minecraftServer.getMaxBuildHeight())) {
+                || blockposition.getY() >= this.minecraftServer.getMaxBuildHeight())) {
             ChatMessage chatmessage = new ChatMessage("build.tooHigh",
-                    new Object[] { Integer.valueOf(this.minecraftServer.getMaxBuildHeight()) });
+                    new Object[]{Integer.valueOf(this.minecraftServer.getMaxBuildHeight())});
 
             chatmessage.getChatModifier().setColor(EnumChatFormat.RED);
             this.player.playerConnection.sendPacket(new PacketPlayOutChat(chatmessage));
@@ -917,7 +891,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
 
             if (this.checkMovement
                     && this.player.e((double) blockposition.getX() + 0.5D, (double) blockposition.getY() + 0.5D,
-                            (double) blockposition.getZ() + 0.5D) < 64.0D
+                    (double) blockposition.getZ() + 0.5D) < 64.0D
                     && !this.minecraftServer.a(worldserver, blockposition, this.player)
                     && worldserver.getWorldBorder().a(blockposition)) {
                 always = throttled || !this.player.playerInteractManager.interact(this.player, worldserver, itemstack,
@@ -961,9 +935,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInSpectate packetplayinspectate) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinspectate))
-                return;
         if (ensureMainThread(packetplayinspectate))
             return; // Blossom
 
@@ -992,7 +963,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                  * if (entity.world != this.player.world) {
                  * WorldServer worldserver1 = this.player.u();
                  * WorldServer worldserver2 = (WorldServer) entity.world;
-                 * 
+                 *
                  * this.player.dimension = entity.dimension;
                  * this.sendPacket(new PacketPlayOutRespawn(this.player.dimension,
                  * worldserver1.getDifficulty(), worldserver1.getWorldData().getType(),
@@ -1006,7 +977,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                  * worldserver2.addEntity(this.player);
                  * worldserver2.entityJoinedWorld(this.player, false);
                  * }
-                 * 
+                 *
                  * this.player.spawnIn(worldserver2);
                  * this.minecraftServer.getPlayerList().a(this.player, worldserver1);
                  * this.player.enderTeleportTo(entity.locX, entity.locY, entity.locZ);
@@ -1027,9 +998,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
 
     // CraftBukkit start
     public void a(PacketPlayInResourcePackStatus packetplayinresourcepackstatus) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinresourcepackstatus))
-                return;
         this.server.getPluginManager().callEvent(new PlayerResourcePackStatusEvent(getPlayer(),
                 PlayerResourcePackStatusEvent.Status.values()[packetplayinresourcepackstatus.b.ordinal()]));
     }
@@ -1044,16 +1012,16 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
         }
         // CraftBukkit end
         PlayerConnection.c.info(this.player.getName() + " lost connection: " + ichatbasecomponent.c()); // CraftBukkit:
-                                                                                                        // Don't
-                                                                                                        // toString().
-                                                                                                        // // PAIL:
-                                                                                                        // Rename
+        // Don't
+        // toString().
+        // // PAIL:
+        // Rename
         // CraftBukkit start - Replace vanilla quit message handling with our own.
         /*
          * this.minecraftServer.aH();
          * ChatMessage chatmessage = new ChatMessage("multiplayer.player.left", new
          * Object[] { this.player.getScoreboardDisplayName()});
-         * 
+         *
          * chatmessage.getChatModifier().setColor(EnumChatFormat.YELLOW);
          * this.minecraftServer.getPlayerList().sendMessage(chatmessage);
          */
@@ -1070,11 +1038,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
         }
 
     }
-
-    @Getter
-    private List<Object2BooleanFunction<Packet<?>>> outgoingPacketListeners = new CopyOnWriteArrayList<>();
-    @Getter
-    private List<Object2BooleanFunction<Packet<?>>> incomingPacketListeners = new CopyOnWriteArrayList<>();
 
     public void sendPacket(final Packet packet) {
         if (packet instanceof PacketPlayOutChat) {
@@ -1101,11 +1064,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
         // CraftBukkit end
 
         try {
-
-            for (val packetListener : outgoingPacketListeners)
-                if (packetListener.apply(packet))
-                    return;
-
             this.networkManager.handle(packet);
         } catch (Throwable throwable) {
             System.out.println("Error sending packet " + packet);
@@ -1127,9 +1085,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInHeldItemSlot packetplayinhelditemslot) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinhelditemslot))
-                return;
         // CraftBukkit start
         if (this.player.dead)
             return;
@@ -1155,9 +1110,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInChat packetplayinchat) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinchat))
-                return;
         // CraftBukkit start - async chat
         boolean isSync = packetplayinchat.a().startsWith("/");
         if (packetplayinchat.a().startsWith("/")) {
@@ -1166,8 +1118,8 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
         }
         // CraftBukkit end
         if (this.player.dead || this.player.getChatFlags() == EntityHuman.EnumChatVisibility.HIDDEN) { // CraftBukkit -
-                                                                                                       // dead men tell
-                                                                                                       // no tales
+            // dead men tell
+            // no tales
             ChatMessage chatmessage = new ChatMessage("chat.cannotSend", new Object[0]);
 
             chatmessage.getChatModifier().setColor(EnumChatFormat.RED);
@@ -1230,7 +1182,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                 });
                 // Spigot end
             } else if (this.player.getChatFlags() == EntityHuman.EnumChatVisibility.SYSTEM) { // Re-add "Command Only"
-                                                                                              // flag check
+                // flag check
 
                 ChatMessage chatmessage = new ChatMessage("chat.cannotSend", new Object[0]);
 
@@ -1241,7 +1193,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                 // CraftBukkit end - the below is for reference. :)
             } else {
                 ChatMessage chatmessage1 = new ChatMessage("chat.type.text",
-                        new Object[] { this.player.getScoreboardDisplayName(), s });
+                        new Object[]{this.player.getScoreboardDisplayName(), s});
 
                 this.minecraftServer.getPlayerList().sendMessage(chatmessage1, false);
             }
@@ -1314,7 +1266,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                     return;
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // This is proper habit for java. If we aren't handling it, pass
-                                                        // it on!
+                    // it on!
                 } catch (Exception e) {
                     throw new RuntimeException("Exception processing chat command", e.getCause());
                 }
@@ -1367,10 +1319,10 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                     waitable.get();
                 } catch (
 
-                InterruptedException e) {
+                        InterruptedException e) {
                     Thread.currentThread().interrupt(); // This is proper habit for java. If we aren't handling
-                                                        // it, pass
-                                                        // it on!
+                    // it, pass
+                    // it on!
                 } catch (ExecutionException e) {
                     throw new RuntimeException("Exception processing chat event", e.getCause());
                 }
@@ -1425,9 +1377,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInArmAnimation packetplayinarmanimation) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinarmanimation))
-                return;
         if (this.player.dead)
             return; // CraftBukkit
         if (ensureMainThread(packetplayinarmanimation))
@@ -1469,9 +1418,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInEntityAction packetplayinentityaction) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinentityaction))
-                return;
         if (ensureMainThread(packetplayinentityaction))
             return; // Blossom
         // CraftBukkit start
@@ -1630,24 +1576,25 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                         return;
                     }
 
-                    // if (!entity.canHit())
-                    // return;
-
-                    if (entity instanceof EntityLiving lastAttackedEntity) {
+                    if (entity instanceof EntityPlayer lastAttackedEntity) {
                         val kbProfile = lastAttackedEntity.kbProfile != null ? lastAttackedEntity.kbProfile
                                 : lastAttackedEntity.maxNoDamageTicks < 10
-                                        ? KnockbackProfileList.getComboKnockbackProfile()
-                                        : KnockbackProfileList.getDefaultKnockbackProfile();
+                                ? KnockbackProfileList.getComboKnockbackProfile()
+                                : KnockbackProfileList.getDefaultKnockbackProfile();
 
-                        int attackBuffer = kbProfile.getAttackBuffer();
+                        if (kbProfile != null) {
+                            int attackBuffer = kbProfile.getAttackBuffer();
 
-                        if (attackBuffer > 0 && lastAttackedEntity.noDamageTicks > 0
-                                && lastAttackedEntity.noDamageTicks <= attackBuffer)
-                            NoDamageTickScheduler.getTasks().put(() -> this.player.attack(lastAttackedEntity),
-                                    lastAttackedEntity.noDamageTicks / 2);
-                    }
+                            int ticksUntilOffHitCooldown = lastAttackedEntity.noDamageTicks - (lastAttackedEntity.maxNoDamageTicks / 2);
 
-                    this.player.attack(entity);
+                            if (ticksUntilOffHitCooldown > 0 && attackBuffer > 0
+                                    && ticksUntilOffHitCooldown <= attackBuffer)
+                                this.player.getTasks().put(new PlayerAttack(this.player, lastAttackedEntity, kbProfile),
+                                        ticksUntilOffHitCooldown);
+
+                            new PlayerAttack(this.player, lastAttackedEntity, kbProfile).run();
+                        }
+                    } else this.player.attack(entity);
 
                     // Mineral: Fix blocking desync
                     if (this.player.isBlocking())
@@ -1665,10 +1612,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInClientCommand packetplayinclientcommand) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinclientcommand))
-                return;
-
         if (ensureMainThread(packetplayinclientcommand))
             return; // Blossom
         this.player.resetIdleTimer();
@@ -1682,7 +1625,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                     // 0, true);
                     this.minecraftServer.getPlayerList().changeDimension(this.player, 0,
                             PlayerTeleportEvent.TeleportCause.END_PORTAL); // CraftBukkit - reroute logic through custom
-                                                                           // portal management
+                    // portal management
                 } else if (this.player.u().getWorldData().isHardcore()) {
                     if (this.minecraftServer.T() && this.player.getName().equals(this.minecraftServer.S())) {
                         this.player.playerConnection.disconnect("You have died. Game over, man, it\'s game over!");
@@ -1714,9 +1657,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInCloseWindow packetplayinclosewindow) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinclosewindow))
-                return;
         if (this.player.dead)
             return; // CraftBukkit
         if (ensureMainThread(packetplayinclosewindow)) // Blossom
@@ -1728,9 +1668,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInWindowClick packetplayinwindowclick) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinwindowclick))
-                return;
         if (this.player.dead)
             return; // CraftBukkit
         if (ensureMainThread(packetplayinwindowclick)) // Blossom
@@ -1812,7 +1749,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                                             } else if (toPlace < 0) {
                                                 action = toPlace != -1 ? InventoryAction.PICKUP_SOME
                                                         : InventoryAction.PICKUP_ONE; // this happens with oversized
-                                                                                      // stacks
+                                                // stacks
                                             } else if (toPlace != 0) {
                                                 action = InventoryAction.PLACE_SOME;
                                             }
@@ -1859,12 +1796,12 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                             ItemStack hotbar = this.player.inventory.getItem(packetplayinwindowclick.c());
                             boolean canCleanSwap = hotbar == null
                                     || (clickedSlot.inventory == player.inventory && clickedSlot.isAllowed(hotbar)); // the
-                                                                                                                     // slot
-                                                                                                                     // will
-                                                                                                                     // accept
-                                                                                                                     // the
-                                                                                                                     // hotbar
-                                                                                                                     // item
+                            // slot
+                            // will
+                            // accept
+                            // the
+                            // hotbar
+                            // item
                             if (clickedSlot.hasItem()) {
                                 if (canCleanSwap) {
                                     action = InventoryAction.HOTBAR_SWAP;
@@ -1874,7 +1811,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                                         action = InventoryAction.HOTBAR_MOVE_AND_READD;
                                     } else {
                                         action = InventoryAction.NOTHING; // This is not sane! Mojang: You should test
-                                                                          // for other slots of same type
+                                        // for other slots of same type
                                     }
                                 }
                             } else if (!clickedSlot.hasItem() && hotbar != null && clickedSlot.isAllowed(hotbar)) {
@@ -1950,7 +1887,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                         if (inventory.getTopInventory()
                                 .contains(org.bukkit.Material.getMaterial(Item.getId(cursor.getItem())))
                                 || inventory.getBottomInventory()
-                                        .contains(org.bukkit.Material.getMaterial(Item.getId(cursor.getItem())))) {
+                                .contains(org.bukkit.Material.getMaterial(Item.getId(cursor.getItem())))) {
                             action = InventoryAction.COLLECT_TO_CURSOR;
                         }
                     }
@@ -2004,7 +1941,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                                     this.player.playerConnection
                                             .sendPacket(new PacketPlayOutSetSlot(this.player.activeContainer.windowId,
                                                     packetplayinwindowclick.b(), this.player.activeContainer
-                                                            .getSlot(packetplayinwindowclick.b()).getItem()));
+                                                    .getSlot(packetplayinwindowclick.b()).getItem()));
                                 }
                             }
                             // PaperSpigot end
@@ -2013,7 +1950,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                             /*
                              * Needs enum constructor in InventoryAction
                              * if (action.modifiesOtherSlots()) {
-                             * 
+                             *
                              * } else {
                              * if (action.modifiesCursor()) {
                              * this.player.playerConnection.sendPacket(new Packet103SetSlot(-1, -1,
@@ -2050,7 +1987,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                                     this.player.playerConnection
                                             .sendPacket(new PacketPlayOutSetSlot(this.player.activeContainer.windowId,
                                                     packetplayinwindowclick.b(), this.player.activeContainer
-                                                            .getSlot(packetplayinwindowclick.b()).getItem()));
+                                                    .getSlot(packetplayinwindowclick.b()).getItem()));
                                     break;
                                 // Modified clicked only
                                 case DROP_ALL_SLOT:
@@ -2058,7 +1995,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                                     this.player.playerConnection
                                             .sendPacket(new PacketPlayOutSetSlot(this.player.activeContainer.windowId,
                                                     packetplayinwindowclick.b(), this.player.activeContainer
-                                                            .getSlot(packetplayinwindowclick.b()).getItem()));
+                                                    .getSlot(packetplayinwindowclick.b()).getItem()));
                                     break;
                                 // Modified cursor only
                                 case DROP_ALL_CURSOR:
@@ -2108,9 +2045,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInEnchantItem packetplayinenchantitem) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinenchantitem))
-                return;
         if (ensureMainThread(packetplayinenchantitem))
             return; // Blossom
         this.player.resetIdleTimer();
@@ -2123,9 +2057,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInSetCreativeSlot packetplayinsetcreativeslot) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinsetcreativeslot))
-                return;
         if (ensureMainThread(packetplayinsetcreativeslot))
             return; // Blossom
         if (this.player.playerInteractManager.isCreative()) {
@@ -2157,7 +2088,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
             // CraftBukkit - Add invalidItems check
             boolean flag2 = itemstack == null
                     || itemstack.getItem() != null && (!invalidItems.contains(Item.getId(itemstack.getItem()))
-                            || !GlobalConfig.getInstance().isFilterCreativeItems()); // Spigot
+                    || !GlobalConfig.getInstance().isFilterCreativeItems()); // Spigot
             boolean flag3 = itemstack == null
                     || itemstack.getData() >= 0 && itemstack.count <= 64 && itemstack.count > 0;
             // CraftBukkit start - Call click event
@@ -2228,9 +2159,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInTransaction packetplayintransaction) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayintransaction))
-                return;
         if (this.player.dead)
             return; // CraftBukkit
         if (ensureMainThread(packetplayintransaction)) // Blossom
@@ -2246,9 +2174,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInUpdateSign packetplayinupdatesign) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinupdatesign))
-                return;
         if (this.player.dead)
             return; // CraftBukkit
         if (ensureMainThread(packetplayinupdatesign)) // Blossom
@@ -2316,9 +2241,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInKeepAlive packetplayinkeepalive) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinkeepalive))
-                return;
         if (packetplayinkeepalive.a() == this.i) {
             int i = (int) (this.d() - this.j);
 
@@ -2332,9 +2254,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInAbilities packetplayinabilities) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinabilities))
-                return;
         if (ensureMainThread(packetplayinabilities))
             return; // Blossom
         // CraftBukkit start
@@ -2344,7 +2263,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
             this.server.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 this.player.abilities.isFlying = packetplayinabilities.isFlying(); // Actually set the player's flying
-                                                                                   // status
+                // status
             } else {
                 this.player.updateAbilities(); // Tell the player their ability was reverted
             }
@@ -2353,9 +2272,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInTabComplete packetplayintabcomplete) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayintabcomplete))
-                return;
         // PandaSpigot start - Async Tab Completion
         // CraftBukkit start
         if (chatSpamField.addAndGet(this, 10) > 500
@@ -2401,9 +2317,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInSettings packetplayinsettings) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayinsettings))
-                return;
         if (ensureMainThread(packetplayinsettings))
             return; // Blossom
         this.player.a(packetplayinsettings);
@@ -2451,9 +2364,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     // PandaSpigot end
 
     public void a(PacketPlayInCustomPayload packetplayincustompayload) {
-        for (val packetListener : incomingPacketListeners)
-            if (packetListener.apply(packetplayincustompayload))
-                return;
         if (ensureMainThread(packetplayincustompayload))
             return; // Blossom
         PacketDataSerializer packetdataserializer;
@@ -2564,14 +2474,14 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                 if (!this.minecraftServer.getEnableCommandBlock()) {
                     this.player.sendMessage(new ChatMessage("advMode.notEnabled", new Object[0]));
                 } else if (this.player.getBukkitEntity().isOp() && this.player.abilities.canInstantlyBuild) { // CraftBukkit
-                                                                                                              // -
-                                                                                                              // Change
-                                                                                                              // to
-                                                                                                              // Bukkit
-                                                                                                              // OP
-                                                                                                              // versus
-                                                                                                              // Vanilla
-                                                                                                              // OP
+                    // -
+                    // Change
+                    // to
+                    // Bukkit
+                    // OP
+                    // versus
+                    // Vanilla
+                    // OP
                     packetdataserializer = packetplayincustompayload.b();
 
                     try {
@@ -2605,7 +2515,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                             }
 
                             commandblocklistenerabstract.h();
-                            this.player.sendMessage(new ChatMessage("advMode.setCommand.success", new Object[] { s }));
+                            this.player.sendMessage(new ChatMessage("advMode.setCommand.success", new Object[]{s}));
                         }
                     } catch (Exception exception3) {
                         PlayerConnection.c.error("Couldn\'t set command block", exception3);

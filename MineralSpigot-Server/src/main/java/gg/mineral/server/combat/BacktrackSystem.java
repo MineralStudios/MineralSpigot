@@ -11,7 +11,7 @@ import net.minecraft.server.PacketListenerPlayIn;
 public class BacktrackSystem {
 
     @Getter
-    private ConcurrentLinkedQueue<PacketRecieveTask> packetReadTasks = new ConcurrentLinkedQueue<PacketRecieveTask>();
+    private ConcurrentLinkedQueue<PacketRecieveTask> packetReadTasks = new ConcurrentLinkedQueue<>();
 
     // config
     private boolean random = GlobalConfig.getInstance().isBacktrackRandom();
@@ -130,7 +130,7 @@ public class BacktrackSystem {
 
         if (random) {
             if (!inRange || currentTime - lastAttackTime > 3000) { // Make it not delay if out of range or too much time
-                                                                   // has passed since last attacked
+                // has passed since last attacked
                 currentDelay -= decayFactor;
                 if (currentDelay < 0)
                     currentDelay = 0;
@@ -158,8 +158,8 @@ public class BacktrackSystem {
         }
     }
 
-    public static record PacketRecieveTask(Packet<PacketListenerPlayIn> packet, PacketListenerPlayIn packetListener,
-            long sendTime) {
+    public record PacketRecieveTask(Packet<PacketListenerPlayIn> packet, PacketListenerPlayIn packetListener,
+                                    long sendTime) {
 
         public boolean shouldSend() {
             return System.currentTimeMillis() >= sendTime;
@@ -188,6 +188,7 @@ public class BacktrackSystem {
                 break;
 
             task = packetReadTasks.poll();
+            assert task != null;
             task.process();
         }
     }

@@ -5,17 +5,14 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import gg.mineral.server.config.GlobalConfig;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelException;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
+import io.netty.channel.local.LocalAddress;
 import io.netty.channel.local.LocalEventLoopGroup;
+import io.netty.channel.local.LocalServerChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -27,6 +24,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
+
+import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -43,6 +42,8 @@ public class ServerConnection {
             return this.a();
         }
     };
+    static final LocalEventLoopGroup fakeGroup = new LocalEventLoopGroup();
+    static final LocalAddress fakeAddress = new LocalAddress("Mineral-fake");
     public static final LazyInitVar<EpollEventLoopGroup> b = new LazyInitVar() {
         protected EpollEventLoopGroup a() {
             return new EpollEventLoopGroup(0,
@@ -116,48 +117,59 @@ public class ServerConnection {
                 ServerConnection.e.info("Using default channel type");
             }
 
-            this.g.add(((ServerBootstrap) ((ServerBootstrap) (new ServerBootstrap()).channel(oclass))
-                    .childHandler(new ChannelInitializer() {
-                        protected void initChannel(Channel channel) throws Exception {
-                            try {
-                                channel.config().setOption(ChannelOption.TCP_NODELAY, Boolean.valueOf(true));
-                            } catch (ChannelException channelexception) {
-                                ;
-                            }
 
-                            if (!disableFlushConsolidation)
-                                channel.pipeline().addFirst(new io.netty.handler.flush.FlushConsolidationHandler()); // PandaSpigot
-                            // PandaSpigot start - newlines
-                            channel.pipeline().addLast("timeout", new ReadTimeoutHandler(30))
-                                    .addLast("legacy_query", new LegacyPingHandler(ServerConnection.this))
-                                    .addLast("splitter", new PacketSplitter())
-                                    .addLast("decoder", new PacketDecoder(EnumProtocolDirection.SERVERBOUND))
-                                    .addLast("prepender", PacketPrepender.INSTANCE) // PandaSpigot - Share
-                                                                                    // PacketPrepender instance
-                                    .addLast("encoder", new PacketEncoder(EnumProtocolDirection.CLIENTBOUND));
-                            // PandaSpigot end
-                            NetworkManager networkmanager = new NetworkManager(EnumProtocolDirection.SERVERBOUND);
+            val channelInitializer = new ChannelInitializer() {
+                protected void initChannel(Channel channel) throws Exception {
+                    try {
+                        channel.config().setOption(ChannelOption.TCP_NODELAY, Boolean.valueOf(true));
+                    } catch (ChannelException channelexception) {
+                        ;
+                    }
 
-                            // PandaSpigot start - prevent blocking on adding a new network manager while
-                            // the server is ticking
-                            // ServerConnection.this.h.add(networkmanager);
-                            ServerConnection.this.pending.add(networkmanager);
-                            // PandaSpigot end
-                            channel.pipeline().addLast("packet_handler", networkmanager);
-                            networkmanager.a(
-                                    (PacketListener) (new HandshakeListener(ServerConnection.this.f, networkmanager)));
-                            io.papermc.paper.network.ChannelInitializeListenerHolder.callListeners(channel); // PandaSpigot
-                                                                                                             // - Add
-                                                                                                             // Channel
-                                                                                                             // initialization
-                                                                                                             // listeners
-                        }
-                    }).group((EventLoopGroup) lazyinitvar.c()).localAddress(address)).bind().syncUninterruptibly()); // PandaSpigot
+                    if (!disableFlushConsolidation)
+                        channel.pipeline().addFirst(new io.netty.handler.flush.FlushConsolidationHandler()); // PandaSpigot
+                    // PandaSpigot start - newlines
+                    channel.pipeline().addLast("timeout", new ReadTimeoutHandler(30))
+                            .addLast("legacy_query", new LegacyPingHandler(ServerConnection.this))
+                            .addLast("splitter", new PacketSplitter())
+                            .addLast("decoder", new PacketDecoder(EnumProtocolDirection.SERVERBOUND))
+                            .addLast("prepender", PacketPrepender.INSTANCE) // PandaSpigot - Share
+                            // PacketPrepender instance
+                            .addLast("encoder", new PacketEncoder(EnumProtocolDirection.CLIENTBOUND));
+                    // PandaSpigot end
+                    NetworkManager networkmanager = new NetworkManager(EnumProtocolDirection.SERVERBOUND);
+
+                    // PandaSpigot start - prevent blocking on adding a new network manager while
+                    // the server is ticking
+                    // ServerConnection.this.h.add(networkmanager);
+                    ServerConnection.this.pending.add(networkmanager);
+                    // PandaSpigot end
+                    channel.pipeline().addLast("packet_handler", networkmanager);
+                    networkmanager.a(
+                            (PacketListener) (new HandshakeListener(ServerConnection.this.f, networkmanager)));
+                    io.papermc.paper.network.ChannelInitializeListenerHolder.callListeners(channel); // PandaSpigot
+                    // - Add
+                    // Channel
+                    // initialization
+                    // listeners
+                }
+            };
+
+
+            this.g.add(new ServerBootstrap()
+                    .group(fakeGroup)
+                    .channel(LocalServerChannel.class)
+                    .localAddress(fakeAddress)
+                    .childHandler(channelInitializer).bind().syncUninterruptibly());
+
+            this.g.add((new ServerBootstrap()).channel(oclass)
+                    .childHandler(channelInitializer).group((EventLoopGroup) lazyinitvar.c()).localAddress(address).bind().syncUninterruptibly()); // PandaSpigot
                                                                                                                      // -
                                                                                                                      // Unix
                                                                                                                      // domain
                                                                                                                      // socket
                                                                                                                      // support
+
         }
     }
 

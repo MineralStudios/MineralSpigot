@@ -8,6 +8,8 @@ import gg.mineral.server.combat.BacktrackSystem;
 import gg.mineral.server.combat.KnockbackProfileList;
 import gg.mineral.server.config.GlobalConfig;
 import io.netty.buffer.Unpooled;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import lombok.Getter;
 import lombok.val;
 
 import java.util.ArrayList;
@@ -87,7 +89,7 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
     // Spigot end
 
     public EntityPlayer(MinecraftServer minecraftserver, WorldServer worldserver, GameProfile gameprofile,
-            PlayerInteractManager playerinteractmanager) {
+                        PlayerInteractManager playerinteractmanager) {
         super(worldserver, gameprofile);
         this.viewDistance = GlobalConfig.getInstance().getViewDistance(); // PaperSpigot - Player view distance API
         playerinteractmanager.player = this;
@@ -200,6 +202,9 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
 
     public long lastTick = MinecraftServer.currentTick;
 
+    @Getter
+    private final Object2IntOpenHashMap<Runnable> tasks = new Object2IntOpenHashMap<>();
+
     public void t_() {
 
         if (MinecraftServer.currentTick == this.lastTick) {
@@ -218,9 +223,22 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
         // CraftBukkit end
         this.playerInteractManager.a();
         --this.invulnerableTicks;
-        // if (this.noDamageTicks > 0)
-        // --this.noDamageTicks;
+        if (this.noDamageTicks > 0)
+            --this.noDamageTicks;
 
+        val iter = tasks.object2IntEntrySet().fastIterator();
+
+        while (iter.hasNext()) {
+            val entry = iter.next();
+            if (entry.getIntValue() > 0)
+                entry.setValue(entry.getIntValue() - 1);
+            else {
+                entry.getKey().run();
+                iter.remove();
+            }
+        }
+
+        getBacktrackSystem().tickBacktrack();
         getBacktrackSystem().onTick(); // Backtrack System
 
         // PaperSpigot start - Configurable container update tick rate
@@ -275,7 +293,7 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
                 if (chunk != null && chunk.isReady()) {
                     arraylist.add(chunk);
                     arraylist1.addAll(chunk.tileEntities.values()); // CraftBukkit - Get tile entities directly
-                                                                    // from the chunk instead of the world
+                    // from the chunk instead of the world
                     iterator1.remove();
                     new io.papermc.paper.event.packet.PlayerChunkLoadEvent(chunk.bukkitChunk,
                             this.getBukkitEntity()).callEvent(); // PandaSpigot
@@ -347,7 +365,7 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
                     ScoreboardObjective scoreboardobjective = (ScoreboardObjective) iterator.next();
 
                     this.getScoreboard().getPlayerScoreForObjective(this.getName(), scoreboardobjective)
-                            .updateForList(Arrays.asList(new EntityHuman[] { this }));
+                            .updateForList(Arrays.asList(new EntityHuman[]{this}));
                 }
                 // CraftBukkit - Update ALL the scores!
                 this.world.getServer().getScoreboardManager().updateAllScoresForList(IScoreboardCriteria.g,
@@ -569,12 +587,12 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
                 /*
                  * BlockPosition blockposition =
                  * this.server.getWorldServer(i).getDimensionSpawn();
-                 * 
+                 *
                  * if (blockposition != null) {
                  * this.playerConnection.a((double) blockposition.getX(), (double)
                  * blockposition.getY(), (double) blockposition.getZ(), 0.0F, 0.0F);
                  * }
-                 * 
+                 *
                  * i = 1;
                  */
                 // CraftBukkit end
@@ -734,15 +752,15 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
             ITileInventory itileinventory = (ITileInventory) iinventory;
 
             if (itileinventory.r_() && !this.a(itileinventory.i()) && !this.isSpectator() && container == null) { // CraftBukkit
-                                                                                                                  // -
-                                                                                                                  // allow
-                                                                                                                  // plugins
-                                                                                                                  // to
-                                                                                                                  // uncancel
-                                                                                                                  // the
-                                                                                                                  // lock
+                // -
+                // allow
+                // plugins
+                // to
+                // uncancel
+                // the
+                // lock
                 this.playerConnection.sendPacket(new PacketPlayOutChat(
-                        new ChatMessage("container.isLocked", new Object[] { iinventory.getScoreboardDisplayName() }),
+                        new ChatMessage("container.isLocked", new Object[]{iinventory.getScoreboardDisplayName()}),
                         (byte) 2));
                 this.playerConnection.sendPacket(new PacketPlayOutNamedSoundEffect("random.door_close", this.locX,
                         this.locY, this.locZ, 1.0F, 1.0F));
@@ -1038,7 +1056,7 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
          * } else {
          * this.setSpectatorTarget(this);
          * }
-         * 
+         *
          * this.updateAbilities();
          * this.bP();
          * // CraftBukkit end
@@ -1063,7 +1081,7 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
          * if (this.server.getPlayerList().isOp(this.getProfile())) {
          * OpListEntry oplistentry = (OpListEntry)
          * this.server.getPlayerList().getOPs().get(this.getProfile());
-         * 
+         *
          * return oplistentry != null ? oplistentry.a() >= i : this.server.p() >= i;
          * } else {
          * return false;
@@ -1122,7 +1140,7 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
 
     public void d(Entity entity) {
         if (entity instanceof EntityHuman) {
-            this.playerConnection.sendPacket(new PacketPlayOutEntityDestroy(new int[] { entity.getId() }));
+            this.playerConnection.sendPacket(new PacketPlayOutEntityDestroy(new int[]{entity.getId()}));
         } else {
             this.removeQueue.add(Integer.valueOf(entity.getId()));
         }

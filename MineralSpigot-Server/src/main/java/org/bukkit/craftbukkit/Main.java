@@ -174,15 +174,15 @@ public class Main {
                  * 'r','m','i','n','a','l'});
                  * String jline_terminal = new String(new char[]
                  * {'j','l','i','n','e','.','t','e','r','m','i','n','a','l'});
-                 * 
+                 *
                  * useJline =
                  * !(jline_UnsupportedTerminal).equals(System.getProperty(jline_terminal));
-                 * 
+                 *
                  * if (options.has("nojline")) {
                  * System.setProperty("user.language", "en");
                  * useJline = false;
                  * }
-                 * 
+                 *
                  * if (useJline) {
                  * AnsiConsole.systemInstall();
                  * } else {
@@ -225,13 +225,35 @@ public class Main {
                 }
                 // Spigot End
                 System.setProperty("library.jansi.version", "PandaSpigot"); // PandaSpigot - set meaningless jansi
-                                                                            // version to prevent git builds from
-                                                                            // crashing on Windows
+                // version to prevent git builds from
+                // crashing on Windows
                 System.out.println("Loading libraries, please wait...");
                 // PandaSpigot start - Modern tick loop
                 net.minecraft.server.DispenserRegistry.c();
 
-                MinecraftServer.main(options);
+                // PandaSpigot start - Modern tick loop
+                net.minecraft.server.DispenserRegistry.c();
+                OptionSet finalOptions = options;
+
+                net.minecraft.server.DedicatedServer server = MinecraftServer.spin(thread -> {
+                    net.minecraft.server.DedicatedServer dedicatedserver = new net.minecraft.server.DedicatedServer(finalOptions, thread);
+
+                    if (finalOptions.has("port")) {
+                        int port = (Integer) finalOptions.valueOf("port");
+                        if (port > 0) {
+                            dedicatedserver.setPort(port);
+                        }
+                    }
+
+                    if (finalOptions.has("universe")) {
+                        dedicatedserver.universe = (File) finalOptions.valueOf("universe");
+                    }
+                    if (finalOptions.has("world")) {
+                        dedicatedserver.setWorld((String) finalOptions.valueOf("world"));
+                    }
+                    return dedicatedserver;
+                });
+                // PandaSpigot end - Modern tick loop
             } catch (Throwable t) {
                 t.printStackTrace();
             }

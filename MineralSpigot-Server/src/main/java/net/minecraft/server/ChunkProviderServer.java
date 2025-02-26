@@ -11,11 +11,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 // CraftBukkit start
 import java.util.Random;
+import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -37,9 +39,9 @@ public class ChunkProviderServer implements IChunkProvider {
     public IChunkProvider chunkProvider;
     public IChunkLoader chunkLoader;
     public boolean forceChunkLoad = false; // CraftBukkit - true -> false
-        // Paper start
-                protected Chunk lastChunkByPos = null;
-    public LongObjectHashMap<Chunk> chunks = new LongObjectHashMap<>() {
+    // Paper start
+    protected Chunk lastChunkByPos = null;
+    public final LongObjectHashMap<Chunk> chunks = new LongObjectHashMap<>() {
         @Override
         public Chunk get(long key) {
             if (lastChunkByPos != null && key == lastChunkByPos.chunkKey) {
@@ -61,51 +63,51 @@ public class ChunkProviderServer implements IChunkProvider {
 
     public ChunkProviderServer(WorldServer worldserver, IChunkLoader ichunkloader, IChunkProvider ichunkprovider) {
         this.emptyChunk = new EmptyChunk(worldserver, Integer.MIN_VALUE, Integer.MIN_VALUE); // PandaSpigot - Occasional
-                                                                                             // Client Side Unloading of
-                                                                                             // 0,0 chunk
+        // Client Side Unloading of
+        // 0,0 chunk
         this.world = worldserver;
         this.chunkLoader = ichunkloader;
         this.chunkProvider = ichunkprovider;
     }
 
-        // SportPaper start
-                public void unloadAllChunks() {
-                for(Chunk chunk : chunks.values()) {
-                        unloadChunk(chunk);
-                    }
-           }
+    // SportPaper start
+    public void unloadAllChunks() {
+        for (Chunk chunk : chunks.values()) {
+            unloadChunk(chunk);
+        }
+    }
 
-            public void unloadChunk(Chunk chunk) {
-                Server server = this.world.getServer();
-                ChunkUnloadEvent event = new ChunkUnloadEvent(chunk.bukkitChunk);
-                server.getPluginManager().callEvent(event);
-                if (!event.isCancelled()) {
+    public void unloadChunk(Chunk chunk) {
+        Server server = this.world.getServer();
+        ChunkUnloadEvent event = new ChunkUnloadEvent(chunk.bukkitChunk);
+        server.getPluginManager().callEvent(event);
+        if (!event.isCancelled()) {
 
-                                chunk.removeEntities();
-                        this.saveChunk(chunk);
-                       this.saveChunkNOP(chunk);
-                        this.chunks.remove(chunk.chunkKey); // CraftBukkit
-                        if (this.unloadQueue.contains(chunk.chunkKey)) {
-                                this.unloadQueue.remove(chunk.chunkKey);
-                           }
-
-                                // Update neighbor counts
-                                        for (int x = -2; x < 3; x++) {
-                                for (int z = -2; z < 3; z++) {
-                                        if (x == 0 && z == 0) {
-                                                continue;
-                                           }
-
-                                                Chunk neighbor = this.getChunkIfLoaded(chunk.locX + x, chunk.locZ + z);
-                                        if (neighbor != null) {
-                                                neighbor.setNeighborUnloaded(-x, -z);
-                                                chunk.setNeighborUnloaded(x, z);
-                                            }
-                                    }
-                            }
-                    }
+            chunk.removeEntities();
+            this.saveChunk(chunk);
+            this.saveChunkNOP(chunk);
+            this.chunks.remove(chunk.chunkKey); // CraftBukkit
+            if (this.unloadQueue.contains(chunk.chunkKey)) {
+                this.unloadQueue.remove(chunk.chunkKey);
             }
-   // SportPaper end
+
+            // Update neighbor counts
+            for (int x = -2; x < 3; x++) {
+                for (int z = -2; z < 3; z++) {
+                    if (x == 0 && z == 0) {
+                        continue;
+                    }
+
+                    Chunk neighbor = this.getChunkIfLoaded(chunk.locX + x, chunk.locZ + z);
+                    if (neighbor != null) {
+                        neighbor.setNeighborUnloaded(-x, -z);
+                        chunk.setNeighborUnloaded(x, z);
+                    }
+                }
+            }
+        }
+    }
+    // SportPaper end
 
     public boolean isChunkLoaded(int i, int j) {
         return this.chunks.containsKey(LongHash.toLong(i, j)); // CraftBukkit
@@ -233,11 +235,11 @@ public class ChunkProviderServer implements IChunkProvider {
                         CrashReportSystemDetails crashreportsystemdetails = crashreport.a("Chunk to be generated");
 
                         crashreportsystemdetails.a("Location", (Object) String.format("%d,%d",
-                                new Object[] { Integer.valueOf(i), Integer.valueOf(j) }));
+                                new Object[]{Integer.valueOf(i), Integer.valueOf(j)}));
                         crashreportsystemdetails.a("Position hash", (Object) Long.valueOf(LongHash.toLong(i, j))); // CraftBukkit
-                                                                                                                   // -
-                                                                                                                   // Use
-                                                                                                                   // LongHash
+                        // -
+                        // Use
+                        // LongHash
                         crashreportsystemdetails.a("Generator", (Object) this.chunkProvider.getName());
                         throw new ReportedException(crashreport);
                     }

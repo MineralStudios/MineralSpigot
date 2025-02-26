@@ -1,11 +1,6 @@
 package org.bukkit.craftbukkit.scoreboard;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -30,7 +25,7 @@ public final class CraftScoreboardManager implements ScoreboardManager {
     private final CraftScoreboard mainScoreboard;
     private final MinecraftServer server;
     private final Collection<CraftScoreboard> scoreboards = new WeakCollection<CraftScoreboard>();
-    private final Map<CraftPlayer, CraftScoreboard> playerBoards = new Object2ObjectOpenHashMap<CraftPlayer, CraftScoreboard>();
+    private final Map<UUID, CraftScoreboard> playerBoards = new Object2ObjectOpenHashMap<>();
 
     public CraftScoreboardManager(MinecraftServer minecraftserver, net.minecraft.server.Scoreboard scoreboardServer) {
         mainScoreboard = new CraftScoreboard(scoreboardServer);
@@ -64,7 +59,7 @@ public final class CraftScoreboardManager implements ScoreboardManager {
 
     // CraftBukkit method
     public CraftScoreboard getPlayerBoard(CraftPlayer player) {
-        CraftScoreboard board = playerBoards.get(player);
+        CraftScoreboard board = playerBoards.get(player.getUniqueId());
         return (CraftScoreboard) (board == null ? getMainScoreboard() : board);
     }
 
@@ -84,9 +79,9 @@ public final class CraftScoreboardManager implements ScoreboardManager {
         }
 
         if (scoreboard == mainScoreboard) {
-            playerBoards.remove(player);
+            playerBoards.remove(player.getUniqueId());
         } else {
-            playerBoards.put(player, (CraftScoreboard) scoreboard);
+            playerBoards.put(player.getUniqueId(), scoreboard);
         }
 
         // Old objective tracking
@@ -112,15 +107,15 @@ public final class CraftScoreboardManager implements ScoreboardManager {
 
     // CraftBukkit method
     public void removePlayer(Player player) {
-        playerBoards.remove(player);
+        playerBoards.remove(player.getUniqueId());
     }
 
     // CraftBukkit method
     public Collection<ScoreboardScore> getScoreboardScores(IScoreboardCriteria criteria, String name,
-            Collection<ScoreboardScore> collection) {
+                                                           Collection<ScoreboardScore> collection) {
         for (CraftScoreboard scoreboard : scoreboards) {
             Scoreboard board = scoreboard.board;
-            for (ScoreboardObjective objective : (Iterable<ScoreboardObjective>) board
+            for (ScoreboardObjective objective : board
                     .getObjectivesForCriteria(criteria)) {
                 collection.add(board.getPlayerScoreForObjective(name, objective));
             }

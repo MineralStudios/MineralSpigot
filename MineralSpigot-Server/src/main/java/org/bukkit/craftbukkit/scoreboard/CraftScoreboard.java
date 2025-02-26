@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit.scoreboard;
 
 import java.util.Collection;
+
 import net.minecraft.server.Scoreboard;
 import net.minecraft.server.ScoreboardObjective;
 import net.minecraft.server.ScoreboardTeam;
@@ -62,13 +63,7 @@ public final class CraftScoreboard implements org.bukkit.scoreboard.Scoreboard {
     }
 
     public ImmutableSet<Objective> getObjectives() {
-        return ImmutableSet.copyOf(Iterables.transform((Collection<ScoreboardObjective>) this.board.getObjectives(), new Function<ScoreboardObjective, Objective>() {
-
-            @Override
-            public Objective apply(ScoreboardObjective input) {
-                return new CraftObjective(CraftScoreboard.this, input);
-            }
-        }));
+        return ImmutableSet.copyOf(Iterables.transform(this.board.getObjectives(), (Function<ScoreboardObjective, Objective>) input -> new CraftObjective(CraftScoreboard.this, input)));
     }
 
     public Objective getObjective(DisplaySlot slot) throws IllegalArgumentException {

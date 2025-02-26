@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit;
 
 import com.google.common.base.Preconditions;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -113,28 +114,28 @@ public class CraftWorld implements World {
         return world.getHighestBlockYAt(new BlockPosition(x, 0, z)).getY();
     }
 
-        @Getter
-        private boolean ticking = false;
+    @Getter
+    private boolean ticking = true;
 
     public boolean checkTicking() {
-                boolean shouldTick = hasPlayers();
-                if(ticking) {
-                       if(!shouldTick) { // Empty
-                                ticking = false;
-                                world.getServer().getLogger().info("Stopping world " + getName());
-                                getHandle().chunkProviderServer.unloadAllChunks();
-                            }
-                   } else if(shouldTick) {
-                        ticking = true;
-                        world.getServer().getLogger().info("Starting world " + getName());
-                        setKeepSpawnInMemory(getKeepSpawnInMemory());
-                    }
-                return ticking;
+        boolean shouldTick = hasPlayers();
+        if (ticking) {
+            if (!shouldTick) { // Empty
+                ticking = false;
+                world.getServer().getLogger().info("Stopping world " + getName());
+                //TODO: fix concurrent modification getHandle().chunkProviderServer.unloadAllChunks();
             }
+        } else if (shouldTick) {
+            ticking = true;
+            world.getServer().getLogger().info("Starting world " + getName());
+            // setKeepSpawnInMemory(getKeepSpawnInMemory());
+        }
+        return ticking;
+    }
 
-            public boolean hasPlayers() {
-                return !world.players.isEmpty();
-            }
+    public boolean hasPlayers() {
+        return !world.players.isEmpty();
+    }
 
     public Location getSpawnLocation() {
         BlockPosition spawn = world.getSpawn();
@@ -244,12 +245,12 @@ public class CraftWorld implements World {
         }
         // PaperSpigot end
         if (chunk.mustSave) { // If chunk had previously been queued to save, must do save to avoid loss of
-                              // that data
+            // that data
             save = true;
         }
 
         chunk.removeEntities(); // Always remove entities - even if discarding, need to get them out of world
-                                // table
+        // table
 
         if (save && !(chunk instanceof EmptyChunk)) {
             world.chunkProviderServer.saveChunk(chunk);
@@ -792,8 +793,8 @@ public class CraftWorld implements World {
         AxisAlignedBB bb = new AxisAlignedBB(location.getX() - x, location.getY() - y, location.getZ() - z,
                 location.getX() + x, location.getY() + y, location.getZ() + z);
         List<net.minecraft.server.Entity> entityList = getHandle().a((net.minecraft.server.Entity) null, bb, null); // PAIL
-                                                                                                                    // :
-                                                                                                                    // rename
+        // :
+        // rename
         List<Entity> bukkitEntityList = new ArrayList<org.bukkit.entity.Entity>(entityList.size());
         for (Object entity : entityList) {
             bukkitEntityList.add(((net.minecraft.server.Entity) entity).getBukkitEntity());
@@ -1156,7 +1157,7 @@ public class CraftWorld implements World {
                 height = 9;
             }
 
-            BlockFace[] faces = new BlockFace[] { BlockFace.EAST, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH };
+            BlockFace[] faces = new BlockFace[]{BlockFace.EAST, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH};
             final BlockPosition pos = new BlockPosition((int) x, (int) y, (int) z);
             for (BlockFace dir : faces) {
                 net.minecraft.server.Block nmsBlock = CraftMagicNumbers.getBlock(block.getRelative(dir));
@@ -1166,7 +1167,7 @@ public class CraftWorld implements World {
                             CraftBlock.blockFaceToNotch(dir).opposite(), width, height);
                     List<net.minecraft.server.Entity> list = (List<net.minecraft.server.Entity>) world.getEntities(null,
                             bb);
-                    for (Iterator<net.minecraft.server.Entity> it = list.iterator(); !taken && it.hasNext();) {
+                    for (Iterator<net.minecraft.server.Entity> it = list.iterator(); !taken && it.hasNext(); ) {
                         net.minecraft.server.Entity e = it.next();
                         if (e instanceof EntityHanging) {
                             taken = true; // Hanging entities do not like hanging entities which intersect them.
@@ -1231,7 +1232,7 @@ public class CraftWorld implements World {
 
     @SuppressWarnings("unchecked")
     public <T extends Entity> T addEntity(net.minecraft.server.Entity entity, SpawnReason reason,
-            java.util.function.Consumer<T> function) throws IllegalArgumentException {
+                                          java.util.function.Consumer<T> function) throws IllegalArgumentException {
         // PandaSpigot end
         Preconditions.checkArgument(entity != null, "Cannot spawn null entity");
 
@@ -1249,7 +1250,7 @@ public class CraftWorld implements World {
     }
 
     public <T extends Entity> T spawn(Location location, Class<T> clazz, java.util.function.Consumer<T> function,
-            SpawnReason reason) throws IllegalArgumentException { // PandaSpigot - function param
+                                      SpawnReason reason) throws IllegalArgumentException { // PandaSpigot - function param
         net.minecraft.server.Entity entity = createEntity(location, clazz);
 
         return addEntity(entity, reason, function); // PandaSpigot - function param
@@ -1512,7 +1513,7 @@ public class CraftWorld implements World {
     private final Spigot spigot = new Spigot() {
         @Override
         public void playEffect(Location location, Effect effect, int id, int data, float offsetX, float offsetY,
-                float offsetZ, float speed, int particleCount, int radius) {
+                               float offsetZ, float speed, int particleCount, int radius) {
             Validate.notNull(location, "Location cannot be null");
             Validate.notNull(effect, "Effect cannot be null");
             Validate.notNull(location.getWorld(), "World cannot be null");
@@ -1529,9 +1530,9 @@ public class CraftWorld implements World {
                         particle = p;
                         if (effect.getData() != null) {
                             if (effect.getData().equals(org.bukkit.Material.class)) {
-                                extra = new int[] { id };
+                                extra = new int[]{id};
                             } else {
-                                extra = new int[] { (data << 12) | (id & 0xFFF) };
+                                extra = new int[]{(data << 12) | (id & 0xFFF)};
                             }
                         }
                         break;

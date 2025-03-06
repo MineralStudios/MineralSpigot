@@ -34,9 +34,11 @@ public class PlayerAttack implements Runnable {
     int fireAspectLevel = 0;
     private static final Random random = new Random();
     private static final Function<? super Double, Double> ZERO_FUNCTION = Functions.constant(-0.0);
+    boolean sprinting = false;
 
-    public PlayerAttack(EntityPlayer attacker, EntityPlayer entity, KnockbackProfile knockback) {
+    public PlayerAttack(EntityPlayer attacker, EntityPlayer entity, KnockbackProfile knockback, boolean sprinting) {
         this.knockback = knockback;
+        this.sprinting = sprinting;
         this.attacker = attacker;
         this.entity = entity;
         this.damageSource = DamageSource.playerAttack(attacker);
@@ -219,6 +221,7 @@ public class PlayerAttack implements Runnable {
         double oldY = entity.motY;
         double oldZ = entity.motZ;
 
+        attacker.setSprinting(sprinting || attacker.isSprinting());
         knockback.callFirstStage(attacker, entity);
 
         entity.velocityChanged = true;

@@ -1589,10 +1589,10 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
 
                             if (ticksUntilOffHitCooldown > 0 && attackBuffer > 0
                                     && ticksUntilOffHitCooldown <= attackBuffer)
-                                this.player.getTasks().put(new PlayerAttack(this.player, lastAttackedEntity, kbProfile),
+                                this.player.getTasks().put(new PlayerAttack(this.player, lastAttackedEntity, kbProfile, this.player.isSprinting()),
                                         ticksUntilOffHitCooldown);
 
-                            new PlayerAttack(this.player, lastAttackedEntity, kbProfile).run();
+                            new PlayerAttack(this.player, lastAttackedEntity, kbProfile, this.player.isSprinting()).run();
                         }
                     } else this.player.attack(entity);
 

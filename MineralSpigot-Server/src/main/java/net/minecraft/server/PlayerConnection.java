@@ -11,6 +11,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
+import gg.mineral.server.combat.LagCompensator;
 import gg.mineral.server.combat.PlayerAttack;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -321,6 +322,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
 
                         // If the event is cancelled we move the player back to their old location.
                         if (event.isCancelled()) {
+                            LagCompensator.INSTANCE.registerMovement(player, to); // Nacho
                             // PandaSpigot start - Smooth teleportation
                             if (GlobalConfig.getInstance().isSmoothTeleportation()) {
                                 this.player.playerConnection.sendPacket(new PacketPlayOutPosition(from.getX(),
@@ -356,6 +358,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                             return;
                         }
                     }
+                    LagCompensator.INSTANCE.registerMovement(player, to); // Nacho
                 }
 
                 if (this.checkMovement && !this.player.dead) {
@@ -602,6 +605,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
             f1 = to.getPitch();
         }
 
+        LagCompensator.INSTANCE.registerMovement(player, to); // Nacho
         this.internalTeleport(d0, d1, d2, f, f1, set);
     }
 
@@ -1488,9 +1492,6 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
     }
 
     public void a(PacketPlayInUseEntity packetplayinuseentity) {
-        // for (val packetListener : incomingPacketListeners)
-        // if (packetListener.apply(packetplayinuseentity))
-        // return;
         if (this.player.dead)
             return; // CraftBukkit
         if (ensureMainThread(packetplayinuseentity))
@@ -1506,14 +1507,15 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
 
         this.player.resetIdleTimer();
         if (entity != null) {
-            boolean flag = this.player.hasLineOfSight(entity);
+            // WindSpigot
+            boolean flag = this.player.hasLineOfSightAccurate(entity);
             double d0 = 36.0D;
 
             if (!flag) {
-                d0 = 9.0D;
+                d0 = 12.75D;
             }
 
-            if (this.player.h(entity) < d0) {
+            if (this.player.distanceSqrdAccurate(entity) <= d0) { // Nacho - <  ->  <=
                 ItemStack itemInHand = this.player.inventory.getItemInHand(); // CraftBukkit
 
                 if (packetplayinuseentity.a() == PacketPlayInUseEntity.EnumEntityUseAction.INTERACT

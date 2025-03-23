@@ -1,6 +1,7 @@
 package net.minecraft.server;
 
 // CraftBukkit start
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -176,10 +177,10 @@ public abstract class EntityLiving extends Entity {
                 if (this instanceof EntityPlayer) {
                     ((WorldServer) this.world).sendParticles((EntityPlayer) this, EnumParticle.BLOCK_DUST, false,
                             this.locX, this.locY, this.locZ, i, 0.0D, 0.0D, 0.0D, 0.15000000596046448D,
-                            new int[] { Block.getCombinedId(iblockdata) });
+                            new int[]{Block.getCombinedId(iblockdata)});
                 } else {
                     ((WorldServer) this.world).a(EnumParticle.BLOCK_DUST, this.locX, this.locY, this.locZ, i, 0.0D,
-                            0.0D, 0.0D, 0.15000000596046448D, new int[] { Block.getCombinedId(iblockdata) });
+                            0.0D, 0.0D, 0.15000000596046448D, new int[]{Block.getCombinedId(iblockdata)});
                 }
                 // CraftBukkit end
             }
@@ -316,7 +317,7 @@ public abstract class EntityLiving extends Entity {
     protected void aZ() {
         ++this.deathTicks;
         if (this.deathTicks >= 20 && !this.dead) { // CraftBukkit - (this.deathTicks == 20) -> (this.deathTicks >= 20 &&
-                                                   // !this.dead)
+            // !this.dead)
             int i;
 
             // CraftBukkit start - Update getExpReward() above if the removed if() changes!
@@ -771,7 +772,7 @@ public abstract class EntityLiving extends Entity {
                 if ((float) this.noDamageTicks > (float) this.maxNoDamageTicks / 2.0F) {
                     if (f <= this.lastDamage) {
                         this.forceExplosionKnockback = true; // CraftBukkit - SPIGOT-949 - for vanilla consistency,
-                                                             // cooldown does not prevent explosion knockback
+                        // cooldown does not prevent explosion knockback
                         return false;
                     }
 
@@ -830,7 +831,7 @@ public abstract class EntityLiving extends Entity {
                         && damagesource == DamageSource.FALL;
                 if (!disablePearlKb && flag
                         && !(knockbackCancelled = GlobalConfig.getInstance().isDisableExplosionKnockback()
-                                && damagesource.isExplosion() && this instanceof EntityHuman)) {
+                        && damagesource.isExplosion() && this instanceof EntityHuman)) {
                     // PaperSpigot end
                     this.world.broadcastEntityEffect(this, (byte) 2);
                     if (damagesource != DamageSource.DROWN) {
@@ -894,7 +895,7 @@ public abstract class EntityLiving extends Entity {
             vec3d1 = vec3d1.b(-this.yaw * 3.1415927F / 180.0F);
             vec3d1 = vec3d1.add(this.locX, this.locY + (double) this.getHeadHeight(), this.locZ);
             this.world.addParticle(EnumParticle.ITEM_CRACK, vec3d1.a, vec3d1.b, vec3d1.c, vec3d.a, vec3d.b + 0.05D,
-                    vec3d.c, new int[] { Item.getId(itemstack.getItem()) });
+                    vec3d.c, new int[]{Item.getId(itemstack.getItem())});
         }
 
     }
@@ -949,25 +950,24 @@ public abstract class EntityLiving extends Entity {
 
             val kbProfile = this.kbProfile != null ? this.kbProfile
                     : this.maxNoDamageTicks < 10 ? KnockbackProfileList.getComboKnockbackProfile()
-                            : KnockbackProfileList.getDefaultKnockbackProfile();
+                    : KnockbackProfileList.getDefaultKnockbackProfile();
 
             if (damagesource.p().equalsIgnoreCase("player") && entity instanceof EntityLiving living && kbProfile != null)
                 kbProfile.callFirstStage(living, this);
             else {
 
-                    float f1 = MathHelper.sqrt(d0 * d0 + d1 * d1);
-                    float f2 = 0.4F;
+                float f1 = MathHelper.sqrt(d0 * d0 + d1 * d1);
+                float f2 = 0.4F;
 
-                    this.motX /= 2.0D;
-                    this.motY /= 2.0D;
-                    this.motZ /= 2.0D;
-                    this.motX -= d0 / (double) f1 * (double) f2;
-                    this.motY += f2;
-                    this.motZ -= d1 / (double) f1 * (double) f2;
-                    if (this.motY > 0.4000000059604645D) {
-                        this.motY = 0.4000000059604645D;
-                    }
-
+                this.motX /= 2.0D;
+                this.motY /= 2.0D;
+                this.motZ /= 2.0D;
+                this.motX -= d0 / (double) f1 * (double) f2;
+                this.motY += f2;
+                this.motZ -= d1 / (double) f1 * (double) f2;
+                if (this.motY > 0.4000000059604645D) {
+                    this.motY = 0.4000000059604645D;
+                }
 
 
             }
@@ -1273,8 +1273,8 @@ public abstract class EntityLiving extends Entity {
         return this.hasEffect(MobEffectList.FASTER_DIG)
                 ? 6 - (1 + this.getEffect(MobEffectList.FASTER_DIG).getAmplifier()) * 1
                 : (this.hasEffect(MobEffectList.SLOWER_DIG)
-                        ? 6 + (1 + this.getEffect(MobEffectList.SLOWER_DIG).getAmplifier()) * 2
-                        : 6);
+                ? 6 + (1 + this.getEffect(MobEffectList.SLOWER_DIG).getAmplifier()) * 2
+                : 6);
     }
 
     public void bw() {
@@ -1381,7 +1381,7 @@ public abstract class EntityLiving extends Entity {
 
                         if (World.a((IBlockAccess) this.world, new BlockPosition(k, (int) this.locY - 1, l))
                                 || this.world.getType(new BlockPosition(k, (int) this.locY - 1, l)).getBlock()
-                                        .getMaterial() == Material.WATER) {
+                                .getMaterial() == Material.WATER) {
                             d0 = this.locX + (double) i;
                             d1 = this.locY + 1.0D;
                             d2 = this.locZ + (double) j;
@@ -1534,7 +1534,7 @@ public abstract class EntityLiving extends Entity {
 
                 if (this.world.isClientSide
                         && (!this.world.isLoaded(new BlockPosition((int) this.locX, 0, (int) this.locZ)) || !this.world
-                                .getChunkAtWorldCoords(new BlockPosition((int) this.locX, 0, (int) this.locZ)).o())) {
+                        .getChunkAtWorldCoords(new BlockPosition((int) this.locX, 0, (int) this.locZ)).o())) {
                     if (this.locY > 0.0D) {
                         this.motY = -0.1D;
                     } else {
@@ -1927,6 +1927,31 @@ public abstract class EntityLiving extends Entity {
         return this.world.rayTrace(new Vec3D(this.locX, this.locY + (double) this.getHeadHeight(), this.locZ),
                 new Vec3D(entity.locX, entity.locY + (double) entity.getHeadHeight(), entity.locZ)) == null;
     }
+
+    // WindSpigot start
+    public boolean hasLineOfSightAccurate(Entity entity) {
+        Vec3D vec = new Vec3D(this.locX, this.locY + (double) this.getHeadHeight(), this.locZ);
+
+        if (entity instanceof EntityPlayer) {
+
+            // Head height is 1,5725
+            // Split it into three to get a more accurate line of sight -> 0.52416667
+
+            double parts = entity.getHeadHeight() / 3;
+
+            return this.world.rayTrace(vec, new Vec3D(entity.locX, entity.locY + (parts * 3), entity.locZ)) == null
+                    || this.world.rayTrace(vec, new Vec3D(entity.locX, entity.locY + (parts * 2), entity.locZ)) == null
+                    || this.world.rayTrace(vec, new Vec3D(entity.locX, entity.locY + (parts * 1), entity.locZ)) == null;
+        } else {
+            return this.world.rayTrace(vec, new Vec3D(entity.locX, entity.locY + (double) entity.getHeadHeight(), entity.locZ)) == null;
+        }
+    }
+
+    public boolean hasLineOfSight(double x, double y, double z) {
+        Vec3D vec = new Vec3D(this.locX, this.locY + (double) this.getHeadHeight(), this.locZ);
+        return this.world.rayTrace(vec, new Vec3D(x, y, z)) == null;
+    }
+    // WindSpigot end
 
     public Vec3D ap() {
         return this.d(1.0F);

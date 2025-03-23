@@ -7,6 +7,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 
 // CraftBukkit start
+import gg.mineral.server.combat.LagCompensator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -146,7 +147,7 @@ public abstract class Entity implements ICommandListener {
     public int getChunkZ() {
         return ag;
     } // PAIL
-      // PaperSpigot end
+    // PaperSpigot end
 
     public boolean ah;
     public boolean ai;
@@ -267,7 +268,7 @@ public abstract class Entity implements ICommandListener {
                 this.world.getServer().getLogger()
                         .warning(this.getName() + " was caught trying to crash the server with an invalid yaw");
                 ((CraftPlayer) this.getBukkitEntity()).kickPlayer("Infinite yaw (Hacking?)"); // Spigot "Nope" ->
-                                                                                              // Descriptive reason
+                // Descriptive reason
             }
             f = 0;
         }
@@ -282,7 +283,7 @@ public abstract class Entity implements ICommandListener {
                 this.world.getServer().getLogger()
                         .warning(this.getName() + " was caught trying to crash the server with an invalid pitch");
                 ((CraftPlayer) this.getBukkitEntity()).kickPlayer("Infinite pitch (Hacking?)"); // Spigot "Nope" ->
-                                                                                                // Descriptive reason
+                // Descriptive reason
             }
             f1 = 0;
         }
@@ -813,7 +814,7 @@ public abstract class Entity implements ICommandListener {
              * "Checking entity block collision");
              * CrashReportSystemDetails crashreportsystemdetails =
              * crashreport.a("Entity being checked for collision");
-             * 
+             *
              * this.appendEntityCrashDetails(crashreportsystemdetails);
              * throw new ReportedException(crashreport);
              * }
@@ -1042,7 +1043,7 @@ public abstract class Entity implements ICommandListener {
                     this.locX + ((double) this.random.nextFloat() - 0.5D) * (double) this.width,
                     this.getBoundingBox().b + 0.1D,
                     this.locZ + ((double) this.random.nextFloat() - 0.5D) * (double) this.width, -this.motX * 4.0D,
-                    1.5D, -this.motZ * 4.0D, new int[] { Block.getCombinedId(iblockdata) });
+                    1.5D, -this.motZ * 4.0D, new int[]{Block.getCombinedId(iblockdata)});
         }
 
     }
@@ -1186,6 +1187,29 @@ public abstract class Entity implements ICommandListener {
         return d0 * d0 + d1 * d1 + d2 * d2;
     }
 
+    // WindSpigot start
+    public double distanceSqrdAccurate(Entity entity) {
+        EntityPlayer entityPlayer = (EntityPlayer) entity;
+        EntityPlayer player = (EntityPlayer) this;
+
+        Location loc;
+        if (entityPlayer.playerConnection.getClass().equals(PlayerConnection.class)
+                && player.playerConnection.getClass().equals(PlayerConnection.class)) {
+            loc = LagCompensator.INSTANCE.getHistoryLocation(entityPlayer.getBukkitEntity(),
+                    player.ping);
+        } else {
+            loc = entityPlayer.getBukkitEntity().getLocation();
+        }
+        // Nacho end
+
+        double d0 = this.locX - loc.getX();
+        double d1 = this.locY - loc.getY();
+        double d2 = this.locZ - loc.getZ();
+
+        return d0 * d0 + d1 * d1 + d2 * d2;
+    }
+    // WindSpigot end
+
     public void d(EntityHuman entityhuman) {
     }
 
@@ -1304,8 +1328,8 @@ public abstract class Entity implements ICommandListener {
 
     public void e(NBTTagCompound nbttagcompound) {
         try {
-            nbttagcompound.set("Pos", this.a(new double[] { this.locX, this.locY, this.locZ }));
-            nbttagcompound.set("Motion", this.a(new double[] { this.motX, this.motY, this.motZ }));
+            nbttagcompound.set("Pos", this.a(new double[]{this.locX, this.locY, this.locZ}));
+            nbttagcompound.set("Motion", this.a(new double[]{this.motX, this.motY, this.motZ}));
 
             // CraftBukkit start - Checking for NaN pitch/yaw and resetting to zero
             // TODO: make sure this is the best way to address this.
@@ -1318,7 +1342,7 @@ public abstract class Entity implements ICommandListener {
             }
             // CraftBukkit end
 
-            nbttagcompound.set("Rotation", this.a(new float[] { this.yaw, this.pitch }));
+            nbttagcompound.set("Rotation", this.a(new float[]{this.yaw, this.pitch}));
             nbttagcompound.setFloat("FallDistance", this.fallDistance);
             nbttagcompound.setShort("Fire", (short) this.fireTicks);
             nbttagcompound.setShort("Air", (short) this.getAirTicks());
@@ -1377,11 +1401,11 @@ public abstract class Entity implements ICommandListener {
              * if (Math.abs(this.motX) > 10.0D) {
              * this.motX = 0.0D;
              * }
-             * 
+             *
              * if (Math.abs(this.motY) > 10.0D) {
              * this.motY = 0.0D;
              * }
-             * 
+             *
              * if (Math.abs(this.motZ) > 10.0D) {
              * this.motZ = 0.0D;
              * }
@@ -1550,7 +1574,7 @@ public abstract class Entity implements ICommandListener {
             // CraftBukkit end
             EntityItem entityitem = this instanceof EntityHuman
                     ? new EntityItem(this.world, this.locX, this.locY + (double) f, this.locZ, itemstack,
-                            (EntityHuman) this)
+                    (EntityHuman) this)
                     : new EntityItem(this.world, this.locX, this.locY + (double) f, this.locZ, itemstack);
 
             entityitem.p();
@@ -2058,9 +2082,9 @@ public abstract class Entity implements ICommandListener {
 
     public String toString() {
         return String.format("%s[\'%s\'/%d, l=\'%s\', x=%.2f, y=%.2f, z=%.2f]",
-                new Object[] { this.getClass().getSimpleName(), this.getName(), Integer.valueOf(this.id),
+                new Object[]{this.getClass().getSimpleName(), this.getName(), Integer.valueOf(this.id),
                         this.world == null ? "~NULL~" : this.world.getWorldData().getName(), Double.valueOf(this.locX),
-                        Double.valueOf(this.locY), Double.valueOf(this.locZ) });
+                        Double.valueOf(this.locY), Double.valueOf(this.locZ)});
     }
 
     public boolean isInvulnerable(DamageSource damagesource) {
@@ -2092,7 +2116,7 @@ public abstract class Entity implements ICommandListener {
             // WorldServer worldserver1 = minecraftserver.getWorldServer(i);
             WorldServer exitWorld = null;
             if (this.dimension < CraftWorld.CUSTOM_DIMENSION_OFFSET) { // Plugins must specify exit from custom Bukkit
-                                                                       // worlds
+                // worlds
                 // Only target existing worlds (compensate for allow-nether/allow-end as false)
                 for (WorldServer world : minecraftserver.worlds) {
                     if (world.dimension == i) {
@@ -2106,19 +2130,19 @@ public abstract class Entity implements ICommandListener {
                     ? minecraftserver.getPlayerList().calculateTarget(enter, minecraftserver.getWorldServer(i))
                     : null;
             boolean useTravelAgent = exitWorld != null && !(this.dimension == 1 && exitWorld.dimension == 1); // don't
-                                                                                                              // use
-                                                                                                              // agent
-                                                                                                              // for
-                                                                                                              // custom
-                                                                                                              // worlds
-                                                                                                              // or
-                                                                                                              // return
-                                                                                                              // from
-                                                                                                              // THE_END
+            // use
+            // agent
+            // for
+            // custom
+            // worlds
+            // or
+            // return
+            // from
+            // THE_END
 
             TravelAgent agent = exit != null ? (TravelAgent) ((CraftWorld) exit.getWorld()).getHandle().getTravelAgent()
                     : org.bukkit.craftbukkit.CraftTravelAgent.DEFAULT; // return arbitrary TA to compensate for
-                                                                       // implementation dependent plugins
+            // implementation dependent plugins
             EntityPortalEvent event = new EntityPortalEvent(this.getBukkitEntity(), enter, exit, agent);
             event.useTravelAgent(useTravelAgent);
             event.getEntity().getServer().getPluginManager().callEvent(event);
@@ -2168,7 +2192,7 @@ public abstract class Entity implements ICommandListener {
                  * CraftBukkit start - We need to do this...
                  * if (j == 1 && i == 1) {
                  * BlockPosition blockposition = this.world.r(worldserver1.getSpawn());
-                 * 
+                 *
                  * entity.setPositionRotation(blockposition, entity.yaw, entity.pitch);
                  * }
                  * // CraftBukkit end
@@ -2238,12 +2262,12 @@ public abstract class Entity implements ICommandListener {
             }
         });
         crashreportsystemdetails.a("Entity\'s Exact location", (Object) String.format("%.2f, %.2f, %.2f",
-                new Object[] { Double.valueOf(this.locX), Double.valueOf(this.locY), Double.valueOf(this.locZ) }));
+                new Object[]{Double.valueOf(this.locX), Double.valueOf(this.locY), Double.valueOf(this.locZ)}));
         crashreportsystemdetails.a("Entity\'s Block location",
                 (Object) CrashReportSystemDetails.a((double) MathHelper.floor(this.locX),
                         (double) MathHelper.floor(this.locY), (double) MathHelper.floor(this.locZ)));
         crashreportsystemdetails.a("Entity\'s Momentum", (Object) String.format("%.2f, %.2f, %.2f",
-                new Object[] { Double.valueOf(this.motX), Double.valueOf(this.motY), Double.valueOf(this.motZ) }));
+                new Object[]{Double.valueOf(this.motX), Double.valueOf(this.motY), Double.valueOf(this.motZ)}));
         crashreportsystemdetails.a("Entity\'s Rider", new Callable() {
             public String a() throws Exception {
                 return Entity.this.passenger.toString();

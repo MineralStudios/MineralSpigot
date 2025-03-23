@@ -7,6 +7,7 @@ import com.mojang.authlib.GameProfile;
 import gg.mineral.api.knockback.Knockback;
 import gg.mineral.server.combat.KnockbackProfile;
 import gg.mineral.server.combat.KnockbackProfileList;
+import gg.mineral.server.combat.LagCompensator;
 import gg.mineral.server.config.GlobalConfig;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.local.LocalChannel;
@@ -30,6 +31,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import net.md_5.bungee.api.chat.BaseComponent;
 
 import net.minecraft.server.*;
@@ -183,7 +185,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     // Paper start
     @Override
     public void sendMessage(BaseComponent component) {
-        sendMessage(new BaseComponent[] { component });
+        sendMessage(new BaseComponent[]{component});
     }
 
     @Override
@@ -206,8 +208,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public void setPlayerListHeaderFooter(BaseComponent header, BaseComponent footer) {
-        this.setPlayerListHeaderFooter(header == null ? null : new BaseComponent[] { header },
-                footer == null ? null : new BaseComponent[] { footer });
+        this.setPlayerListHeaderFooter(header == null ? null : new BaseComponent[]{header},
+                footer == null ? null : new BaseComponent[]{footer});
     }
 
     @Override
@@ -224,7 +226,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public void setSubtitle(BaseComponent subtitle) {
-        setSubtitle(new BaseComponent[] { subtitle });
+        setSubtitle(new BaseComponent[]{subtitle});
     }
 
     @Override
@@ -235,12 +237,12 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public void showTitle(BaseComponent title) {
-        showTitle(new BaseComponent[] { title });
+        showTitle(new BaseComponent[]{title});
     }
 
     @Override
     public void showTitle(BaseComponent[] title, BaseComponent[] subtitle, int fadeInTicks, int stayTicks,
-            int fadeOutTicks) {
+                          int fadeOutTicks) {
         setTitleTimes(fadeInTicks, stayTicks, fadeOutTicks);
         setSubtitle(subtitle);
         showTitle(title);
@@ -248,7 +250,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public void showTitle(BaseComponent title, BaseComponent subtitle, int fadeInTicks, int stayTicks,
-            int fadeOutTicks) {
+                          int fadeOutTicks) {
         setTitleTimes(fadeInTicks, stayTicks, fadeOutTicks);
         setSubtitle(subtitle);
         showTitle(title);
@@ -510,27 +512,27 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          * int x = loc.getBlockX();
          * int y = loc.getBlockY();
          * int z = loc.getBlockZ();
-         * 
+         *
          * int cx = x >> 4;
          * int cz = z >> 4;
-         * 
+         *
          * if (sx <= 0 || sy <= 0 || sz <= 0) {
          * return false;
          * }
-         * 
+         *
          * if ((x + sx - 1) >> 4 != cx || (z + sz - 1) >> 4 != cz || y < 0 || y + sy >
          * 128) {
          * return false;
          * }
-         * 
+         *
          * if (data.length != (sx * sy * sz * 5) / 2) {
          * return false;
          * }
-         * 
+         *
          * Packet51MapChunk packet = new Packet51MapChunk(x, y, z, sx, sy, sz, data);
-         * 
+         *
          * getHandle().playerConnection.sendPacket(packet);
-         * 
+         *
          * return true;
          */
 
@@ -585,6 +587,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
             return false;
         }
 
+        LagCompensator.INSTANCE.registerMovement(this, to); // Nacho
         // If this player is riding another entity, we must dismount before teleporting.
         entity.mount(null);
 
@@ -1164,7 +1167,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public void sendEquipmentChange(org.bukkit.entity.LivingEntity entity, org.bukkit.inventory.EquipmentSlot slot,
-            org.bukkit.inventory.ItemStack item) {
+                                    org.bukkit.inventory.ItemStack item) {
         Preconditions.checkArgument(entity != null, "entity must not be null");
         Preconditions.checkArgument(slot != null, "slot must not be null");
         Preconditions.checkArgument(item != null, "item must not be null");
@@ -1461,7 +1464,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     @Override
     public void setFlying(boolean value) {
         boolean needsUpdate = getHandle().abilities.isFlying != value; // PaperSpigot - Only refresh abilities if needed
-                                                                       // // PandaSpigot - Fix GH-37
+        // // PandaSpigot - Fix GH-37
         if (!getAllowFlight() && value) {
             throw new IllegalArgumentException("Cannot make player fly if getAllowFlight() is false");
         }
@@ -1742,7 +1745,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
         @Override
         public void playEffect(Location location, Effect effect, int id, int data, float offsetX, float offsetY,
-                float offsetZ, float speed, int particleCount, int radius) {
+                               float offsetZ, float speed, int particleCount, int radius) {
             Validate.notNull(location, "Location cannot be null");
             Validate.notNull(effect, "Effect cannot be null");
             Validate.notNull(location.getWorld(), "World cannot be null");
@@ -1759,9 +1762,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
                         particle = p;
                         if (effect.getData() != null) {
                             if (effect.getData().equals(org.bukkit.Material.class)) {
-                                extra = new int[] { id };
+                                extra = new int[]{id};
                             } else {
-                                extra = new int[] { (data << 12) | (id & 0xFFF) };
+                                extra = new int[]{(data << 12) | (id & 0xFFF)};
                             }
                         }
                         break;
@@ -1806,7 +1809,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
         @Override
         public void sendMessage(BaseComponent component) {
-            sendMessage(new BaseComponent[] { component });
+            sendMessage(new BaseComponent[]{component});
         }
 
         @Override

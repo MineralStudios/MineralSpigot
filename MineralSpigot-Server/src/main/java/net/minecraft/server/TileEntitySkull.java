@@ -3,6 +3,7 @@ package net.minecraft.server;
 import com.google.common.collect.Iterables;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+
 import java.util.UUID;
 
 // Spigot start
@@ -10,6 +11,7 @@ import com.google.common.base.Predicate;
 import com.google.common.cache.LoadingCache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -31,13 +33,11 @@ public class TileEntitySkull extends TileEntity {
                     .build()
     );
     public static final LoadingCache<String, GameProfile> skinCache = CacheBuilder.newBuilder()
-            .maximumSize( 5000 )
-            .expireAfterAccess( 60, TimeUnit.MINUTES )
-            .build( new CacheLoader<String, GameProfile>()
-            {
+            .maximumSize(5000)
+            .expireAfterAccess(60, TimeUnit.MINUTES)
+            .build(new CacheLoader<String, GameProfile>() {
                 @Override
-                public GameProfile load(String key) throws Exception
-                {
+                public GameProfile load(String key) throws Exception {
                     final GameProfile[] profiles = new GameProfile[1];
                     ProfileLookupCallback gameProfileLookup = new ProfileLookupCallback() {
 
@@ -52,33 +52,32 @@ public class TileEntitySkull extends TileEntity {
                         }
                     };
 
-                    MinecraftServer.getServer().getGameProfileRepository().findProfilesByNames(new String[] { key }, Agent.MINECRAFT, gameProfileLookup);
+                    MinecraftServer.getServer().getGameProfileRepository().findProfilesByNames(new String[]{key}, Agent.MINECRAFT, gameProfileLookup);
 
-                    GameProfile profile = profiles[ 0 ];
+                    GameProfile profile = profiles[0];
                     if (profile == null) {
                         UUID uuid = EntityHuman.a(new GameProfile(null, key));
                         profile = new GameProfile(uuid, key);
 
                         gameProfileLookup.onProfileLookupSucceeded(profile);
-                    } else
-                    {
+                    } else {
 
-                        Property property = Iterables.getFirst( profile.getProperties().get( "textures" ), null );
+                        Property property = Iterables.getFirst(profile.getProperties().get("textures"), null);
 
-                        if ( property == null )
-                        {
-                            profile = MinecraftServer.getServer().aD().fillProfileProperties( profile, true );
+                        if (property == null) {
+                            profile = MinecraftServer.getServer().aD().fillProfileProperties(profile, true);
                         }
                     }
 
 
                     return profile;
                 }
-            } );
-    
+            });
+
     // Spigot end
 
-    public TileEntitySkull() {}
+    public TileEntitySkull() {
+    }
 
     public void b(NBTTagCompound nbttagcompound) {
         super.b(nbttagcompound);
@@ -137,7 +136,7 @@ public class TileEntitySkull extends TileEntity {
     private void e() {
         // Spigot start
         GameProfile profile = this.g;
-        setSkullType( 0 ); // Work around client bug
+        setSkullType(0); // Work around client bug
         b(profile, new Predicate<GameProfile>() {
 
             @Override
@@ -150,7 +149,7 @@ public class TileEntitySkull extends TileEntity {
                 }
                 return false;
             }
-        }); 
+        });
         // Spigot end
     }
 
@@ -162,14 +161,14 @@ public class TileEntitySkull extends TileEntity {
             } else if (MinecraftServer.getServer() == null) {
                 callback.apply(gameprofile);
             } else {
-                GameProfile profile = skinCache.getIfPresent(gameprofile.getName());
+                GameProfile profile = skinCache.getIfPresent(gameprofile.getName().toLowerCase());
                 if (profile != null && Iterables.getFirst(profile.getProperties().get("textures"), (Object) null) != null) {
                     callback.apply(profile);
                 } else {
                     executor.execute(new Runnable() {
                         @Override
                         public void run() {
-                            final GameProfile profile = skinCache.getUnchecked(gameprofile.getName().toLowerCase());                            
+                            final GameProfile profile = skinCache.getUnchecked(gameprofile.getName().toLowerCase());
                             MinecraftServer.getServer().processQueue.add(new Runnable() {
                                 @Override
                                 public void run() {

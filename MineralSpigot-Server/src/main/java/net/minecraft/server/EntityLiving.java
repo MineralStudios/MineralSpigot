@@ -44,6 +44,7 @@ public abstract class EntityLiving extends Entity {
     @Setter
     @Nullable
     protected KnockbackProfile kbProfile = null;
+    public boolean extraKnockback = true;
 
     private static final UUID a = UUID.fromString("662A6B8D-DA3E-4C1C-8813-96EA6097278D");
     private static final AttributeModifier b = (new AttributeModifier(EntityLiving.a, "Sprinting speed boost",

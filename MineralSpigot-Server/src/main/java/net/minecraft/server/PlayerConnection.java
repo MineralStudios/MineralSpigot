@@ -1462,6 +1462,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
 
             case 3:
                 this.player.setSprinting(true);
+                this.player.extraKnockback = true;
                 break;
 
             case 4:

@@ -389,7 +389,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
                 || packet instanceof PacketPlayOutKickDisconnect; // no delay for certain packets
         // PandaSpigot end - add flush parameter
         final EnumProtocol enumprotocol = EnumProtocol.a(packet);
-        final EnumProtocol enumprotocol1 = (EnumProtocol) this.channel.attr(NetworkManager.c).get();
+        final EnumProtocol enumprotocol1 = this.channel.attr(NetworkManager.c).get();
 
         if (enumprotocol1 != enumprotocol) {
             NetworkManager.g.debug("Disabled auto read");

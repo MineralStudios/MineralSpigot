@@ -16,17 +16,17 @@ public class PacketPlayInUseEntity implements Packet<PacketListenerPlayIn> {
     private Vec3D c;
 
     public PacketPlayInUseEntity(int i,
-            PacketPlayInUseEntity.EnumEntityUseAction packetplayinuseentity_enumentityuseaction) {
+                                 PacketPlayInUseEntity.EnumEntityUseAction packetplayinuseentity_enumentityuseaction) {
         this(i, packetplayinuseentity_enumentityuseaction, null);
     }
 
     public void a(PacketDataSerializer packetdataserializer) throws IOException {
         this.a = packetdataserializer.e();
-        this.action = (PacketPlayInUseEntity.EnumEntityUseAction) packetdataserializer
-                .a(PacketPlayInUseEntity.EnumEntityUseAction.class);
+        this.action = packetdataserializer
+                .a(EnumEntityUseAction.class);
         if (this.action == PacketPlayInUseEntity.EnumEntityUseAction.INTERACT_AT) {
-            this.c = new Vec3D((double) packetdataserializer.readFloat(), (double) packetdataserializer.readFloat(),
-                    (double) packetdataserializer.readFloat());
+            this.c = new Vec3D(packetdataserializer.readFloat(), packetdataserializer.readFloat(),
+                    packetdataserializer.readFloat());
         }
 
     }

@@ -247,7 +247,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
                 val player = playerConnection.player;
                 val backtrackSystem = player.getBacktrackSystem();
                 int currentDelay = backtrackSystem.isEnabled() && packet instanceof PacketPlayInFlying
-                        ? backtrackSystem.getCurrentDelay()
+                        ? Math.max(0, backtrackSystem.getCurrentDelay() - player.ping)
                         : 0;
 
                 // System.out.println("Receiving packet with delay: " + currentDelay + "ms");

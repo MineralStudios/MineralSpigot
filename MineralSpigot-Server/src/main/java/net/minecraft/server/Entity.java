@@ -1189,24 +1189,30 @@ public abstract class Entity implements ICommandListener {
 
     // WindSpigot start
     public double distanceSqrdAccurate(Entity entity) {
-        EntityPlayer entityPlayer = (EntityPlayer) entity;
-        EntityPlayer player = (EntityPlayer) this;
+        // Only use lag compensation when both entities are players
+        if (entity instanceof EntityPlayer && this instanceof EntityPlayer) {
+            EntityPlayer entityPlayer = (EntityPlayer) entity;
+            EntityPlayer player = (EntityPlayer) this;
 
-        Location loc;
-        if (entityPlayer.playerConnection.getClass().equals(PlayerConnection.class)
-                && player.playerConnection.getClass().equals(PlayerConnection.class)) {
-            loc = LagCompensator.INSTANCE.getHistoryLocation(entityPlayer.getBukkitEntity(),
-                    player.ping);
+            Location loc;
+            if (entityPlayer.playerConnection.getClass().equals(PlayerConnection.class)
+                    && player.playerConnection.getClass().equals(PlayerConnection.class)) {
+                loc = LagCompensator.INSTANCE.getHistoryLocation(entityPlayer.getBukkitEntity(),
+                        player.ping);
+            } else {
+                loc = entityPlayer.getBukkitEntity().getLocation();
+            }
+            // Nacho end
+
+            double d0 = this.locX - loc.getX();
+            double d1 = this.locY - loc.getY();
+            double d2 = this.locZ - loc.getZ();
+
+            return d0 * d0 + d1 * d1 + d2 * d2;
         } else {
-            loc = entityPlayer.getBukkitEntity().getLocation();
+            // Fall back to regular distance calculation for non-player entities
+            return this.h(entity);
         }
-        // Nacho end
-
-        double d0 = this.locX - loc.getX();
-        double d1 = this.locY - loc.getY();
-        double d2 = this.locZ - loc.getZ();
-
-        return d0 * d0 + d1 * d1 + d2 * d2;
     }
     // WindSpigot end
 

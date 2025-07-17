@@ -675,6 +675,7 @@ public class GlobalConfig {
 
         commands.put("restart", new RestartCommand("restart"));
         commands.put("tps", new TicksPerSecondCommand("tps"));
+        commands.put("kb", new gg.mineral.server.command.KnockbackCommand("kb"));
 
         for (Map.Entry<String, Command> entry : commands.entrySet())
             server.getCommandMap().register(entry.getKey(), "Spigot", entry.getValue());

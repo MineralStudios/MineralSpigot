@@ -686,6 +686,9 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
         switch (PlayerConnection.SyntheticClass_1.a[packetplayinblockdig.c().ordinal()]) {
             case 1: // DROP_ITEM
                 if (!this.player.isSpectator()) {
+                    if (this.player.bS()) {
+                        this.player.bU();
+                    }
                     // limit how quickly items can be dropped
                     // If the ticks aren't the same then the count starts from 0 and we update the
                     // lastDropTick.
@@ -709,6 +712,9 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
 
             case 2: // DROP_ALL_ITEMS
                 if (!this.player.isSpectator()) {
+                    if (this.player.bS()) {
+                        this.player.bU();
+                    }
                     this.player.a(true);
                 }
 
@@ -1105,6 +1111,9 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                 return;
             }
             // CraftBukkit end
+            if (this.player.bS()) {
+                this.player.bU();
+            }
             this.player.inventory.itemInHandIndex = packetplayinhelditemslot.a();
             this.player.resetIdleTimer();
         } else {

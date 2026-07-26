@@ -1096,9 +1096,7 @@ public abstract class EntityHuman extends EntityLiving {
                         if (i > 0) {
 
                             if (entity instanceof EntityLiving victim) {
-                                val kbProfile = victim.kbProfile != null ? victim.kbProfile
-                                        : victim.maxNoDamageTicks < 10 ? KnockbackProfileList.getComboKnockbackProfile()
-                                                : KnockbackProfileList.getDefaultKnockbackProfile();
+                                val kbProfile = victim.getEffectiveKBProfile();
                                 kbProfile.callSecondStage(
                                         this, victim, EnchantmentManager.a((EntityLiving) this));
                             } else {

@@ -771,6 +771,16 @@ public abstract class EntityLiving extends Entity {
                 boolean flag = true;
 
                 if ((float) this.noDamageTicks > (float) this.maxNoDamageTicks / 2.0F) {
+                    // Mineral start - configurable double damage (knockback profile)
+                    val kbProfile = getEffectiveKBProfile();
+
+                    if (damagesource.p().equalsIgnoreCase("player") && kbProfile != null
+                            && !kbProfile.isDoubleDamage()) {
+                        this.forceExplosionKnockback = true;
+                        return false;
+                    }
+                    // Mineral end
+
                     if (f <= this.lastDamage) {
                         this.forceExplosionKnockback = true; // CraftBukkit - SPIGOT-949 - for vanilla consistency,
                         // cooldown does not prevent explosion knockback
@@ -945,13 +955,17 @@ public abstract class EntityLiving extends Entity {
     protected void dropEquipment(boolean flag, int i) {
     }
 
+    public KnockbackProfile getEffectiveKBProfile() {
+        return this.kbProfile != null ? this.kbProfile
+                : this.maxNoDamageTicks < 10 ? KnockbackProfileList.getComboKnockbackProfile()
+                        : KnockbackProfileList.getDefaultKnockbackProfile();
+    }
+
     public void a(Entity entity, float f, double d0, double d1, DamageSource damagesource) {
         if (this.random.nextDouble() >= this.getAttributeInstance(GenericAttributes.c).getValue()) {
             this.ai = true;
 
-            val kbProfile = this.kbProfile != null ? this.kbProfile
-                    : this.maxNoDamageTicks < 10 ? KnockbackProfileList.getComboKnockbackProfile()
-                    : KnockbackProfileList.getDefaultKnockbackProfile();
+            val kbProfile = getEffectiveKBProfile();
 
             if (damagesource.p().equalsIgnoreCase("player") && entity instanceof EntityLiving living && kbProfile != null)
                 kbProfile.callFirstStage(living, this);

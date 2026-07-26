@@ -100,9 +100,13 @@ public class PlayerAttack implements Runnable {
     @Override
     public void run() {
 
-        if ((float) entity.noDamageTicks > (float) entity.maxNoDamageTicks / 2.0F) {
+        // Mineral start - configurable double damage (knockback profile)
+        boolean invulnerable = (float) entity.noDamageTicks > (float) entity.maxNoDamageTicks / 2.0F;
+
+        if (invulnerable && (knockback == null || !knockback.isDoubleDamage())) {
             return;
         }
+        // Mineral end
 
         if (attacker.playerInteractManager.getGameMode() == WorldSettings.EnumGamemode.SPECTATOR) {
             attacker.setSpectatorTarget(entity);
@@ -159,18 +163,35 @@ public class PlayerAttack implements Runnable {
 
         entity.aB = 1.5F;
 
-        if (!damageAllowed(attackDamage)) {
-            return;
+        // Mineral start - configurable double damage (knockback profile)
+        // Matches vanilla: a hit landing inside the invulnerability window only deals
+        // the amount by which it exceeds the last hit, and produces no knockback,
+        // hurt animation or sound.
+        if (invulnerable) {
+            if (attackDamage <= entity.lastDamage) {
+                return;
+            }
+
+            if (!damageAllowed(attackDamage - entity.lastDamage)) {
+                return;
+            }
+
+            entity.lastDamage = attackDamage;
+        } else {
+            if (!damageAllowed(attackDamage)) {
+                return;
+            }
+
+            entity.lastDamage = attackDamage;
+            entity.noDamageTicks = entity.maxNoDamageTicks;
+            entity.hurtTicks = entity.av = 10;
+
+            executeKnockback();
+            entity.world.broadcastEntityEffect(entity, (byte) 2);
+            entity.makeSound("game.player.hurt", 1.0F, (random.nextFloat()
+                    - random.nextFloat()) * 0.2F + 1.0F);
         }
-
-        entity.lastDamage = attackDamage;
-        entity.noDamageTicks = entity.maxNoDamageTicks;
-        entity.hurtTicks = entity.av = 10;
-
-        executeKnockback();
-        entity.world.broadcastEntityEffect(entity, (byte) 2);
-        entity.makeSound("game.player.hurt", 1.0F, (random.nextFloat()
-                - random.nextFloat()) * 0.2F + 1.0F);
+        // Mineral end
 
         if (fireAspectLevel > 0 && !entity.isBurning()) {
             EntityCombustByEntityEvent combustEvent = new EntityCombustByEntityEvent(attacker.getBukkitEntity(),

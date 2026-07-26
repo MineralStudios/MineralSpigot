@@ -2,6 +2,12 @@
 import net.minecraft.server.v1_8_R3.EntityLiving
 import gg.mineral.server.combat.KnockbackProtocol
 
+// Combat values
+// When true, a player hit while still invulnerable takes the amount by which the
+// new hit exceeds the last one (vanilla "double damage"), with no extra knockback,
+// hurt animation or sound. When false, such hits are ignored entirely.
+doubleDamage = false
+
 // Knockback values
 friction = 3.5
 horizontal = 0.325

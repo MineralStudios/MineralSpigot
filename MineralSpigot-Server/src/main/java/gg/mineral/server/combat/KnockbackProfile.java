@@ -23,6 +23,7 @@ public class KnockbackProfile extends Knockback {
     private Binding binding;
     private KnockbackProtocol protocol;
     private int attackBuffer = 0;
+    private boolean doubleDamage = false;
 
     public static KnockbackProfile createNew(String name) throws KBProfileAlreadyExistsException, IOException {
         val knockbackFolder = new File("knockback");
@@ -65,6 +66,7 @@ public class KnockbackProfile extends Knockback {
             configValues.putAll(binding.getVariables());
 
             this.attackBuffer = (int) configValues.getOrDefault("attackBuffer", 0);
+            this.doubleDamage = (boolean) configValues.getOrDefault("doubleDamage", false);
 
             protocol = (KnockbackProtocol) configValues.get("protocol");
 

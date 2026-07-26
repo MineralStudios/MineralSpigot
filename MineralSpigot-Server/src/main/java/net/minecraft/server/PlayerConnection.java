@@ -1592,10 +1592,7 @@ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerList
                     }
 
                     if (entity instanceof EntityPlayer lastAttackedEntity) {
-                        val kbProfile = lastAttackedEntity.kbProfile != null ? lastAttackedEntity.kbProfile
-                                : lastAttackedEntity.maxNoDamageTicks < 10
-                                ? KnockbackProfileList.getComboKnockbackProfile()
-                                : KnockbackProfileList.getDefaultKnockbackProfile();
+                        val kbProfile = lastAttackedEntity.getEffectiveKBProfile();
 
                         if (kbProfile != null) {
                             int attackBuffer = kbProfile.getAttackBuffer();
